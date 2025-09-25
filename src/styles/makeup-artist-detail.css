@@ -1,0 +1,175 @@
+/* Makeup Artist Detail Page Styles */
+.makeup-portfolio-slider {
+  padding-bottom: 40px;
+}
+
+.makeup-portfolio-slider .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: rgba(233, 30, 99, 0.5);
+  opacity: 1;
+}
+
+.makeup-portfolio-slider .swiper-pagination-bullet-active {
+  background: #E91E63;
+  transform: scale(1.2);
+}
+
+.makeup-portfolio-slider .swiper-button-next,
+.makeup-portfolio-slider .swiper-button-prev {
+  color: #E91E63;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.makeup-portfolio-slider .swiper-button-next:after,
+.makeup-portfolio-slider .swiper-button-prev:after {
+  font-size: 18px;
+}
+
+.portfolio-item {
+  overflow: hidden;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.portfolio-item:hover {
+  transform: translateY(-5px);
+}
+
+.portfolio-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(233, 30, 99, 0.8) 100%);
+  opacity: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+  opacity: 1;
+}
+
+.portfolio-info {
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.portfolio-item:hover .portfolio-info {
+  transform: translateY(0);
+}
+
+.description-content {
+  font-size: 1rem;
+  color: #666;
+}
+
+.map-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.map-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+/* Enhanced Feedback Section */
+.feedback-rating-box {
+  padding: 2rem;
+  background: linear-gradient(45deg, #E91E63, #ad1457);
+  border-radius: 15px;
+  color: white;
+}
+
+.feedback-rating-box .rating-number {
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.feature-tag {
+  background: rgba(255,255,255,0.2);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* Comment Section Enhancements */
+.comment-box {
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.comment-box:hover {
+  transform: translateY(-2px);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.comment-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.comment-meta {
+  flex-grow: 1;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.comment-content {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.comment-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.comment-image {
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.comment-image:hover {
+  transform: scale(1.05);
+}
