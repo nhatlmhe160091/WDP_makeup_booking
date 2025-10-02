@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { useState, useEffect } from "react";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+// import SendRequest from "@quanlysanbong/utils/SendRequest";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -104,9 +104,12 @@ const CarouselComponent = ({ pathUrl }) => {
       spaceBetween={50}
       slidesPerView={1}
       loop={banners.length > 1}
-      autoplay={banners.length > 1 ? { delay: 3000 } : false}
+      autoplay={{
+        delay: 3000,
+        disableOnInteraction: false,
+      }}
       pagination={{ clickable: true }}
-      navigation={banners.length > 1}
+      navigation={false}
       className="mySwiper"
     >
       {banners.map((banner, index) => (
@@ -122,26 +125,24 @@ const CarouselComponent = ({ pathUrl }) => {
             fetchpriority={index === 0 ? "high" : "low"}
           />
           <div className="carousel-caption">
-            <div className="container">
-              <div className="row gx-5 justify-content-end">
-                <div className="col-xl-7">
-                  <div className="text-sm-center text-md-end">
-                    <h4 className="text-uppercase fw-bold mb-4" style={{ color: "#E91E63" }}>Chào Mừng Đến Với {WEB_NAME}</h4>
-                    <h1 className="display-4 text-uppercase text-white mb-4">{banner.title}</h1>
-                    <p className="mb-5 fs-5">{banner.description}</p>
-                    <div className="d-flex justify-content-center justify-content-md-end">
-                      <a
-                        className="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2"
-                        href={VIDEO_LINK}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <i className="fas fa-play-circle me-2"></i> Xem Video
-                      </a>
-                      <Link className="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="/dich-vu">
-                        Đặt Lịch Makeup
-                      </Link>
-                    </div>
+            <div className="container-fluid d-flex justify-content-start align-items-center h-100 ps-4 ps-md-5" style={{ height: '100%' }}>
+              <div className="col-xl-7 col-lg-8 col-md-10 col-12">
+                <div className="text-start">
+                  <h4 className="text-uppercase fw-bold mb-4" style={{ color: "#E91E63" }}>Chào Mừng Đến Với {WEB_NAME}</h4>
+                  <h1 className="display-4 text-uppercase text-white mb-4">{banner.title}</h1>
+                  <p className="mb-5 fs-5">{banner.description}</p>
+                  <div className="d-flex justify-content-start">
+                    <a
+                      className="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2"
+                      href={VIDEO_LINK}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <i className="fas fa-play-circle me-2"></i> Xem Video
+                    </a>
+                    <Link className="btn btn-primary rounded-pill py-3 px-4 px-md-5 ms-2" href="/dich-vu">
+                      Đặt Lịch Makeup
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -149,6 +150,13 @@ const CarouselComponent = ({ pathUrl }) => {
           </div>
         </SwiperSlide>
       ))}
+
+      <style jsx global>{`
+        .swiper-button-prev,
+        .swiper-button-next {
+          display: none !important;
+        }
+      `}</style>
     </Swiper>
   );
 };

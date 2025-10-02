@@ -40,20 +40,27 @@ export async function POST(req) {
     const accountsCollection = db.collection("users");
     const tokenCollection = db.collection("tokens");
 
-    const { email, password, address, name, role = ROLE_MANAGER.USER, phone = "" } = await req.json();
+    const { email, password, address, name, role = ROLE_MANAGER.USER, phone = "", cccd } = await req.json();
 
     // role phải thuộc ROLE_MANAGER
     if (!Object.values(ROLE_MANAGER).includes(role)) {
       return NextResponse.json({ success: false, message: "Invalid role" }, { status: 400 });
     }
 
-    // Kiểm tra xem email đã tồn tại chưa
-    const user = await accountsCollection.findOne({
-      email
-    });
 
+    // Kiểm tra xem email đã tồn tại chưa
+    const user = await accountsCollection.findOne({ email });
     if (user) {
       return NextResponse.json({ success: false, message: "Email already exists" }, { status: 400 });
+    }
+
+    // Kiểm tra xem CCCD đã tồn tại chưa
+    if (!cccd) {
+      return NextResponse.json({ success: false, message: "CCCD is required" }, { status: 400 });
+    }
+    const cccdExists = await accountsCollection.findOne({ cccd });
+    if (cccdExists) {
+      return NextResponse.json({ success: false, message: "CCCD already exists" }, { status: 400 });
     }
 
     // Mã hóa mật khẩu trước khi lưu vào database
@@ -65,6 +72,7 @@ export async function POST(req) {
       name,
       address,
       phone,
+      cccd,
       role,
       totalPrice: 0,
       withdrawn: 0,

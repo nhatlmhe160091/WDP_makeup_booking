@@ -8,6 +8,15 @@
     visibility 0s linear 0.5s;
   z-index: 99999;
 }
+/* Accent and utilities */
+:root {
+  --accent: #ff5c95ff;
+}
+
+.accent-text { color: var(--accent) !important; }
+.accent-bg { background-color: rgba(248,187,208,0.08) !important; }
+.rounded-xl { border-radius: 18px !important; }
+
 
 #spinner.show {
   transition:

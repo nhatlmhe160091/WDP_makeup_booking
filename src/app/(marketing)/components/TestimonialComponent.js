@@ -47,10 +47,10 @@ const TestimonialComponent = () => {
   };
 
   return (
-    <div className="container-fluid testimonial pb-5">
+    <div className="container-fluid testimonial pb-5" style={{ background: "rgba(248,187,208,0.08)" }}>
       <div className="container pb-5">
         <div className="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style={{ maxWidth: "800px" }}>
-          <h4 className="text-primary">Đánh Giá</h4>
+          <h4 style={{ color: "#ff5c95ff", fontWeight: 600 }}>Đánh Giá</h4>
           <h1 className="display-5 mb-4">Khách Hàng Nói Gì Về Chúng Tôi?</h1>
           <p className="mb-0">
             Những phản hồi thực tế từ các khách hàng đã trải nghiệm dịch vụ đặt lịch makeup tại hệ thống của chúng tôi.
@@ -60,32 +60,29 @@ const TestimonialComponent = () => {
         <div className="row justify-content-center">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="col-lg-4 col-md-6 col-12 mb-4">
-              <div className="testimonial-item">
-                <div className="testimonial-quote-left">
-                  <i className="fas fa-quote-left fa-2x"></i>
-                </div>
-                <div className="testimonial-img">
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    width={100}
-                    height={100}
-                    className="img-fluid rounded-circle"
-                  />
-                </div>
-                <div className="testimonial-text">
-                  <p className="mb-0">{testimonial.text}</p>
-                </div>
-                <div className="testimonial-title">
-                  <div>
-                    <h4 className="mb-0">{testimonial.name}</h4>
-                    <p className="mb-0">{testimonial.role}</p>
+              <div className="card h-100 rounded-4 shadow-sm p-4">
+                <div className="d-flex align-items-start mb-3">
+                  <div className="me-3 text-muted" style={{ fontSize: '28px' }}>
+                    <i className="fas fa-quote-left" style={{ color: '#ff5c95ff' }}></i>
                   </div>
-                  <div className="d-flex text-primary">{renderStars(testimonial.stars)}</div>
+                  <div className="testimonial-img me-3">
+                    <Image
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      width={80}
+                      height={80}
+                      className="img-fluid rounded-circle"
+                    />
+                  </div>
+                  <div>
+                    <h5 className="mb-0">{testimonial.name}</h5>
+                    <p className="mb-0 text-secondary small">{testimonial.role}</p>
+                  </div>
                 </div>
-                <div className="testimonial-quote-right">
-                  <i className="fas fa-quote-right fa-2x"></i>
+                <div className="testimonial-text mb-3">
+                  <p className="mb-0 text-dark">{testimonial.text}</p>
                 </div>
+                <div className="d-flex justify-content-end text-warning">{renderStars(testimonial.stars)}</div>
               </div>
             </div>
           ))}

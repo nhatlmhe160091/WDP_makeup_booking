@@ -15,6 +15,7 @@ const SignUpComponent = () => {
     province: "",
     email: "",
     phone: "",
+    cccd: "",
     password: "",
     confirmPassword: "",
     acceptTerms: false,
@@ -44,6 +45,39 @@ const SignUpComponent = () => {
     if (!formData.phone) {
       validationErrors.phone = "Số điện thoại là bắt buộc.";
     }
+
+    if (!formData.cccd) {
+      validationErrors.cccd = "CCCD là bắt buộc.";
+    } else if (!/^\d{9,12}$/.test(formData.cccd)) {
+      validationErrors.cccd = "CCCD không hợp lệ.";
+    } else {
+      // Chỉ kiểm tra tuổi khi CCCD là dạng 12 số (mới)
+      if (formData.cccd.length === 12) {
+        const cccd = formData.cccd;
+        const centuryChar = cccd.charAt(3);
+        const yearShortStr = cccd.substring(4, 6);
+
+        const centuryDigit = parseInt(centuryChar, 10);
+        const yearShort = parseInt(yearShortStr, 10);
+
+        if (Number.isNaN(centuryDigit) || Number.isNaN(yearShort)) {
+          validationErrors.cccd = "Số CCCD chứa ký tự không hợp lệ.";
+        } else {
+          // Tính thế kỷ: 0,1 -> 1900; 2,3 -> 2000; 4,5 -> 2100; ...
+          const baseCentury = 1900 + Math.floor(centuryDigit / 2) * 100;
+          const yearFull = baseCentury + yearShort;
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          if (yearFull > currentYear) {
+            validationErrors.cccd = "Số CCCD chứa năm sinh không hợp lệ.";
+          } else if (currentYear - yearFull < 18) {
+            validationErrors.cccd = "Số CCCD cho thấy bạn chưa đủ 18 tuổi.";
+          }
+        }
+      }
+      // Nếu CCCD là cũ (9 số) thì không đủ thông tin để suy năm chính xác -> không kiểm tra tuổi ở đây.
+    }
+
     if (!formData.password) {
       validationErrors.password = "Mật khẩu là bắt buộc.";
     }
@@ -69,7 +103,8 @@ const SignUpComponent = () => {
       setLoading(true);
       const res = await SendRequest("POST", "/api/users", {
         ...formData,
-        address: formData.province
+        address: formData.province,
+        cccd: formData.cccd
       });
       setLoading(false);
 
@@ -165,7 +200,7 @@ const SignUpComponent = () => {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
+                    <label htmlFor="phone" className="form-label">
                       Số điện thoại
                     </label>
                     <input
@@ -179,6 +214,23 @@ const SignUpComponent = () => {
                       required
                     />
                     {errors.phone && <div className="text-danger">{errors.phone}</div>}
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="cccd" className="form-label">
+                      Số CCCD
+                    </label>
+                    <input
+                      disabled={loading}
+                      type="text"
+                      className="form-control"
+                      id="cccd"
+                      value={formData.cccd}
+                      onChange={handleChange}
+                      placeholder="Nhập số CCCD của bạn"
+                      required
+                    />
+                    {errors.cccd && <div className="text-danger">{errors.cccd}</div>}
                   </div>
 
                   <div className="mb-3">
