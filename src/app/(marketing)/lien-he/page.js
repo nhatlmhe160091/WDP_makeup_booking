@@ -29,11 +29,11 @@ export default function ContactPage() {
             <div className="col-xl-6">
               <div className="wow fadeInUp" data-wow-delay="0.2s">
                 <div className="bg-light rounded p-5 mb-5" style={{ border: "1px solid #FED9D5" }}>
-                  <h4 className="mb-4" style={{ color: "#E91E63" }}>Liên Hệ Với Chúng Tôi</h4>
+                  <h4 className="mb-4" style={{ color: "#ff5c95ff" }}>Liên Hệ Với Chúng Tôi</h4>
                   <div className="row g-4">
                     <div className="col-md-6">
                       <div className="contact-add-item">
-                        <div className="contact-icon mb-4" style={{ color: "#E91E63" }}>
+                        <div className="contact-icon mb-4" style={{ color: "#ff5c95ff" }}>
                           <i className="fas fa-map-marker-alt fa-2x"></i>
                         </div>
                         <div>
@@ -44,7 +44,7 @@ export default function ContactPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="contact-add-item">
-                        <div className="contact-icon mb-4" style={{ color: "#E91E63" }}>
+                        <div className="contact-icon mb-4" style={{ color: "#ff5c95ff" }}>
                           <i className="fas fa-paper-plane fa-2x"></i>
                         </div>
                         <div>
@@ -55,7 +55,7 @@ export default function ContactPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="contact-add-item">
-                        <div className="contact-icon mb-4" style={{ color: "#E91E63" }}>
+                        <div className="contact-icon mb-4" style={{ color: "#ff5c95ff" }}>
                           <i className="fas fa-phone fa-2x"></i>
                         </div>
                         <div>
@@ -66,7 +66,7 @@ export default function ContactPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="contact-add-item">
-                        <div className="contact-icon mb-4" style={{ color: "#E91E63" }}>
+                        <div className="contact-icon mb-4" style={{ color: "#ff5c95ff" }}>
                           <i className="fas fa-globe fa-2x"></i>
                         </div>
                         <div>

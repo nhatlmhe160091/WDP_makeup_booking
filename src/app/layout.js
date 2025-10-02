@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
         {/* favicon */}
         <link rel="icon" href="/img/MuaHub.png" />
         <title>MuaHub - Đặt lịch Makeup</title>
-        <meta name="theme-color" content="#E91E63" />
+        <meta name="theme-color" content="#ff5c95ff" />
       </head>
       <body>
         <AppProvider>

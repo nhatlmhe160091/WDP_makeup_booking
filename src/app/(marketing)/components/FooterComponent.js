@@ -12,7 +12,7 @@ const FooterComponent = () => {
             <div className="col-md-6 col-lg-6 col-xl-4">
               <div className="footer-item">
                 <a href="#" className="p-0" style={{ pointerEvents: "none" }}>
-                  <h4 className="text-white" style={{ color: "#E91E63" }}>
+                  <h4 className="text-white" style={{ color: "#ff5c95ff" }}>
                     <i className="fas fa-search-dollar me-3"></i>
                     {WEB_NAME}
                   </h4>
@@ -27,10 +27,10 @@ const FooterComponent = () => {
                     className="d-flex rounded align-items-center py-2 px-3 me-2"
                     style={{ pointerEvents: "none" }}
                   >
-                    <i className="fas fa-apple-alt" style={{ color: "#E91E63" }}></i>
+                    <i className="fas fa-apple-alt" style={{ color: "#ff5c95ff" }}></i>
                     <div className="ms-3">
-                      <small style={{ color: "#E91E63" }}>Tải trên</small>
-                      <h6 style={{ color: "#E91E63" }}>App Store</h6>
+                      <small style={{ color: "#ff5c95ff" }}>Tải trên</small>
+                      <h6 style={{ color: "#ff5c95ff" }}>App Store</h6>
                     </div>
                   </a>
                   <a
@@ -38,7 +38,7 @@ const FooterComponent = () => {
                     className="bg-dark d-flex rounded align-items-center py-2 px-3 ms-2"
                     style={{ pointerEvents: "none" }}
                   >
-                    <i className="fas fa-play" style={{ color: "#E91E63" }}></i>
+                    <i className="fas fa-play" style={{ color: "#ff5c95ff" }}></i>
                     <div className="ms-3">
                       <small className="text-white">Tải trên</small>
                       <h6 className="text-white">Google Play</h6>
@@ -97,19 +97,19 @@ const FooterComponent = () => {
               <div className="footer-item">
                 <h4 className="text-white mb-4">Thông tin liên hệ</h4>
                 <div className="d-flex align-items-center">
-                  <i className="fas fa-map-marker-alt me-3" style={{ color: "#E91E63" }}></i>
+                  <i className="fas fa-map-marker-alt me-3" style={{ color: "#ff5c95ff" }}></i>
                   <p className="text-white mb-0">{ADDRESS}</p>
                 </div>
                 <div className="d-flex align-items-center">
-                  <i className="fas fa-envelope me-3" style={{ color: "#E91E63" }}></i>
+                  <i className="fas fa-envelope me-3" style={{ color: "#ff5c95ff" }}></i>
                   <p className="text-white mb-0">{EMAIL}</p>
                 </div>
                 <div className="d-flex align-items-center">
-                  <i className="fa fa-phone-alt me-3" style={{ color: "#E91E63" }}></i>
+                  <i className="fa fa-phone-alt me-3" style={{ color: "#ff5c95ff" }}></i>
                   <p className="text-white mb-0">{PHONE_NUMBER}</p>
                 </div>
                 <div className="d-flex align-items-center mb-4">
-                  <i className="fab fa-firefox-browser me-3" style={{ color: "#E91E63" }}></i>
+                  <i className="fab fa-firefox-browser me-3" style={{ color: "#ff5c95ff" }}></i>
                   <p className="text-white mb-0">{MAIN_URL_APP}</p>
                 </div>
                 <div className="d-flex">

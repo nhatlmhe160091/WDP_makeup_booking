@@ -11,13 +11,13 @@
 }
 
 .makeup-portfolio-slider .swiper-pagination-bullet-active {
-  background: #E91E63;
+  background: #ff5c95ff;
   transform: scale(1.2);
 }
 
 .makeup-portfolio-slider .swiper-button-next,
 .makeup-portfolio-slider .swiper-button-prev {
-  color: #E91E63;
+  color: #ff5c95ff;
   background: white;
   width: 40px;
   height: 40px;
@@ -92,7 +92,7 @@
 /* Enhanced Feedback Section */
 .feedback-rating-box {
   padding: 2rem;
-  background: linear-gradient(45deg, #E91E63, #ad1457);
+  background: linear-gradient(45deg, #ff5c95ff, #ad1457);
   border-radius: 15px;
   color: white;
 }

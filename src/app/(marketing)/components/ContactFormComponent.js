@@ -3,7 +3,7 @@
 const ContactFormComponent = () => {
   return (
     <div className="bg-light p-5 rounded h-100 wow fadeInUp" data-wow-delay="0.2s" style={{ border: "1px solid #FED9D5" }}>
-      <h4 style={{ color: "#E91E63" }}>Gửi Tin Nhắn</h4>
+      <h4 style={{ color: "#ff5c95ff" }}>Gửi Tin Nhắn</h4>
       <p className="mb-4">
         Bạn có thể điền thông tin vào biểu mẫu dưới đây để chúng tôi hỗ trợ bạn nhanh nhất. Hãy chia sẻ yêu cầu của bạn
         với chúng tôi.

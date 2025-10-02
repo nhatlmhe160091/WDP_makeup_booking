@@ -328,7 +328,7 @@ const SanBongDetail = () => {
                       style={{ 
                         bottom: -5, 
                         right: -5, 
-                        background: '#E91E63', 
+                        background: '#ff5c95ff', 
                         borderRadius: '50%',
                         padding: '4px',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
@@ -339,7 +339,7 @@ const SanBongDetail = () => {
                   </div>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h2 className="mb-1" style={{ color: '#E91E63' }}>{stadiumData.stadiumName}</h2>
+                  <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{stadiumData.stadiumName}</h2>
                   <p className="text-muted mb-0">
                     <i className="fas fa-user-circle me-2"></i>
                     Chuyên viên: <strong>{stadiumData.owner.name}</strong>
@@ -389,7 +389,7 @@ const SanBongDetail = () => {
 
               <div className="mb-4">
                 <h5 className="mb-3">
-                  <i className="fas fa-palette me-2" style={{ color: '#E91E63' }}></i>
+                  <i className="fas fa-palette me-2" style={{ color: '#ff5c95ff' }}></i>
                   Bảng giá dịch vụ
                 </h5>
                 <div className="row g-3">
@@ -421,7 +421,7 @@ const SanBongDetail = () => {
 
               <div className="mb-3">
                 <h5 className="mb-3">
-                  <i className="fas fa-star me-2" style={{ color: '#E91E63' }}></i>
+                  <i className="fas fa-star me-2" style={{ color: '#ff5c95ff' }}></i>
                   Tiện ích & Dịch vụ đi kèm
                 </h5>
                 <div className="d-flex flex-wrap gap-2">
@@ -430,7 +430,7 @@ const SanBongDetail = () => {
                       key={index}
                       className="badge"
                       style={{
-                        background: 'linear-gradient(45deg, #E91E63, #ad1457)',
+                        background: 'linear-gradient(45deg, #ff5c95ff, #ad1457)',
                         color: 'white',
                         padding: '8px 16px',
                         borderRadius: '20px',

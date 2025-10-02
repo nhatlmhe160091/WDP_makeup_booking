@@ -278,7 +278,7 @@ const SignUpComponent = () => {
                         onChange={handleChange}
                       />
                       <label className="form-check-label" htmlFor="acceptTerms">
-                        Tôi đồng ý với các điều khoản sử dụng
+                        Tôi đồng ý với <a href="/contract" target="_blank" rel="noopener noreferrer" style={{color:'#ff5c95', textDecoration:'underline'}}>các điều khoản sử dụng</a>
                       </label>
                     </div>
                     {errors.acceptTerms && <div className="text-danger">{errors.acceptTerms}</div>}

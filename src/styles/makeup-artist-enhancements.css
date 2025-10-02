@@ -1,6 +1,6 @@
 /* Default Makeup Artist Image Styles */
 .default-makeup-image {
-  background: linear-gradient(135deg, #E91E63, #ad1457);
+  background: linear-gradient(135deg, #ff5c95ff, #ad1457);
   display: flex;
   align-items: center;
   justify-content: center;

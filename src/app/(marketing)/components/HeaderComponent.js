@@ -72,7 +72,7 @@ const HeaderComponent = () => {
               alt="MuaHub"
               style={{ height: "180px", objectFit: "contain", mixBlendMode: "darken", backgroundColor: "transparent", marginRight: 0 }}
             />
-            <span style={{ color: "#E91E63", marginLeft: "-20px", fontWeight: 700 }}>{WEB_NAME}</span>
+            <span style={{ color: "#ff5c95ff", marginLeft: "-20px", fontWeight: 700 }}>{WEB_NAME}</span>
           </h1>
         </Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">

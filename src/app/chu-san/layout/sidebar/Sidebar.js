@@ -78,7 +78,7 @@ const MSidebar = ({ isMobileSidebarOpen, onSidebarClose, isSidebarOpen }) => {
                 </a>
                 <Box
                   sx={{
-                    color: "#E91E63",
+                    color: "#ff5c95ff",
                     fontWeight: 700,
                     fontSize: "24px",
                     ml: -4
@@ -147,7 +147,7 @@ const MSidebar = ({ isMobileSidebarOpen, onSidebarClose, isSidebarOpen }) => {
             </a>
             <Box
               sx={{
-                color: "#E91E63",
+                color: "#ff5c95ff",
                 fontWeight: 700,
                 fontSize: "24px",
                 ml: -4

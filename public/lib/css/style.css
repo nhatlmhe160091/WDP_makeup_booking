@@ -77,17 +77,17 @@
 
 .btn.btn-primary:hover {
   background: var(--bs-dark);
-  color: #E91E63;
+  color: #ff5c95ff;
 }
 
 .btn.btn-light {
-  color: #E91E63;
+  color: #ff5c95ff;
   border: none;
 }
 
 .btn.btn-light:hover {
   color: var(--bs-white);
-  background: #E91E63;
+  background: #ff5c95ff;
 }
 
 /*** Topbar Start ***/
@@ -98,11 +98,11 @@
   font-weight: 600;
   vertical-align: middle;
   margin-left: 8px;
-  color: #E91E63;
+  color: #ff5c95ff;
 }
 
 .topbar .dropdown .dropdown-menu a:hover {
-  background: #E91E63;
+  background: #ff5c95ff;
   color: var(--bs-white);
 }
 
@@ -145,7 +145,7 @@
 .navbar-light .navbar-nav .nav-link.active,
 .navbar-light .navbar-nav .nav-item .nav-link:hover,
 .navbar-light .navbar-nav .nav-item .nav-link.active {
-  color: #E91E63;
+  color: #ff5c95ff;
 }
 
 .navbar-light .navbar-brand img {
@@ -167,7 +167,7 @@
 }
 
 .dropdown .dropdown-menu a:hover {
-  background: #E91E63;
+  background: #ff5c95ff;
   color: var(--bs-white);
 }
 

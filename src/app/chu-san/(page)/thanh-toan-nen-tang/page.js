@@ -253,7 +253,7 @@ const WebsitePaymentPage = () => {
         <Chip
           label={paymentTypes[type]?.label || "Chưa xác định"}
           size="large"
-          sx={{ bgcolor: "#E91E63", color: "#fff" }}
+          sx={{ bgcolor: "#ff5c95ff", color: "#fff" }}
         />
       );
     }
@@ -342,9 +342,9 @@ const WebsitePaymentPage = () => {
                     fontWeight: 700,
                     color:
                       key === 'revenue'
-                        ? '#E91E63'
+                        ? '#ff5c95ff'
                         : key === 'monthly_3'
-                        ? '#E91E63'
+                        ? '#ff5c95ff'
                         : key === 'monthly_6'
                         ? 'var(--mui-palette-info-main, #0288d1)'
                         : 'var(--mui-palette-success-main, #2e7d32)'
@@ -377,7 +377,7 @@ const WebsitePaymentPage = () => {
                     borderRadius: 2,
                     fontWeight: 600,
                     ...(currentPlan !== key
-                      ? { bgcolor: '#E91E63', '&:hover': { bgcolor: '#d81b60' } }
+                      ? { bgcolor: '#ff5c95ff', '&:hover': { bgcolor: '#d81b60' } }
                       : {})
                   }}
                   onClick={(e) => {

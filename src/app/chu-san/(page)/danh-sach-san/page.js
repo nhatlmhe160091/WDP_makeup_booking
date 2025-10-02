@@ -100,7 +100,7 @@ const StadiumListPage = () => {
             <Button
               variant="contained"
               startIcon={<Add />}
-              sx={{ bgcolor: "#E91E63", ":hover": { bgcolor: "#d81b60" } }}
+              sx={{ bgcolor: "#ff5c95ff", ":hover": { bgcolor: "#d81b60" } }}
             >
               Thêm dịch vụ mới
             </Button>
@@ -127,7 +127,7 @@ const StadiumListPage = () => {
                   <Button
                     variant="contained"
                     startIcon={<Add />}
-                    sx={{ bgcolor: "#E91E63", ":hover": { bgcolor: "#d81b60" } }}
+                    sx={{ bgcolor: "#ff5c95ff", ":hover": { bgcolor: "#d81b60" } }}
                   >
                     Thêm dịch vụ đầu tiên
                   </Button>

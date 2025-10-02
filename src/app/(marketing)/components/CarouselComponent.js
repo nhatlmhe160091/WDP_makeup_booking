@@ -78,7 +78,7 @@ const CarouselComponent = ({ pathUrl }) => {
                 <Link href={parentPath.path}>{parentPath.name}</Link>
               </li>
             )}
-            <li className="breadcrumb-item active" style={{ color: "#E91E63" }}>{NameStadium}</li>
+            <li className="breadcrumb-item active" style={{ color: "#ff5c95ff" }}>{NameStadium}</li>
           </ol>
         </div>
       </div>
@@ -128,7 +128,7 @@ const CarouselComponent = ({ pathUrl }) => {
             <div className="container-fluid d-flex justify-content-start align-items-center h-100 ps-4 ps-md-5" style={{ height: '100%' }}>
               <div className="col-xl-7 col-lg-8 col-md-10 col-12">
                 <div className="text-start">
-                  <h4 className="text-uppercase fw-bold mb-4" style={{ color: "#E91E63" }}>Chào Mừng Đến Với {WEB_NAME}</h4>
+                  <h4 className="text-uppercase fw-bold mb-4" style={{ color: "#ff5c95ff" }}>Chào Mừng Đến Với {WEB_NAME}</h4>
                   <h1 className="display-4 text-uppercase text-white mb-4">{banner.title}</h1>
                   <p className="mb-5 fs-5">{banner.description}</p>
                   <div className="d-flex justify-content-start">

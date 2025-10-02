@@ -65,7 +65,7 @@
 }
 
 .bg-gradient-pink {
-  background: linear-gradient(45deg, #E91E63, #ad1457) !important;
+  background: linear-gradient(45deg, #ff5c95ff, #ad1457) !important;
   border: none;
   box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
 }
@@ -93,7 +93,7 @@
 }
 
 .btn-gradient-primary {
-  background: linear-gradient(45deg, #E91E63, #ad1457);
+  background: linear-gradient(45deg, #ff5c95ff, #ad1457);
   border: none;
   color: white;
   transition: all 0.3s ease;
@@ -161,7 +161,7 @@
 }
 
 .custom-bullet-active {
-  background: #E91E63 !important;
+  background: #ff5c95ff !important;
   transform: scale(1.2) !important;
   box-shadow: 0 0 10px rgba(233, 30, 99, 0.5) !important;
 }

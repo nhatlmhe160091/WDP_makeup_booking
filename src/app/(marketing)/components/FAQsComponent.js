@@ -60,7 +60,7 @@ const FAQsComponent = () => {
           </div>
           <div className="col-lg-6 wow fadeInRight" data-wow-delay="0.2s">
             <div className="rounded-4 overflow-hidden" style={{ backgroundColor: "rgba(248,187,208,0.12)" }}>
-              <img src="img/about-2.png" className="img-fluid w-100" alt="FAQ Illustration" />
+              <img src="img/ab3.jpg" className="img-fluid w-100" alt="FAQ Illustration" />
             </div>
           </div>
         </div>
