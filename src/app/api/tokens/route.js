@@ -38,7 +38,7 @@ export async function POST(req) {
     const { user_id, email, token, type, status, created_at, expires_at } = await req.json();
 
     if (!user_id || !email || !token || !type || !status || !created_at || !expires_at) {
-      return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Missing required packages" }, { status: 400 });
     }
 
     const result = await tokenCollection.insertOne({

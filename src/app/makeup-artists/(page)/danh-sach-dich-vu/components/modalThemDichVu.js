@@ -116,7 +116,7 @@ const AddServiceModal = ({ open, onClose, onSuccess }) => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [amenities, setAmenities] = useState([]);
-  const [fields, setFields] = useState(fieldSizes);
+  const [packages, setPackages] = useState(fieldSizes);
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -149,7 +149,7 @@ const AddServiceModal = ({ open, onClose, onSuccess }) => {
     setLatitude("");
     setLongitude("");
     setAmenities([]);
-    setFields(fieldSizes);
+    setPackages(fieldSizes);
   };
 
   const handleSubmit = async () => {
@@ -166,7 +166,7 @@ const AddServiceModal = ({ open, onClose, onSuccess }) => {
       }
 
       // Kiểm tra giá & số lượng hợp lệ
-      for (const [key, value] of Object.entries(fields)) {
+      for (const [key, value] of Object.entries(packages)) {
         if (value.isAvailable && (value.price <= 0 || value.count <= 0)) {
           toast.error("Giá và số lượng dịch vụ makeup phải lớn hơn 0");
           return;
@@ -215,7 +215,7 @@ const AddServiceModal = ({ open, onClose, onSuccess }) => {
         openingTime: openingTime.format("HH:mm"),
         closingTime: closingTime.format("HH:mm"),
         images: imgs,
-        fields
+        packages
       };
 
       // Send request
@@ -367,8 +367,8 @@ const AddServiceModal = ({ open, onClose, onSuccess }) => {
             <Grid item xs={12}>
               <Typography variant="h6">Gói dịch vụ và giá</Typography>
               <SelectServiceComponent
-                fields={fields}
-                setFields={setFields}
+                packages={packages}
+                setPackages={setPackages}
                 openingTime={openingTime}
                 closingTime={closingTime}
               />

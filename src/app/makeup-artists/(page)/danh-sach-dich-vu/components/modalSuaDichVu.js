@@ -116,7 +116,7 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [amenities, setAmenities] = useState([]);
-  const [fields, setFields] = useState(fieldSizes);
+  const [packages, setPackages] = useState(fieldSizes);
   const [experienceYears, setExperienceYears] = useState(0);
   const [experienceMonths, setExperienceMonths] = useState(0);
 
@@ -144,16 +144,16 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
       setExperienceYears(serviceData.experienceYears || 0);
       setExperienceMonths(serviceData.experienceMonths || 0);
 
-      // Merge fields data với default fields
-      const mergedFields = { ...fieldSizes };
-      if (serviceData.fields) {
-        Object.keys(serviceData.fields).forEach((key) => {
-          if (mergedFields[key]) {
-            mergedFields[key] = { ...mergedFields[key], ...serviceData.fields[key] };
+      // Merge packages data với default packages
+      const mergedPackages = { ...fieldSizes };
+      if (serviceData.packages) {
+        Object.keys(serviceData.packages).forEach((key) => {
+          if (mergedPackages[key]) {
+            mergedPackages[key] = { ...mergedPackages[key], ...serviceData.packages[key] };
           }
         });
       }
-      setFields(mergedFields);
+      setPackages(mergedPackages);
     }
   }, [open, serviceData]);
 
@@ -195,7 +195,7 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
     setLatitude("");
     setLongitude("");
     setAmenities([]);
-    setFields(fieldSizes);
+    setPackages(fieldSizes);
     setExperienceYears(0);
     setExperienceMonths(0);
   };
@@ -214,7 +214,7 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
       }
 
       // Kiểm tra giá & số lượng hợp lệ
-      for (const [key, value] of Object.entries(fields)) {
+      for (const [key, value] of Object.entries(packages)) {
         if (value.isAvailable && (value.price <= 0 || value.count <= 0)) {
           toast.error("Giá và số lượng dịch vụ makeup phải lớn hơn 0");
           return;
@@ -267,7 +267,7 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
         openingTime: openingTime.format("HH:mm"),
         closingTime: closingTime.format("HH:mm"),
         images: allImages,
-        fields,
+        packages,
         experienceYears: Number.isFinite(Number(experienceYears)) ? Number(experienceYears) : 0,
         experienceMonths: Number.isFinite(Number(experienceMonths)) ? Number(experienceMonths) : 0
       };
@@ -450,8 +450,8 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
             <Grid item xs={12}>
               <Typography variant="h6">Gói dịch vụ và giá</Typography>
               <SelectServiceComponent
-                fields={fields}
-                setFields={setFields}
+                packages={packages}
+                setPackages={setPackages}
                 openingTime={openingTime}
                 closingTime={closingTime}
               />

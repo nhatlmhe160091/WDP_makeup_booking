@@ -104,7 +104,7 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
             <strong>Dịch vụ:</strong>
           </p>
           <div className="services-list mb-3">
-            {Object.values(field.fields || {})
+            {Object.values(field.packages || {})
               .filter((s) => s.isAvailable)
               .slice(0, 3)
               .map((s, index) => (
@@ -113,9 +113,9 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
                   <span className="badge bg-success">{formatCurrency(s.price)}</span>
                 </div>
               ))}
-            {Object.values(field.fields || {}).filter((s) => s.isAvailable).length > 3 && (
+            {Object.values(field.packages || {}).filter((s) => s.isAvailable).length > 3 && (
               <div className="text-center mt-2">
-                <small className="text-muted">+{Object.values(field.fields || {}).filter((s) => s.isAvailable).length - 3} dịch vụ khác</small>
+                <small className="text-muted">+{Object.values(field.packages || {}).filter((s) => s.isAvailable).length - 3} dịch vụ khác</small>
               </div>
             )}
           </div>
@@ -147,10 +147,10 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
             )}
 
             {/* Hiển thị số dịch vụ */}
-            {Object.values(field.fields || {}).filter((s) => s.isAvailable).length > 0 && (
+            {Object.values(field.packages || {}).filter((s) => s.isAvailable).length > 0 && (
               <span className="badge bg-info">
                 <i className="fas fa-palette me-1"></i>
-                {Object.values(field.fields || {}).filter((s) => s.isAvailable).length} dịch vụ
+                {Object.values(field.packages || {}).filter((s) => s.isAvailable).length} dịch vụ
               </span>
             )}
           </div>

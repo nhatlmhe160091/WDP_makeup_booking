@@ -124,7 +124,7 @@ const CreateServicePage = () => {
   const [amenities, setAmenities] = useState([]);
   const [experienceYears, setExperienceYears] = useState(0);
   const [experienceMonths, setExperienceMonths] = useState(0);
-  const [fields, setFields] = useState(fieldSizes);
+  const [packages, setPackages] = useState(fieldSizes);
 
   // Lấy vị trí hiện tại
   const getCurrentLocation = () => {
@@ -176,7 +176,7 @@ const CreateServicePage = () => {
         return;
       }
       // Kiểm tra giá & số lượng hợp lệ
-      for (const [key, value] of Object.entries(fields)) {
+      for (const [key, value] of Object.entries(packages)) {
         if (value.isAvailable && (value.price <= 0 || value.count <= 0)) {
           toast.error("Giá và số lượng dịch vụ makeup phải lớn hơn 0");
           return;
@@ -226,7 +226,7 @@ const CreateServicePage = () => {
         openingTime: openingTime.format("HH:mm"),
         closingTime: closingTime.format("HH:mm"),
         images: imgs,
-        fields,
+        packages,
         experienceYears: Number.isFinite(Number(experienceYears)) ? Number(experienceYears) : 0,
         experienceMonths: Number.isFinite(Number(experienceMonths)) ? Number(experienceMonths) : 0
       };
@@ -244,7 +244,7 @@ const CreateServicePage = () => {
       setLatitude("");
       setLongitude("");
       setAmenities([]);
-      setFields(fieldSizes);
+      setPackages(fieldSizes);
       setExperienceYears(0);
       setExperienceMonths(0);
     } catch (error) {
@@ -408,8 +408,8 @@ const CreateServicePage = () => {
           </Grid>
 
           <SelectServiceComponent
-            fields={fields}
-            setFields={setFields}
+            packages={packages}
+            setPackages={setPackages}
             openingTime={openingTime}
             closingTime={closingTime}
           />

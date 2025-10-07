@@ -118,7 +118,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
       const payload = {
         serviceId: serviceData._id,
         ownerId: serviceData.ownerId,
-        deposit: serviceData.fields[selectedField].price,
+        deposit: serviceData.packages[selectedField].price,
         field: selectedField,
         time: slot.time,
         date: selectedDate,
@@ -192,7 +192,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                 <strong>Ngày đặt:</strong> {convertDateFormat(selectedDate)}
               </div>
               <div className="col-sm-6">
-                <strong>Dịch vụ:</strong> {serviceData.fields[selectedField].name}
+                <strong>Dịch vụ:</strong> {serviceData.packages[selectedField].name}
               </div>
             </div>
 
@@ -211,12 +211,12 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
               <div className="col-sm-6">
                 <strong>Tiền cọc (30%):</strong>
                 <br />
-                {formatCurrency(serviceData.fields[selectedField].price * 0.3 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData.packages[selectedField].price * 0.3 * selectedFieldSlot.length)}
               </div>
               <div className="col-sm-6">
                 <strong>Cần thanh toán (70%):</strong>
                 <br />
-                {formatCurrency(serviceData.fields[selectedField].price * 0.7 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData.packages[selectedField].price * 0.7 * selectedFieldSlot.length)}
               </div>
             </div>
 
@@ -302,8 +302,8 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
             <Form.Group className="mb-3">
               <Form.Label>Chọn dịch vụ</Form.Label>
               <div className="d-flex flex-wrap gap-2">
-                {Object.keys(serviceData.fields).map((field, index) => {
-                  if (!serviceData.fields[field].isAvailable) return null;
+                {Object.keys(serviceData.packages).map((field, index) => {
+                  if (!serviceData.packages[field].isAvailable) return null;
                   return (
                     <Button
                       key={index}
@@ -321,7 +321,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                           color: selectedField === field ? "#fff" : "#adafb3"
                         }}
                       >
-                        {serviceData.fields[field].name}
+                        {serviceData.packages[field].name}
                       </div>
                       <div
                         style={{
@@ -331,7 +331,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                           color: selectedField === field ? "#fff" : "#414142"
                         }}
                       >
-                        {formatCurrency(serviceData.fields[field].price)} VND
+                        {formatCurrency(serviceData.packages[field].price)} VND
                       </div>
                     </Button>
                   );
@@ -341,13 +341,13 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 
             <Form.Group className="mb-3">
               <Form.Label>Chọn khung giờ</Form.Label>
-              {selectedField && serviceData.fields[selectedField] ? (
+              {selectedField && serviceData.packages[selectedField] ? (
                 <div className="table-responsive">
                   <table className="table table-bordered">
                     <thead>
                       <tr>
                         <th style={{ width: "120px", backgroundColor: "#f8f9fa" }}>Khung giờ</th>
-                        {Array.from({ length: serviceData.fields[selectedField].count }, (_, i) => (
+                        {Array.from({ length: serviceData.packages[selectedField].count }, (_, i) => (
                           <th key={i} className="text-center" style={{ backgroundColor: "#f8f9fa" }}>
                             Slot {i + 1}
                           </th>
@@ -355,8 +355,8 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {serviceData.fields[selectedField].timeDetail.map((time, timeIndex) => {
-                        const maxCapacity = serviceData.fields[selectedField].count || 0;
+                      {serviceData.packages[selectedField].timeDetail.map((time, timeIndex) => {
+                        const maxCapacity = serviceData.packages[selectedField].count || 0;
                         // Ẩn khung giờ nếu ngày được chọn là hôm nay và khung giờ đã qua
                         const [startTime] = time.split("-");
                         if (

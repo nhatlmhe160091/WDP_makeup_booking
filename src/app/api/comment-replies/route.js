@@ -30,7 +30,7 @@ export async function POST(req) {
     const body = await req.json();
     const { commentId, userId, content } = body;
     if (!commentId || !userId || !content || content.trim().length === 0) {
-      return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Missing packages" }, { status: 400 });
     }
 
     const doc = {

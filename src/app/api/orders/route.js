@@ -37,9 +37,9 @@ export async function GET(req) {
     let projection = { serviceName: 1, location: 1, locationDetail: 1, openingTime: 1, closingTime: 1 };
     if (date) {
       searchQuery.date = date;
-      projection = { ...projection, fields: 1 };
+      projection = { ...projection, packages: 1 };
     }
-    // fields
+    // packages
 
     // Fetch the orders based on the search query, if any filters were provided
     let orders = await ordersCollection

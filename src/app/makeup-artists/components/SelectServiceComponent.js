@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const types = [5, 7, 11];
 
-const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime }) => {
+const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTime }) => {
   const [viewDetail, setViewDetail] = useState({
     5: false,
     7: false,
@@ -12,39 +12,39 @@ const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime })
 
   // update if openingTime or closingTime change
   useEffect(() => {
-    setFields((prevFields) => {
-      const newFields = { ...prevFields };
+    setPackages((prevPackages) => {
+      const newPackages = { ...prevPackages };
       types.forEach((fieldIndex) => {
-        if (newFields[fieldIndex].isAvailable) {
+        if (newPackages[fieldIndex].isAvailable) {
           const data = generateTimeSlots(
             openingTime.format("HH:mm"),
             closingTime.format("HH:mm"),
-            newFields[fieldIndex].timeMatch
+            newPackages[fieldIndex].timeMatch
           );
-          newFields[fieldIndex].timeDetail = data;
+          newPackages[fieldIndex].timeDetail = data;
         }
       });
-      return newFields;
+      return newPackages;
     });
-  }, [openingTime, closingTime, setFields]);
+  }, [openingTime, closingTime, setPackages]);
 
   const handleFieldChange = (fieldIndex, field, value) => {
-    setFields((prevFields) => {
-      const newFields = { ...prevFields };
-      newFields[fieldIndex] = { ...newFields[fieldIndex], [field]: value };
+    setPackages((prevPackages) => {
+      const newPackages = { ...prevPackages };
+      newPackages[fieldIndex] = { ...newPackages[fieldIndex], [field]: value };
       if (field === "timeMatch") {
         const data = generateTimeSlots(
           openingTime.format("HH:mm"),
           closingTime.format("HH:mm"),
-          newFields[fieldIndex].timeMatch
+          newPackages[fieldIndex].timeMatch
         );
-        newFields[fieldIndex].timeDetail = data;
+        newPackages[fieldIndex].timeDetail = data;
       }
-      return newFields;
+      return newPackages;
     });
   };
 
-  // console.log(fields);
+  // console.log(packages);
 
   function generateTimeSlots(openTime, closeTime, matchDuration) {
     function timeToMinutes(time) {
@@ -90,13 +90,13 @@ const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime })
                   fontWeight: "500"
                 }}
               >
-                {fields[fieldIndex].name}
+                {packages[fieldIndex].name}
               </Typography>
 
               {/* form checkbox */}
               <input
                 type="checkbox"
-                checked={fields[fieldIndex].isAvailable}
+                checked={packages[fieldIndex].isAvailable}
                 style={{ width: "16px", height: "16px" }}
                 onChange={(e) => {
                   handleFieldChange(fieldIndex, "isAvailable", e.target.checked);
@@ -112,11 +112,11 @@ const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime })
                 type="number"
                 fullWidth
                 variant="outlined"
-                value={fields[fieldIndex].price}
+                value={packages[fieldIndex].price}
                 onChange={(e) => {
                   handleFieldChange(fieldIndex, "price", e.target.value);
                 }}
-                disabled={!fields[fieldIndex].isAvailable}
+                disabled={!packages[fieldIndex].isAvailable}
               />
             </Grid>
 
@@ -126,11 +126,11 @@ const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime })
                 type="number"
                 fullWidth
                 variant="outlined"
-                value={fields[fieldIndex].count}
+                value={packages[fieldIndex].count}
                 onChange={(e) => {
                   handleFieldChange(fieldIndex, "count", e.target.value);
                 }}
-                disabled={!fields[fieldIndex].isAvailable}
+                disabled={!packages[fieldIndex].isAvailable}
               />
             </Grid>
 
@@ -140,30 +140,30 @@ const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime })
                 type="number"
                 fullWidth
                 variant="outlined"
-                value={fields[fieldIndex].timeMatch}
+                value={packages[fieldIndex].timeMatch}
                 onChange={(e) => {
                   handleFieldChange(fieldIndex, "timeMatch", e.target.value);
                 }}
-                disabled={!fields[fieldIndex].isAvailable}
+                disabled={!packages[fieldIndex].isAvailable}
               />
             </Grid>
 
             <Grid item xs={12} sx={{ borderBottom: "1px solid #e0e0e0", paddingBottom: 2 }}>
               <Button
                 variant="contained"
-                disabled={!fields[fieldIndex].isAvailable}
+                disabled={!packages[fieldIndex].isAvailable}
                 onClick={() => setViewDetail((prev) => ({ ...prev, [fieldIndex]: !prev[fieldIndex] }))}
               >
                 Chi tiết
               </Button>
 
-              {viewDetail[fieldIndex] && fields[fieldIndex].timeDetail.length > 0 && (
+              {viewDetail[fieldIndex] && packages[fieldIndex].timeDetail.length > 0 && (
                 <Grid item xs={12}>
                   <Typography variant="h6" marginTop={2}>
                     Chi tiết thời gian
                   </Typography>
                   <Grid container spacing={2}>
-                    {fields[fieldIndex].timeDetail.map((time, index) => (
+                    {packages[fieldIndex].timeDetail.map((time, index) => (
                       <Grid item xs={3} key={index}>
                         <Typography>{time}</Typography>
                       </Grid>

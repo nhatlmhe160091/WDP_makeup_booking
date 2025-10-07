@@ -1,6 +1,6 @@
 import "@muahub/styles/style.css";
 import META_DATA from "./metaData";
-import SanBongDetail from "./SanBongDetail";
+import MakeupServiceDetail from "./MakeupServiceDetail";
 
 export const metadata = {
   title: `${META_DATA.TITLE}`,
@@ -18,5 +18,5 @@ export const metadata = {
 };
 
 export default function SanBongPage() {
-  return <SanBongDetail />;
+  return <MakeupServiceDetail />;
 }

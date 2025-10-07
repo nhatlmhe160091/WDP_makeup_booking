@@ -52,7 +52,7 @@ export async function POST(req) {
       openingTime,
       closingTime,
       images,
-      fields
+      packages
     } = await req.json();
 
     const newService = {
@@ -67,7 +67,7 @@ export async function POST(req) {
       openingTime,
       closingTime,
       images,
-      fields,
+      packages,
       active: true,
       created_at: new Date(),
       updated_at: new Date()
@@ -100,7 +100,7 @@ export async function PUT(req) {
       openingTime,
       closingTime,
       images,
-      fields,
+      packages,
       active = true
     } = await req.json();
 
@@ -126,7 +126,7 @@ export async function PUT(req) {
           openingTime,
           closingTime,
           images,
-          fields,
+          packages,
           active,
           updated_at: new Date()
         }

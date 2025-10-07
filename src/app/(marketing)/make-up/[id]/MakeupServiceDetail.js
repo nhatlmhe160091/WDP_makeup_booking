@@ -17,7 +17,7 @@ import Link from "next/link";
 import { Button, Card, Form, Modal, Collapse } from "react-bootstrap";
 import { Avatar, Box, Typography } from "@mui/material";
 
-const SanBongDetail = () => {
+const MakeupServiceDetail = () => {
   const { currentUser } = useApp();
   const pathUrl = usePathname();
   const id = pathUrl.split("/").pop();
@@ -48,6 +48,7 @@ const SanBongDetail = () => {
       const res = await SendRequest("get", `/api/services/${id}`);
       if (res.payload) {
         setServiceData(res.payload);
+        // console.log("servicedata", res.payload);
       }
     };
     if (id) {
@@ -302,13 +303,13 @@ const SanBongDetail = () => {
     const totalRating = feedbacks.reduce((sum, feedback) => sum + (feedback.rating || 0), 0);
     return (totalRating / feedbacks.length).toFixed(1);
   };
-
+   
   const isServiceOwner = (userId) => {
     return serviceData && serviceData.owner && serviceData.owner._id === userId;
   };
 
   if (!serviceData) return <p className="text-center">Đang tải dữ liệu...</p>;
-
+  
   return (
     <div className="container py-5">
       <div className="row">
@@ -398,7 +399,7 @@ const SanBongDetail = () => {
                   Bảng giá dịch vụ
                 </h5>
                 <div className="row g-3">
-                  {Object.values(serviceData.fields)
+                  {Object.values(serviceData.packages)
                     .filter((f) => f.isAvailable)
                     .map((service, index) => (
                       <div key={index} className="col-md-6">
@@ -935,4 +936,4 @@ const SanBongDetail = () => {
   );
 };
 
-export default SanBongDetail;
+export default MakeupServiceDetail;

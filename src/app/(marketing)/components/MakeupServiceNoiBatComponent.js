@@ -6,18 +6,18 @@ import SendRequest from "@muahub/utils/SendRequest";
 
 const itemsPerPage = 12;
 
-const SanBongNoiBatComponent = () => {
-  const [fields, setFields] = useState([]);
+const MakeupServiceNoiBatComponent = () => {
+  const [packages, setPackages] = useState([]);
 
-  // Fetch fields data from API
+  // Fetch packages data from API
   useEffect(() => {
-    const fetchFields = async () => {
+    const fetchPackages = async () => {
       const response = await SendRequest("GET", "/api/services");
       if (response.payload) {
-        setFields(response.payload);
+        setPackages(response.payload);
       }
     };
-    fetchFields();
+    fetchPackages();
   }, []);
 
   return (
@@ -27,9 +27,9 @@ const SanBongNoiBatComponent = () => {
           <h1 className="display-5 mb-4">Dịch vụ makeup nổi bật</h1>
           <p className="mb-0">Tổng hợp các dịch vụ được nhiều khách đặt nhất, chất lượng cao và uy tín.</p>
         </div>
-        {/* Fields List */}
+        {/* Packages List */}
         <div className="row g-3">
-          {fields.slice(0, 6).map((field) => (
+          {packages.slice(0, 6).map((field) => (
             <BoxFieldComponent key={field._id} field={field} />
           ))}
         </div>
@@ -38,4 +38,4 @@ const SanBongNoiBatComponent = () => {
   );
 };
 
-export default SanBongNoiBatComponent;
+export default MakeupServiceNoiBatComponent;

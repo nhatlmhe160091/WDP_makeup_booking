@@ -206,7 +206,7 @@ const ServiceListPage = () => {
                     <strong>Loại dịch vụ makeup khả dụng:</strong>
                   </Typography>
                   <ul style={{ marginBottom: 0 }}>
-                    {Object.values(service.fields)
+                    {Object.values(service.packages)
                       .filter((field) => field.isAvailable)
                       .map((field, index) => (
                         <li key={index}>

@@ -9,7 +9,7 @@ import OurTeamComponent from "./components/OurTeamComponent";
 import TestimonialComponent from "./components/TestimonialComponent";
 import META_DATA from "./metaData";
 import BoxFieldComponent from "./components/BoxFieldComponent";
-import SanBongNoiBatComponent from "./components/SanBongNoiBatComponent";
+import MakeupServiceNoiBatComponent from "./components/MakeupServiceNoiBatComponent";
 
 export const metadata = {
   title: `${META_DATA.TITLE}`,
@@ -26,7 +26,7 @@ export const metadata = {
   }
 };
 export default function Home() {
-  const fields = [
+  const packages = [
     {
       id: 1,
       name: "Sân 5 người",
@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <div>
       <AboutUsComponent />
-      <SanBongNoiBatComponent />
+      <MakeupServiceNoiBatComponent />
 
       <div className="container-fluid service pb-5">
         <div className="container">
@@ -61,7 +61,7 @@ export default function Home() {
             <h1 className="display-5">Các dịch vụ phổ biến tại Hà Nội</h1>
           </div>
           <div className="row g-3">
-            {fields.map((field) => (
+            {packages.map((field) => (
               <BoxFieldComponent key={field.id} field={field} />
             ))}
           </div>

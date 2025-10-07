@@ -61,7 +61,7 @@ export async function POST(request) {
     // Kiểm tra dữ liệu đầu vào
     if (!body.serviceId || !body.content || !body.userId) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields: serviceId, content, or userId" },
+        { success: false, error: "Missing required packages: serviceId, content, or userId" },
         { status: 400 }
       );
     }
@@ -101,7 +101,7 @@ export async function PUT(request) {
 
     // Kiểm tra dữ liệu đầu vào
     if (!body._id || !body.content) {
-      return NextResponse.json({ success: false, error: "Missing required fields: _id or content" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Missing required packages: _id or content" }, { status: 400 });
     }
 
     // Cập nhật comment

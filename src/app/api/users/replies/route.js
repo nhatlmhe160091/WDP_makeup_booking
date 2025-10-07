@@ -51,10 +51,10 @@ export async function POST(req) {
 
     const { feedbackId, userId, content } = await req.json();
 
-    // Validate required fields
+    // Validate required packages
     if (!feedbackId || !userId || !content) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields: feedbackId, userId, content" },
+        { success: false, error: "Missing required packages: feedbackId, userId, content" },
         { status: 400 }
       );
     }
@@ -93,7 +93,7 @@ export async function PUT(req) {
     const { id, content } = await req.json();
 
     if (!id || !content) {
-      return NextResponse.json({ success: false, error: "Missing required fields: id, content" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Missing required packages: id, content" }, { status: 400 });
     }
 
     await repliesCollection.updateOne({ _id: getObjectId(id) }, { $set: { content, updated_at: new Date() } });

@@ -7,11 +7,11 @@ import SendRequest from "@muahub/utils/SendRequest";
 
 const itemsPerPage = 12;
 
-const SanBongModal = () => {
+const MakeupServiceModal = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [areaFilter, setAreaFilter] = useState("");
   const [sizeFilter, setSizeFilter] = useState("");
-  const [fields, setFields] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [sortByDistance, setSortByDistance] = useState(false);
   const [sortByBookings, setSortByBookings] = useState(false); 
@@ -78,14 +78,14 @@ const SanBongModal = () => {
 
 
   useEffect(() => {
-    const fetchFields = async () => {
+    const fetchPackages = async () => {
       const response = await SendRequest("GET", "/api/services");
       if (response.payload) {
-        setFields(response.payload);
+        setPackages(response.payload);
       }
     };
 
-    fetchFields();
+    fetchPackages();
     fetchBookingCounts();
   }, []);
 
@@ -110,20 +110,20 @@ const SanBongModal = () => {
     setCurrentPage(1);
   };
 
-  // Filter fields
-  const filteredFields = fields.filter((field) => {
+  // Filter packages
+  const filteredPackages = packages.filter((field) => {
     const matchesArea = areaFilter ? field.location.includes(areaFilter) : true;
     if (sizeFilter === "") return matchesArea;
-    const matchesType = field.fields[sizeFilter].isAvailable;
+    const matchesType = field.packages[sizeFilter].isAvailable;
     return matchesArea && matchesType;
   });
 
-  // Sort fields based on selected criteria
-  let sortedFields = [...filteredFields];
+  // Sort packages based on selected criteria
+  let sortedPackages = [...filteredPackages];
 
   if (sortByDistance && userLocation) {
     // Sort by distance
-    sortedFields = sortedFields
+    sortedPackages = sortedPackages
       .map((field) => ({
         ...field,
         distance:
@@ -134,24 +134,24 @@ const SanBongModal = () => {
       .sort((a, b) => a.distance - b.distance);
   } else if (sortByBookings) {
     // Sort by booking count (từ nhiều đến ít)
-    sortedFields = sortedFields
+    sortedPackages = sortedPackages
       .map((field) => ({
         ...field,
         bookingCount: bookingCounts[field._id] || 0
       }))
       .sort((a, b) => b.bookingCount - a.bookingCount);
   } else {
-    // Add booking count to fields for display
-    sortedFields = sortedFields.map((field) => ({
+    // Add booking count to packages for display
+    sortedPackages = sortedPackages.map((field) => ({
       ...field,
       bookingCount: bookingCounts[field._id] || 0
     }));
   }
 
-  // Paginate fields
-  const paginatedFields = sortedFields.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // Paginate packages
+  const paginatedPackages = sortedPackages.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const totalPages = Math.ceil(sortedFields.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedPackages.length / itemsPerPage);
 
   return (
     <div className="container-fluid makeup-list-bg py-5">
@@ -191,16 +191,16 @@ const SanBongModal = () => {
         </div>
 
         <div className="row mb-2">
-          {/* Fields List */}
+          {/* Packages List */}
           <div className="row g-4">
-            {paginatedFields.length === 0 ? (
+            {paginatedPackages.length === 0 ? (
               <div className="col-12 text-center py-5">
                 <i className="fas fa-search fa-3x text-muted mb-3"></i>
                 <h5 className="text-muted">Không tìm thấy dịch vụ phù hợp</h5>
                 <p>Vui lòng thử lại với bộ lọc khác hoặc khu vực khác.</p>
               </div>
             ) : (
-              paginatedFields.map((field) => (
+              paginatedPackages.map((field) => (
                 <BoxFieldComponent
                   key={field._id}
                   field={field}
@@ -244,4 +244,4 @@ const SanBongModal = () => {
   );
 };
 
-export default SanBongModal;
+export default MakeupServiceModal;

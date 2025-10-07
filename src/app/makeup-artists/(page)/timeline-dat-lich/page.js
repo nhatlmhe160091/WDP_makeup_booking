@@ -93,7 +93,7 @@ const TimelineHistoryPage = () => {
                     {service.serviceName}
                   </Typography>
                   <Grid container spacing={2}>
-                    {Object.entries(service.fields).map(([fieldId, field]) => (
+                    {Object.entries(service.packages).map(([fieldId, field]) => (
                       <Grid item xs={12} key={fieldId}>
                         <Typography variant="subtitle1" gutterBottom>
                           {field.name}
@@ -159,7 +159,7 @@ const TimelineHistoryPage = () => {
               <Typography>Phone: {booking.user.phone}</Typography>
               <Typography>Thời gian: {booking.time}</Typography>
               <Typography>Dịch vụ makeup: {booking.service.serviceName}</Typography>
-              <Typography>Loại dịch vụ makeup: {booking.service.fields[booking.field].name}</Typography>
+              <Typography>Loại dịch vụ makeup: {booking.service.packages[booking.field].name}</Typography>
             </Paper>
           ))}
           <Button variant="contained" color="primary" onClick={handleCloseModal} style={{ marginTop: 10 }}>

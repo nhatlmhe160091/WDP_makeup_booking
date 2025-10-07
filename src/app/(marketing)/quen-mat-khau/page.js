@@ -71,7 +71,7 @@ export default function Page() {
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <fieldset disabled={loading}>
+            <packageset disabled={loading}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
                   Địa chỉ email
@@ -105,7 +105,7 @@ export default function Page() {
                   "Gửi yêu cầu đặt lại mật khẩu"
                 )}
               </button>
-            </fieldset>
+            </packageset>
           </form>
         )}
       </div>
