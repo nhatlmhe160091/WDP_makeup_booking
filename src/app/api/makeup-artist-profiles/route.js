@@ -77,20 +77,59 @@ export async function PUT(req) {
     const profilesCollection = db.collection(COLLECTION_NAME);
     const {
       artistId,
+      name,
+      avatar,
       bio,
       experienceYears,
+      experienceMonths,
       workingHours,
+      phone,
+      email,
+      address,
+      bankInfo, // { bankName, bankAccount, accountHolder }
       socialLinks,
-      portfolio,
-      certificates
+      portfolio, // [{ image, desc, category }]
+      certificates // [{ name, fileUrl }]
     } = await req.json();
     if (!artistId) {
       return NextResponse.json({ success: false, message: "Missing artistId" }, { status: 400 });
     }
+    // Validate cơ bản
+    if (name && (typeof name !== "string" || name.length < 1 || name.length > 100)) {
+      return NextResponse.json({ success: false, message: "Tên không hợp lệ" }, { status: 400 });
+    }
+    if (bio && (typeof bio !== "string" || bio.length > 1000)) {
+      return NextResponse.json({ success: false, message: "Bio quá dài" }, { status: 400 });
+    }
+    if (experienceYears && (isNaN(experienceYears) || experienceYears < 0)) {
+      return NextResponse.json({ success: false, message: "Kinh nghiệm năm không hợp lệ" }, { status: 400 });
+    }
+    if (experienceMonths && (isNaN(experienceMonths) || experienceMonths < 0 || experienceMonths > 11)) {
+      return NextResponse.json({ success: false, message: "Kinh nghiệm tháng không hợp lệ" }, { status: 400 });
+    }
+    if (phone && !/^0\d{9,10}$/.test(phone)) {
+      return NextResponse.json({ success: false, message: "Số điện thoại không hợp lệ" }, { status: 400 });
+    }
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+      return NextResponse.json({ success: false, message: "Email không hợp lệ" }, { status: 400 });
+    }
+    if (bankInfo) {
+      if (!bankInfo.bankName || !bankInfo.accountHolder || !/^[0-9]{6,20}$/.test(bankInfo.bankAccount)) {
+        return NextResponse.json({ success: false, message: "Thông tin ngân hàng không hợp lệ" }, { status: 400 });
+      }
+    }
+    // Chuẩn bị dữ liệu cập nhật
     const updateFields = {};
+    if (name !== undefined) updateFields.name = name;
+    if (avatar !== undefined) updateFields.avatar = avatar;
     if (bio !== undefined) updateFields.bio = bio;
     if (experienceYears !== undefined) updateFields.experienceYears = experienceYears;
+    if (experienceMonths !== undefined) updateFields.experienceMonths = experienceMonths;
     if (workingHours !== undefined) updateFields.workingHours = workingHours;
+    if (phone !== undefined) updateFields.phone = phone;
+    if (email !== undefined) updateFields.email = email;
+    if (address !== undefined) updateFields.address = address;
+    if (bankInfo !== undefined) updateFields.bankInfo = bankInfo;
     if (socialLinks !== undefined) updateFields.socialLinks = socialLinks;
     if (portfolio !== undefined) updateFields.portfolio = portfolio;
     if (certificates !== undefined) updateFields.certificates = certificates;
@@ -102,7 +141,7 @@ export async function PUT(req) {
     if (result.matchedCount === 0) {
       return NextResponse.json({ success: false, message: "Profile not found" }, { status: 404 });
     }
-  return NextResponse.json({ success: true, message: "Profile updated" });
+    return NextResponse.json({ success: true, message: "Profile updated" });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
+import UpdateMakeupArtistProfileComponent from "./UpdateMakeupArtistProfileComponent";
 import toast from "react-hot-toast";
 import SendRequest from "@muahub/utils/SendRequest";
 import { ROLE_MANAGER } from "@muahub/constants/System";
@@ -86,6 +87,13 @@ const UserProfileComponent = () => {
         <Tab eventKey="account" title="Cập nhật tài khoản">
           <UpdateProfileComponent currentUser={currentUser} updateUser={updateUser} />
         </Tab>
+              
+        {/* Tab cập nhật hồ sơ chuyên gia cho MUA */}
+        {currentUser.role === "makeup_artist" && (
+          <Tab eventKey="mua-profile" title="Cập nhật hồ sơ chuyên gia">
+            <UpdateMakeupArtistProfileComponent currentUser={currentUser} />
+          </Tab>
+        )}
 
         <Tab eventKey="password" title="Cập nhật mật khẩu">
           <Form onSubmit={handlePasswordUpdate}>
