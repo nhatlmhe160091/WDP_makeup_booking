@@ -5,12 +5,33 @@ import CarouselComponent from "./CarouselComponent";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useState, useRef } from "react";
 import { useApp } from "@quanlysanbong/app/contexts/AppContext";
 import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
 
 const HeaderComponent = () => {
   const pathUrl = usePathname();
   const { currentUser } = useApp();
+  const [allMakeups, setAllMakeups] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  // Load all makeups once when component mounts
+  useEffect(() => {
+    const fetchAllMakeups = async () => {
+      try {
+        const res = await fetch('/api/stadiums');
+        const json = await res.json();
+        if (json && json.success) {
+          setAllMakeups(json.data || []);
+        }
+      } catch (e) {
+        console.error('Failed to load makeups:', e);
+      }
+    };
+    fetchAllMakeups();
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -55,6 +76,62 @@ const HeaderComponent = () => {
     navbarCollapse.classList.remove("show");
   }, [pathUrl]);
 
+  // Handle clicks outside search results
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const resultsBox = document.getElementById("stadium-search-results");
+      const searchInput = document.getElementById("stadium-search-input");
+      if (!resultsBox?.contains(e.target) && e.target !== searchInput) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Handle search input changes with local filtering
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    setShowResults(true);
+    setFocusedIndex(-1);
+  };
+
+  // Get filtered results
+  const getFilteredMakeups = () => {
+    if (!searchValue.trim()) return [];
+    const searchLower = searchValue.toLowerCase().trim();
+    return allMakeups
+      .filter(makeup => 
+        makeup.stadiumName?.toLowerCase().includes(searchLower) ||
+        makeup.location?.toLowerCase().includes(searchLower) ||
+        makeup.description?.toLowerCase().includes(searchLower)
+      )
+      .slice(0, 5);
+  };
+
+  // Handle keyboard navigation
+  const handleSearchKeyDown = (e) => {
+    const filtered = getFilteredMakeups();
+    
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex(prev => Math.min(prev + 1, filtered.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter" && focusedIndex >= 0) {
+      e.preventDefault();
+      const selected = filtered[focusedIndex];
+      if (selected) {
+        window.location.href = `/dich-vu/${selected._id}`;
+      }
+    } else if (e.key === "Escape") {
+      setShowResults(false);
+      setFocusedIndex(-1);
+    }
+  };
+
   const logout = () => {
     // Logout
     localStorage.removeItem("token");
@@ -79,6 +156,40 @@ const HeaderComponent = () => {
           <span className="fa fa-bars"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarCollapse">
+          {/* Search box for makeup/services */}
+          <div className="me-3 position-relative" style={{ minWidth: 260 }}>
+            <input
+              className="form-control"
+              placeholder="Tìm kiếm dịch vụ..."
+              value={searchValue}
+              onChange={handleSearchChange}
+              onKeyDown={handleSearchKeyDown}
+              id="stadium-search-input"
+            />
+            {showResults && (
+              <div 
+                id="stadium-search-results" 
+                className="list-group position-absolute w-100 shadow-sm" 
+                style={{ zIndex: 1050 }}
+              >
+                {getFilteredMakeups().map((makeup, index) => (
+                  <Link
+                    key={makeup._id}
+                    href={`/dich-vu/${makeup._id}`}
+                    className={`list-group-item list-group-item-action ${index === focusedIndex ? 'active' : ''}`}
+                    onClick={() => setShowResults(false)}
+                  >
+                    {makeup.stadiumName} {makeup.location ? `- ${makeup.location}` : ''}
+                  </Link>
+                ))}
+                {getFilteredMakeups().length === 0 && searchValue.trim() && (
+                  <div className="list-group-item text-muted">
+                    Không tìm thấy kết quả
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           <div className="navbar-nav ms-auto py-0">
             <Link href="/" className={`nav-item nav-link ${pathUrl === "/" ? "active" : ""}`}>
               Trang chủ
