@@ -66,8 +66,8 @@ const SanBongModal = () => {
   
         const counts = {};
         response.payload.forEach((order) => {
-          const stadiumId = order.stadiumId;
-          counts[stadiumId] = (counts[stadiumId] || 0) + 1;
+          const serviceId = order.serviceId;
+          counts[serviceId] = (counts[serviceId] || 0) + 1;
         });
         setBookingCounts(counts);
       }
@@ -79,7 +79,7 @@ const SanBongModal = () => {
 
   useEffect(() => {
     const fetchFields = async () => {
-      const response = await SendRequest("GET", "/api/stadiums");
+      const response = await SendRequest("GET", "/api/services");
       if (response.payload) {
         setFields(response.payload);
       }

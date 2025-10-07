@@ -18,7 +18,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
-import SelectStadiumComponent from "../../../components/SelectStadiumComponent";
+import SelectServiceComponent from "../../../components/SelectServiceComponent";
 import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
 import toast from "react-hot-toast";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
@@ -103,10 +103,10 @@ const availableAmenities = [
   "Có hợp đồng cam kết"
 ];
 
-const AddStadiumModal = ({ open, onClose, onSuccess }) => {
+const AddServiceModal = ({ open, onClose, onSuccess }) => {
   const { currentUser } = useApp();
 
-  const [stadiumName, setStadiumName] = useState("");
+  const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [openingTime, setOpeningTime] = useState(dayjs("2022-04-17T06:00", "HH:mm"));
@@ -141,7 +141,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
   };
 
   const resetForm = () => {
-    setStadiumName("");
+    setServiceName("");
     setDescription("");
     setImages([]);
     setLocation("");
@@ -155,7 +155,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
   const handleSubmit = async () => {
     try {
       // Validation
-      if (!stadiumName.trim()) {
+      if (!serviceName.trim()) {
         toast.error("Vui lòng nhập tên dịch vụ makeup");
         return;
       }
@@ -205,7 +205,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
 
       // Prepare data
       const data = {
-        stadiumName,
+        serviceName,
         description,
         location,
         locationDetail,
@@ -219,7 +219,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
       };
 
       // Send request
-      const res = await SendRequest("POST", "/api/stadiums", data);
+      const res = await SendRequest("POST", "/api/services", data);
 
       toast.success("Thêm dịch vụ makeup thành công");
       resetForm();
@@ -249,8 +249,8 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
                 label="Tên dịch vụ"
                 fullWidth
                 variant="outlined"
-                value={stadiumName}
-                onChange={(e) => setStadiumName(e.target.value)}
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
               />
             </Grid>
 
@@ -366,7 +366,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
 
             <Grid item xs={12}>
               <Typography variant="h6">Gói dịch vụ và giá</Typography>
-              <SelectStadiumComponent
+              <SelectServiceComponent
                 fields={fields}
                 setFields={setFields}
                 openingTime={openingTime}
@@ -386,4 +386,4 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
   );
 };
 
-export default AddStadiumModal;
+export default AddServiceModal;

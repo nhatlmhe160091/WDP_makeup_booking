@@ -8,7 +8,7 @@ import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 
-const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
+const OrderServiceModal = ({ open, onClose, serviceData }) => {
   const [selectedDate, setSelectedDate] = useState(""),
     [selectedField, setSelectedField] = useState(""),
     [errorMessage, setErrorMessage] = useState(""),
@@ -21,15 +21,15 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
 
   // useEffect(() => {
   //   const fetchOrderData = async () => {
-  //     const res = await SendRequest("GET", `/api/orders?stadiumId=${stadiumData._id}`);
+  //     const res = await SendRequest("GET", `/api/orders?serviceId=${serviceData._id}`);
   //     if (res && res.payload) {
   //       setDataOrder(res.payload);
   //     }
   //   };
-  //   if (stadiumData && stadiumData._id) {
+  //   if (serviceData && serviceData._id) {
   //     fetchOrderData();
   //   }
-  // }, [stadiumData]);
+  // }, [serviceData]);
 
   useEffect(() => {
     if (open) {
@@ -116,9 +116,9 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
     let orderCost = 0;
     selectedFieldSlot.forEach((slot) => {
       const payload = {
-        stadiumId: stadiumData._id,
-        ownerId: stadiumData.ownerId,
-        deposit: stadiumData.fields[selectedField].price,
+        serviceId: serviceData._id,
+        ownerId: serviceData.ownerId,
+        deposit: serviceData.fields[selectedField].price,
         field: selectedField,
         time: slot.time,
         date: selectedDate,
@@ -178,7 +178,7 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
   return (
     <Modal show={open} onHide={onClose} centered size="lg" backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>Đặt lịch trang điểm cho {stadiumData.stadiumName}</Modal.Title>
+        <Modal.Title>Đặt lịch trang điểm cho {serviceData.serviceName}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {qrCode.length ? (
@@ -192,7 +192,7 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
                 <strong>Ngày đặt:</strong> {convertDateFormat(selectedDate)}
               </div>
               <div className="col-sm-6">
-                <strong>Dịch vụ:</strong> {stadiumData.fields[selectedField].name}
+                <strong>Dịch vụ:</strong> {serviceData.fields[selectedField].name}
               </div>
             </div>
 
@@ -211,17 +211,17 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
               <div className="col-sm-6">
                 <strong>Tiền cọc (30%):</strong>
                 <br />
-                {formatCurrency(stadiumData.fields[selectedField].price * 0.3 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData.fields[selectedField].price * 0.3 * selectedFieldSlot.length)}
               </div>
               <div className="col-sm-6">
                 <strong>Cần thanh toán (70%):</strong>
                 <br />
-                {formatCurrency(stadiumData.fields[selectedField].price * 0.7 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData.fields[selectedField].price * 0.7 * selectedFieldSlot.length)}
               </div>
             </div>
 
             <div className="mb-3">
-              <strong>Chuyên viên:</strong> {stadiumData?.owner?.name} ({stadiumData?.owner?.phone})
+              <strong>Chuyên viên:</strong> {serviceData?.owner?.name} ({serviceData?.owner?.phone})
             </div>
 
             {orderDone ? (
@@ -302,8 +302,8 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
             <Form.Group className="mb-3">
               <Form.Label>Chọn dịch vụ</Form.Label>
               <div className="d-flex flex-wrap gap-2">
-                {Object.keys(stadiumData.fields).map((field, index) => {
-                  if (!stadiumData.fields[field].isAvailable) return null;
+                {Object.keys(serviceData.fields).map((field, index) => {
+                  if (!serviceData.fields[field].isAvailable) return null;
                   return (
                     <Button
                       key={index}
@@ -321,7 +321,7 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
                           color: selectedField === field ? "#fff" : "#adafb3"
                         }}
                       >
-                        {stadiumData.fields[field].name}
+                        {serviceData.fields[field].name}
                       </div>
                       <div
                         style={{
@@ -331,7 +331,7 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
                           color: selectedField === field ? "#fff" : "#414142"
                         }}
                       >
-                        {formatCurrency(stadiumData.fields[field].price)} VND
+                        {formatCurrency(serviceData.fields[field].price)} VND
                       </div>
                     </Button>
                   );
@@ -341,13 +341,13 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
 
             <Form.Group className="mb-3">
               <Form.Label>Chọn khung giờ</Form.Label>
-              {selectedField && stadiumData.fields[selectedField] ? (
+              {selectedField && serviceData.fields[selectedField] ? (
                 <div className="table-responsive">
                   <table className="table table-bordered">
                     <thead>
                       <tr>
                         <th style={{ width: "120px", backgroundColor: "#f8f9fa" }}>Khung giờ</th>
-                        {Array.from({ length: stadiumData.fields[selectedField].count }, (_, i) => (
+                        {Array.from({ length: serviceData.fields[selectedField].count }, (_, i) => (
                           <th key={i} className="text-center" style={{ backgroundColor: "#f8f9fa" }}>
                             Slot {i + 1}
                           </th>
@@ -355,8 +355,8 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {stadiumData.fields[selectedField].timeDetail.map((time, timeIndex) => {
-                        const maxCapacity = stadiumData.fields[selectedField].count || 0;
+                      {serviceData.fields[selectedField].timeDetail.map((time, timeIndex) => {
+                        const maxCapacity = serviceData.fields[selectedField].count || 0;
                         // Ẩn khung giờ nếu ngày được chọn là hôm nay và khung giờ đã qua
                         const [startTime] = time.split("-");
                         if (
@@ -483,4 +483,4 @@ const OrderStadiumModal = ({ open, onClose, stadiumData }) => {
   );
 };
 
-export default OrderStadiumModal;
+export default OrderServiceModal;

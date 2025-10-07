@@ -5,8 +5,8 @@ import Link from "next/link";
 import "@muahub/styles/makeup-artist-enhancements.css";
 
 const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingCount = false, bookingCount = 0 }) => {
-  // Xử lý tên artist - ưu tiên artistName, sau đó stadiumName
-  const displayName = field.artistName || field.stadiumName;
+  // Xử lý tên artist - ưu tiên artistName, sau đó serviceName
+  const displayName = field.artistName || field.serviceName;
   
   // Xử lý kinh nghiệm - tính từ experienceYears hoặc experienceMonths
   const getExperience = () => {

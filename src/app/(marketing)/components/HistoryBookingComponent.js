@@ -11,7 +11,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [stadiumFeedback, setStadiumFeedback] = useState(null);
+  const [serviceFeedback, setServiceFeedback] = useState(null);
   const [feedback, setFeedback] = useState({ title: "", reason: "", rating: 0 });
   const [userFeedback, setUserFeedback] = useState([]);
   const [modalHuySan, setModalHuySan] = useState(false);
@@ -76,16 +76,16 @@ const HistoryBookingComponent = ({ currentUser }) => {
     .map((feedback) => feedback.orderId);
   const bookingsFiltered = bookings.filter((booking) => !ratedOrderIds.includes(booking._id));
 
-  const stadiumsRated = [];
+  const servicesRated = [];
   bookingsFiltered.forEach((booking) => {
     const matchedOrder = userFeedback.find(
       (feedback) => feedback.orderId === booking._id && feedback.userId === currentUser._id
     );
 
-    if (matchedOrder && matchedOrder.stadium) {
-      stadiumsRated.push({
-        stadiumId: matchedOrder.stadiumId,
-        stadiumName: matchedOrder.stadium.stadiumName
+    if (matchedOrder && matchedOrder.service) {
+      servicesRated.push({
+        serviceId: matchedOrder.serviceId,
+        serviceName: matchedOrder.service.serviceName
       });
     }
   });
@@ -98,8 +98,8 @@ const HistoryBookingComponent = ({ currentUser }) => {
 
     const payload = {
       userId: currentUser._id,
-      orderId: stadiumFeedback._id,
-      stadiumId: stadiumFeedback.stadiumId,
+      orderId: serviceFeedback._id,
+      serviceId: serviceFeedback.serviceId,
       title: feedback.title,
       reason: feedback.reason,
       rating: feedback.rating
@@ -110,10 +110,10 @@ const HistoryBookingComponent = ({ currentUser }) => {
       toast.success("Phản ánh và đánh giá của bạn đã được gửi thành công!");
       setShowModal(false);
       setFeedback({ title: "", reason: "", rating: 0 });
-      setStadiumFeedback(null);
+      setServiceFeedback(null);
 
       const updatedBookings = bookings.map((booking) => {
-        if (booking._id === stadiumFeedback._id) {
+        if (booking._id === serviceFeedback._id) {
           return { ...booking, rated: true };
         }
         return booking;
@@ -132,7 +132,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
   };
 
   const onFeedBack = (booking) => {
-    setStadiumFeedback(booking);
+    setServiceFeedback(booking);
     setShowModal(true);
   };
 
@@ -240,7 +240,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
               return (
                 <tr key={booking._id}>
                   <td>
-                    <Link href={`/make-up/${booking.stadiumId}`}>{booking.stadium?.stadiumName}</Link>
+                    <Link href={`/make-up/${booking.serviceId}`}>{booking.service?.serviceName}</Link>
                   </td>
                   <td>{convertDate(booking.date)}</td>
                   <td>Dịch vụ {booking.field} người</td>
@@ -289,8 +289,8 @@ const HistoryBookingComponent = ({ currentUser }) => {
             <div key={booking._id} className="card mb-3 shadow-sm">
               <div className="card-body">
                 <h6 className="card-title mb-1">
-                  <Link href={`/make-up/${booking.stadiumId}`} className="text-decoration-none">
-                    {booking.stadium?.stadiumName}
+                  <Link href={`/make-up/${booking.serviceId}`} className="text-decoration-none">
+                    {booking.service?.serviceName}
                   </Link>
                 </h6>
                 <div className="mb-1">
@@ -338,8 +338,8 @@ const HistoryBookingComponent = ({ currentUser }) => {
           <Modal.Title>
             Phản ánh và đánh giá dịch vụ
             <div className="text-muted" style={{ fontSize: "0.8rem" }}>
-              {stadiumFeedback?.stadium?.stadiumName} - {new Date(stadiumFeedback?.date).toLocaleDateString()} - Dịch vụ{" "}
-              {stadiumFeedback?.field} - {stadiumFeedback?.time}
+              {serviceFeedback?.service?.serviceName} - {new Date(serviceFeedback?.date).toLocaleDateString()} - Dịch vụ{" "}
+              {serviceFeedback?.field} - {serviceFeedback?.time}
             </div>
           </Modal.Title>
         </Modal.Header>
@@ -398,7 +398,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
             </p>
             <ul className="mb-0">
               <li>
-                <strong>Dịch vụ:</strong> {selectedBooking?.stadium?.stadiumName}
+                <strong>Dịch vụ:</strong> {selectedBooking?.service?.serviceName}
               </li>
               <li>
                 <strong>Ngày:</strong> {convertDate(selectedBooking?.date)}

@@ -56,10 +56,10 @@ const CarouselComponent = ({ pathUrl }) => {
   ];
 
   if (pathUrl !== "/") {
-    let NameStadium = LinkName.find((item) => item.path === pathUrl)?.name || "";
+    let NameService = LinkName.find((item) => item.path === pathUrl)?.name || "";
     let parentPath = null;
     if (pathUrl.includes("/make-up/")) {
-      NameStadium = "Chi Tiết Dịch Vụ";
+      NameService = "Chi Tiết Dịch Vụ";
       parentPath = {
         name: "Danh sách dịch vụ",
         path: "/dich-vu"
@@ -68,7 +68,7 @@ const CarouselComponent = ({ pathUrl }) => {
     return (
       <div className="container-fluid bg-breadcrumb" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/img/carousel3.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="container text-center py-5" style={{ maxWidth: "900px" }}>
-          <h4 className="text-white display-4 mb-4">{NameStadium}</h4>
+          <h4 className="text-white display-4 mb-4">{NameService}</h4>
           <ol className="breadcrumb d-flex justify-content-center mb-0">
             <li className="breadcrumb-item">
               <Link href="/">Trang chủ</Link>
@@ -78,7 +78,7 @@ const CarouselComponent = ({ pathUrl }) => {
                 <Link href={parentPath.path}>{parentPath.name}</Link>
               </li>
             )}
-            <li className="breadcrumb-item active" style={{ color: "#ff5c95ff" }}>{NameStadium}</li>
+            <li className="breadcrumb-item active" style={{ color: "#ff5c95ff" }}>{NameService}</li>
           </ol>
         </div>
       </div>

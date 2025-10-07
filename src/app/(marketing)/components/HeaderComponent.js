@@ -21,7 +21,7 @@ const HeaderComponent = () => {
   useEffect(() => {
     const fetchAllMakeups = async () => {
       try {
-        const res = await fetch('/api/stadiums');
+        const res = await fetch('/api/services');
         const json = await res.json();
         if (json && json.success) {
           setAllMakeups(json.data || []);
@@ -79,8 +79,8 @@ const HeaderComponent = () => {
   // Handle clicks outside search results
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const resultsBox = document.getElementById("stadium-search-results");
-      const searchInput = document.getElementById("stadium-search-input");
+      const resultsBox = document.getElementById("service-search-results");
+      const searchInput = document.getElementById("service-search-input");
       if (!resultsBox?.contains(e.target) && e.target !== searchInput) {
         setShowResults(false);
       }
@@ -103,7 +103,7 @@ const HeaderComponent = () => {
     const searchLower = searchValue.toLowerCase().trim();
     return allMakeups
       .filter(makeup => 
-        makeup.stadiumName?.toLowerCase().includes(searchLower) ||
+        makeup.serviceName?.toLowerCase().includes(searchLower) ||
         makeup.location?.toLowerCase().includes(searchLower) ||
         makeup.description?.toLowerCase().includes(searchLower)
       )
@@ -164,11 +164,11 @@ const HeaderComponent = () => {
               value={searchValue}
               onChange={handleSearchChange}
               onKeyDown={handleSearchKeyDown}
-              id="stadium-search-input"
+              id="service-search-input"
             />
             {showResults && (
               <div 
-                id="stadium-search-results" 
+                id="service-search-results" 
                 className="list-group position-absolute w-100 shadow-sm" 
                 style={{ zIndex: 1050 }}
               >
@@ -179,7 +179,7 @@ const HeaderComponent = () => {
                     className={`list-group-item list-group-item-action ${index === focusedIndex ? 'active' : ''}`}
                     onClick={() => setShowResults(false)}
                   >
-                    {makeup.stadiumName} {makeup.location ? `- ${makeup.location}` : ''}
+                    {makeup.serviceName} {makeup.location ? `- ${makeup.location}` : ''}
                   </Link>
                 ))}
                 {getFilteredMakeups().length === 0 && searchValue.trim() && (

@@ -31,25 +31,25 @@ const ProductPerformance = () => {
       });
       if (res.payload) {
         // Tính số lần đặt của từng dịch vụ makeup
-        const stadiumCounts = res.payload.reduce((acc, booking) => {
-          const stadiumId = booking.stadiumId;
-          if (!acc[stadiumId]) {
-            acc[stadiumId] = {
+        const serviceCounts = res.payload.reduce((acc, booking) => {
+          const serviceId = booking.serviceId;
+          if (!acc[serviceId]) {
+            acc[serviceId] = {
               count: 0,
-              stadiumName: booking.stadium.stadiumName,
-              location: booking.stadium.location
+              serviceName: booking.service.serviceName,
+              location: booking.service.location
             };
           }
-          acc[stadiumId].count += 1;
+          acc[serviceId].count += 1;
           return acc;
         }, {});
 
         // Chuyển đổi thành mảng và sắp xếp theo số lần đặt giảm dần
-        const sortedStadiums = Object.values(stadiumCounts).sort((a, b) => b.count - a.count);
+        const sortedServices = Object.values(serviceCounts).sort((a, b) => b.count - a.count);
 
         // Lấy top 5 dịch vụ được đặt nhiều nhất
-        const top5Stadiums = sortedStadiums.slice(0, 5);
-        setData(top5Stadiums);
+        const top5Services = sortedServices.slice(0, 5);
+        setData(top5Services);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -112,25 +112,25 @@ const ProductPerformance = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((stadium, index) => (
+              {data.map((service, index) => (
                 <TableRow key={index}>
                   <TableCell>
                     <Typography variant="subtitle2" fontWeight={500}>
-                      {stadium.stadiumName}
+                      {service.serviceName}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="subtitle2" fontWeight={400}>
-                      {stadium.location}
+                      {service.location}
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    <Typography variant="h6">{stadium.count}</Typography>
+                    <Typography variant="h6">{service.count}</Typography>
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={stadium.count > 0 ? "Hoạt động" : "Không hoạt động"}
-                      color={stadium.count > 0 ? "success" : "error"}
+                      label={service.count > 0 ? "Hoạt động" : "Không hoạt động"}
+                      color={service.count > 0 ? "success" : "error"}
                       size="small"
                     />
                   </TableCell>

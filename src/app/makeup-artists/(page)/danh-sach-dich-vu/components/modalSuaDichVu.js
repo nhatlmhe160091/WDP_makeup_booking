@@ -18,7 +18,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
-import SelectStadiumComponent from "../../../components/SelectStadiumComponent";
+import SelectServiceComponent from "../../../components/SelectServiceComponent";
 import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
 import toast from "react-hot-toast";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
@@ -103,10 +103,10 @@ const availableAmenities = [
   "Có hợp đồng cam kết"
 ];
 
-const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
+const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
   const { currentUser } = useApp();
 
-  const [stadiumName, setStadiumName] = useState("");
+  const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [openingTime, setOpeningTime] = useState(dayjs("2022-04-17T06:00", "HH:mm"));
@@ -120,42 +120,42 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
   const [experienceYears, setExperienceYears] = useState(0);
   const [experienceMonths, setExperienceMonths] = useState(0);
 
-  // Load dữ liệu khi mở modal và có stadiumData
+  // Load dữ liệu khi mở modal và có serviceData
   useEffect(() => {
-    if (open && stadiumData) {
-      setStadiumName(stadiumData.stadiumName || "");
-      setDescription(stadiumData.description || "");
-      setImages(stadiumData.images || []);
+    if (open && serviceData) {
+      setServiceName(serviceData.serviceName || "");
+      setDescription(serviceData.description || "");
+      setImages(serviceData.images || []);
 
       // Sửa lại cách parse thời gian
-      if (stadiumData.openingTime) {
-        const [hour, minute] = stadiumData.openingTime.split(":");
+      if (serviceData.openingTime) {
+        const [hour, minute] = serviceData.openingTime.split(":");
         setOpeningTime(dayjs().hour(parseInt(hour)).minute(parseInt(minute)));
       }
-      if (stadiumData.closingTime) {
-        const [hour, minute] = stadiumData.closingTime.split(":");
+      if (serviceData.closingTime) {
+        const [hour, minute] = serviceData.closingTime.split(":");
         setClosingTime(dayjs().hour(parseInt(hour)).minute(parseInt(minute)));
       }
-      setLocation((prev)=> stadiumData.location || prev);
-      setLocationDetail(stadiumData.locationDetail || "");
-      setLatitude(stadiumData.latitude ? stadiumData.latitude.toString() : "");
-      setLongitude(stadiumData.longitude ? stadiumData.longitude.toString() : "");
-      setAmenities(stadiumData.amenities || []);
-      setExperienceYears(stadiumData.experienceYears || 0);
-      setExperienceMonths(stadiumData.experienceMonths || 0);
+      setLocation((prev)=> serviceData.location || prev);
+      setLocationDetail(serviceData.locationDetail || "");
+      setLatitude(serviceData.latitude ? serviceData.latitude.toString() : "");
+      setLongitude(serviceData.longitude ? serviceData.longitude.toString() : "");
+      setAmenities(serviceData.amenities || []);
+      setExperienceYears(serviceData.experienceYears || 0);
+      setExperienceMonths(serviceData.experienceMonths || 0);
 
       // Merge fields data với default fields
       const mergedFields = { ...fieldSizes };
-      if (stadiumData.fields) {
-        Object.keys(stadiumData.fields).forEach((key) => {
+      if (serviceData.fields) {
+        Object.keys(serviceData.fields).forEach((key) => {
           if (mergedFields[key]) {
-            mergedFields[key] = { ...mergedFields[key], ...stadiumData.fields[key] };
+            mergedFields[key] = { ...mergedFields[key], ...serviceData.fields[key] };
           }
         });
       }
       setFields(mergedFields);
     }
-  }, [open, stadiumData]);
+  }, [open, serviceData]);
 
   // Reset form khi đóng modal
   useEffect(() => {
@@ -187,7 +187,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
   };
 
   const resetForm = () => {
-    setStadiumName("");
+    setServiceName("");
     setDescription("");
     setImages([]);
     setLocation("");
@@ -203,7 +203,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
   const handleSubmit = async () => {
     try {
       // Validation
-      if (!stadiumName.trim()) {
+      if (!serviceName.trim()) {
         toast.error("Vui lòng nhập tên dịch vụ makeup");
         return;
       }
@@ -257,7 +257,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
 
       // Prepare data
       const data = {
-        stadiumName,
+        serviceName,
         description,
         location,
         locationDetail,
@@ -273,7 +273,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
       };
 
       // Send request - sử dụng PUT để cập nhật
-      const res = await SendRequest("PUT", `/api/stadiums/${stadiumData._id}`, data);
+      const res = await SendRequest("PUT", `/api/services/${serviceData._id}`, data);
 
       toast.success("Cập nhật dịch vụ makeup thành công");
       onSuccess(); // Callback để refresh danh sách
@@ -302,8 +302,8 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
                 label="Tên dịch vụ"
                 fullWidth
                 variant="outlined"
-                value={stadiumName}
-                onChange={(e) => setStadiumName(e.target.value)}
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
               />
             </Grid>
 
@@ -311,7 +311,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
               <SearchAddressComponent
                 className=""
                 onSearch={setLocation}
-                oldSearch={stadiumData.location || ""}
+                oldSearch={serviceData.location || ""}
                 value={location} // Thêm prop value để auto-fill
               />
               <TextField
@@ -449,7 +449,7 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
 
             <Grid item xs={12}>
               <Typography variant="h6">Gói dịch vụ và giá</Typography>
-              <SelectStadiumComponent
+              <SelectServiceComponent
                 fields={fields}
                 setFields={setFields}
                 openingTime={openingTime}
@@ -471,4 +471,4 @@ const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
   );
 };
 
-export default EditStadiumModal;
+export default EditServiceModal;

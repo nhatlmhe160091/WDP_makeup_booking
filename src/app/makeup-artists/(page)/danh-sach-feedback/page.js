@@ -104,8 +104,8 @@ const FeedbackManagementPage = () => {
                     {feedback.user.phone}
                   </TableCell>
                   <TableCell>
-                    <Typography>{feedback.stadium.stadiumName}</Typography>
-                    {feedback.stadium.locationDetail}, {feedback.stadium.location}
+                    <Typography>{feedback.service.serviceName}</Typography>
+                    {feedback.service.locationDetail}, {feedback.service.location}
                   </TableCell>
                   <TableCell>{feedback.order.field} người</TableCell>
                   <TableCell>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const types = [5, 7, 11];
 
-const SelectStadiumComponent = ({ fields, setFields, openingTime, closingTime }) => {
+const SelectServiceComponent = ({ fields, setFields, openingTime, closingTime }) => {
   const [viewDetail, setViewDetail] = useState({
     5: false,
     7: false,
@@ -179,4 +179,4 @@ const SelectStadiumComponent = ({ fields, setFields, openingTime, closingTime })
   );
 };
 
-export default SelectStadiumComponent;
+export default SelectServiceComponent;

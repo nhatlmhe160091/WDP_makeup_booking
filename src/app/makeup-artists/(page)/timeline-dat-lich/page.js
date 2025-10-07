@@ -12,7 +12,7 @@ const TimelineHistoryPage = () => {
   const [loading, setLoading] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [date, setDate] = useState("");
-  const [stadiums, setStadiums] = useState([]);
+  const [services, setServices] = useState([]);
   const [selectedBookings, setSelectedBookings] = useState([]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const TimelineHistoryPage = () => {
       });
       if (res.payload) {
         setBookings(res.payload);
-        setStadiums(res.payload.map((b) => b.stadium).filter((v, i, a) => a.findIndex((t) => t._id === v._id) === i));
+        setServices(res.payload.map((b) => b.service).filter((v, i, a) => a.findIndex((t) => t._id === v._id) === i));
       }
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -86,14 +86,14 @@ const TimelineHistoryPage = () => {
             style={{ marginBottom: 20 }} // Thêm margin dưới
           />
           <Grid container spacing={3}>
-            {stadiums.map((stadium) => (
-              <Grid item xs={12} key={stadium._id}>
+            {services.map((service) => (
+              <Grid item xs={12} key={service._id}>
                 <Paper elevation={3} style={{ padding: 20 }}>
                   <Typography variant="h6" gutterBottom>
-                    {stadium.stadiumName}
+                    {service.serviceName}
                   </Typography>
                   <Grid container spacing={2}>
-                    {Object.entries(stadium.fields).map(([fieldId, field]) => (
+                    {Object.entries(service.fields).map(([fieldId, field]) => (
                       <Grid item xs={12} key={fieldId}>
                         <Typography variant="subtitle1" gutterBottom>
                           {field.name}
@@ -101,7 +101,7 @@ const TimelineHistoryPage = () => {
                         <Grid container spacing={1}>
                           {field.timeDetail.map((time) => {
                             const matchingBookings = bookings.filter(
-                              (b) => b.time === time && b.field === fieldId && b.stadiumId === stadium._id
+                              (b) => b.time === time && b.field === fieldId && b.serviceId === service._id
                             );
                             return (
                               <Grid item xs={12} sm={6} md={3} key={time}>
@@ -158,8 +158,8 @@ const TimelineHistoryPage = () => {
               <Typography>Email: {booking.user.email}</Typography>
               <Typography>Phone: {booking.user.phone}</Typography>
               <Typography>Thời gian: {booking.time}</Typography>
-              <Typography>Dịch vụ makeup: {booking.stadium.stadiumName}</Typography>
-              <Typography>Loại dịch vụ makeup: {booking.stadium.fields[booking.field].name}</Typography>
+              <Typography>Dịch vụ makeup: {booking.service.serviceName}</Typography>
+              <Typography>Loại dịch vụ makeup: {booking.service.fields[booking.field].name}</Typography>
             </Paper>
           ))}
           <Button variant="contained" color="primary" onClick={handleCloseModal} style={{ marginTop: 10 }}>

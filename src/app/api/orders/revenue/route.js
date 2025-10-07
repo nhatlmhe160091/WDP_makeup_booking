@@ -2,7 +2,7 @@ import clientPromise from "@muahub/lib/mongodb";
 import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
 
-const DB_NAME = "stadiums";
+const DB_NAME = "services";
 const COLLECTION_NAME = "orders";
 
 // API GET - Lấy danh sách dịch vụ makeup

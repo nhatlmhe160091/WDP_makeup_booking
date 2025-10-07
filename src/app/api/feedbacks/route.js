@@ -9,12 +9,12 @@ export async function GET(req) {
   try {
     const client = await clientPromise;
     const db = client.db("accounts");
-    const dbStadium = client.db("stadiums");
+    const dbService = client.db("services");
 
     const feedbacksCollection = db.collection("feedbacks");
     const accountsCollection = db.collection("users");
-    const ordersCollection = dbStadium.collection("orders");
-    const stadiumsCollection = dbStadium.collection("stadium");
+    const ordersCollection = dbService.collection("orders");
+    const servicesCollection = dbService.collection("service");
 
     // Lấy query parameters
     const { searchParams } = new URL(req.url);
@@ -37,16 +37,16 @@ export async function GET(req) {
 
     const userIds = feedbacks.map((feedback) => feedback.userId);
     const orderIds = feedbacks.map((feedback) => feedback.orderId);
-    const stadiumIds = feedbacks.map((feedback) => feedback.stadiumId);
+    const serviceIds = feedbacks.map((feedback) => feedback.serviceId);
 
     const users = await accountsCollection.find({ _id: { $in: userIds } }).toArray();
     const orders = await ordersCollection.find({ _id: { $in: orderIds } }).toArray();
-    const stadiums = await stadiumsCollection.find({ _id: { $in: stadiumIds } }).toArray();
+    const services = await servicesCollection.find({ _id: { $in: serviceIds } }).toArray();
 
     const newFeedbacks = feedbacks.map((feedback) => {
       const user = users.find((user) => user._id.toString() === feedback.userId.toString());
       const order = orders.find((order) => order._id.toString() === feedback.orderId.toString());
-      const stadium = stadiums.find((stadium) => stadium._id.toString() === feedback.stadiumId.toString());
+      const service = services.find((service) => service._id.toString() === feedback.serviceId.toString());
 
       return {
         ...feedback,
@@ -61,8 +61,8 @@ export async function GET(req) {
               status: order.status
             }
           : {},
-        stadium: stadium
-          ? { stadiumName: stadium.stadiumName, location: stadium.location, locationDetail: stadium.locationDetail }
+        service: service
+          ? { serviceName: service.serviceName, location: service.location, locationDetail: service.locationDetail }
           : {}
       };
     });
@@ -83,7 +83,7 @@ export async function POST(req) {
     const db = client.db("accounts");
     const feedbacksCollection = db.collection("feedbacks");
 
-    const { userId, title, reason, orderId, stadiumId, rating } = await req.json();
+    const { userId, title, reason, orderId, serviceId, rating } = await req.json();
 
     // Validate rating
     if (rating && (rating < 1 || rating > 5)) {
@@ -109,7 +109,7 @@ export async function POST(req) {
     const newFeedback = {
       userId: getObjectId(userId),
       orderId: getObjectId(orderId),
-      stadiumId: getObjectId(stadiumId),
+      serviceId: getObjectId(serviceId),
       title,
       reason,
       rating: rating || 0,

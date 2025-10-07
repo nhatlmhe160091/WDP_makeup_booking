@@ -88,9 +88,9 @@ const RecentNotifies = () => {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent>
-                  <Typography fontWeight="600">{booking.stadium.stadiumName}</Typography>
+                  <Typography fontWeight="600">{booking.service.serviceName}</Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {booking.stadium.location}
+                    {booking.service.location}
                   </Typography>
                   <Typography variant="body2">Người đặt: {booking.user.name}</Typography>
                 </TimelineContent>

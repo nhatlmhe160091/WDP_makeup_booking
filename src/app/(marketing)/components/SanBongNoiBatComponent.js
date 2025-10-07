@@ -12,7 +12,7 @@ const SanBongNoiBatComponent = () => {
   // Fetch fields data from API
   useEffect(() => {
     const fetchFields = async () => {
-      const response = await SendRequest("GET", "/api/stadiums");
+      const response = await SendRequest("GET", "/api/services");
       if (response.payload) {
         setFields(response.payload);
       }

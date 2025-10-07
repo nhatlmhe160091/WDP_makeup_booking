@@ -18,30 +18,30 @@ import PageContainer from "../../components/container/PageContainer";
 import Link from "next/link";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER } from "@muahub/constants/System";
-import AddStadiumModal from "./components/modalThemDichVu";
-import EditStadiumModal from "./components/modalSuaDichVu";
+import AddServiceModal from "./components/modalThemDichVu";
+import EditServiceModal from "./components/modalSuaDichVu";
 
-const StadiumListPage = () => {
+const ServiceListPage = () => {
   const { currentUser } = useApp();
-  const [stadiums, setStadiums] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [openModal, setOpenModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [selectedStadium, setSelectedStadium] = useState({});
+  const [selectedService, setSelectedService] = useState({});
   const itemsPerPage = 5;
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await SendRequest("GET", "/api/stadiums", {
+      const res = await SendRequest("GET", "/api/services", {
         ownerId: currentUser.role === ROLE_MANAGER.SALE ? currentUser._id : ""
       });
       if (res.payload) {
-        setStadiums(res.payload);
+        setServices(res.payload);
       }
     } catch (error) {
-      console.error("Error fetching stadiums:", error);
+      console.error("Error fetching services:", error);
     } finally {
       setLoading(false);
     }
@@ -68,14 +68,14 @@ const StadiumListPage = () => {
     fetchData(); // Refresh danh sách sau khi thêm thành công
   };
 
-  const handleOpenEditModal = (stadium) => {
-    setSelectedStadium(stadium);
+  const handleOpenEditModal = (service) => {
+    setSelectedService(service);
     setEditModal(true);
   };
 
   const handleCloseEditModal = () => {
     setEditModal(false);
-    setSelectedStadium({});
+    setSelectedService({});
   };
 
   const handleEditSuccess = () => {
@@ -84,8 +84,8 @@ const StadiumListPage = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = stadiums.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(stadiums.length / itemsPerPage);
+  const currentItems = services.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(services.length / itemsPerPage);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -135,49 +135,49 @@ const StadiumListPage = () => {
               </Box>
             </Grid>
           )}
-          {currentItems.map((stadium) => (
-            <Grid item xs={12} md={6} lg={4} key={stadium._id}>
+          {currentItems.map((service) => (
+            <Grid item xs={12} md={6} lg={4} key={service._id}>
               <Card>
                 <CardMedia
                   component="img"
                   height="200"
-                  image={stadium.images[0] || "/default-stadium.jpg"}
-                  alt={stadium.stadiumName}
+                  image={service.images[0] || "/default-service.jpg"}
+                  alt={service.serviceName}
                 />
                 <CardContent>
                   <Typography variant="h6" marginBottom={1}>
-                    {stadium.stadiumName}
+                    {service.serviceName}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {stadium.locationDetail}, {stadium.location}
+                    {service.locationDetail}, {service.location}
                   </Typography>
 
                   {/* Hiển thị tọa độ nếu có */}
-                  {stadium.latitude && stadium.longitude && (
+                  {service.latitude && service.longitude && (
                     <Typography variant="body2" color="textSecondary" marginTop={1}>
-                      📍 {stadium.latitude.toFixed(4)}, {stadium.longitude.toFixed(4)}
+                      📍 {service.latitude.toFixed(4)}, {service.longitude.toFixed(4)}
                     </Typography>
                   )}
 
                   <Typography variant="body2" color="textSecondary" marginTop={1}>
-                    Giờ mở cửa: {stadium.openingTime} - {stadium.closingTime}
+                    Giờ mở cửa: {service.openingTime} - {service.closingTime}
                   </Typography>
 
                   {/* Hiển thị kinh nghiệm nếu có */}
-                  {(stadium.experienceYears || stadium.experienceMonths) && (
+                  {(service.experienceYears || service.experienceMonths) && (
                     <Typography variant="body2" color="textSecondary" marginTop={1}>
-                      Kinh nghiệm: {stadium.experienceYears || 0} năm {stadium.experienceMonths || 0} tháng
+                      Kinh nghiệm: {service.experienceYears || 0} năm {service.experienceMonths || 0} tháng
                     </Typography>
                   )}
 
                   {/* Hiển thị tiện ích nếu có */}
-                  {stadium.amenities && stadium.amenities.length > 0 && (
+                  {service.amenities && service.amenities.length > 0 && (
                     <Box mt={1}>
                       <Typography variant="body2" mb={1}>
                         <strong>Tiện ích:</strong>
                       </Typography>
                       <Box display="flex" flexWrap="wrap" gap={0.5}>
-                        {stadium.amenities.slice(0, 3).map((amenity, index) => (
+                        {service.amenities.slice(0, 3).map((amenity, index) => (
                           <Typography
                             key={index}
                             variant="caption"
@@ -193,9 +193,9 @@ const StadiumListPage = () => {
                             {amenity}
                           </Typography>
                         ))}
-                        {stadium.amenities.length > 3 && (
+                        {service.amenities.length > 3 && (
                           <Typography variant="caption" color="textSecondary">
-                            +{stadium.amenities.length - 3} khác
+                            +{service.amenities.length - 3} khác
                           </Typography>
                         )}
                       </Box>
@@ -206,7 +206,7 @@ const StadiumListPage = () => {
                     <strong>Loại dịch vụ makeup khả dụng:</strong>
                   </Typography>
                   <ul style={{ marginBottom: 0 }}>
-                    {Object.values(stadium.fields)
+                    {Object.values(service.fields)
                       .filter((field) => field.isAvailable)
                       .map((field, index) => (
                         <li key={index}>
@@ -219,7 +219,7 @@ const StadiumListPage = () => {
 
                   {/* Xem, sửa, đặt dịch vụ makeup */}
                   <Box display="flex" gap={1} mt={2}>
-                    <Link href={`/make-up/${stadium._id}`}>
+                    <Link href={`/make-up/${service._id}`}>
                       <Button variant="contained" color="primary" size="small">
                         Xem chi tiết
                       </Button>
@@ -228,7 +228,7 @@ const StadiumListPage = () => {
                       variant="outlined"
                       color="secondary"
                       size="small"
-                      onClick={() => handleOpenEditModal(stadium)}
+                      onClick={() => handleOpenEditModal(service)}
                     >
                       Sửa
                     </Button>
@@ -239,7 +239,7 @@ const StadiumListPage = () => {
                       onClick={async () => {
                         if (!window.confirm("Bạn chắc chắn muốn xóa dịch vụ này?")) return;
                         try {
-                          const res = await SendRequest("DELETE", "/api/stadiums", { id: stadium._id });
+                          const res = await SendRequest("DELETE", "/api/services", { id: service._id });
                           if (res?.success) {
                             toast.success("Xóa dịch vụ thành công");
                             fetchData();
@@ -268,17 +268,17 @@ const StadiumListPage = () => {
       )}
 
       {/* Modal thêm dịch vụ makeup (giữ lại để không ảnh hưởng luồng cũ; không dùng khi đã điều hướng) */}
-      <AddStadiumModal open={openModal} onClose={handleCloseModal} onSuccess={handleAddSuccess} />
+      <AddServiceModal open={openModal} onClose={handleCloseModal} onSuccess={handleAddSuccess} />
 
       {/* Modal sửa dịch vụ makeup */}
-      <EditStadiumModal
+      <EditServiceModal
         open={editModal}
         onClose={handleCloseEditModal}
         onSuccess={handleEditSuccess}
-        stadiumData={selectedStadium}
+        serviceData={selectedService}
       />
     </PageContainer>
   );
 };
 
-export default StadiumListPage;
+export default ServiceListPage;

@@ -24,7 +24,7 @@ import DashboardCard from "../../components/shared/DashboardCard";
 import dayjs from "dayjs";
 import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
 import SearchAddressComponent from "../../components/SearchAddressComponent";
-import SelectStadiumComponent from "../../components/SelectStadiumComponent";
+import SelectServiceComponent from "../../components/SelectServiceComponent";
 import toast from "react-hot-toast";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
 import { useApp } from "@muahub/app/contexts/AppContext";
@@ -109,10 +109,10 @@ const availableAmenities = [
   "Có hợp đồng cam kết"
 ];
 
-const CreateStadiumPage = () => {
+const CreateServicePage = () => {
   const { currentUser } = useApp();
 
-  const [stadiumName, setStadiumName] = useState("");
+  const [serviceName, setServiceName] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [openingTime, setOpeningTime] = useState(dayjs("2022-04-17T06:00", "HH:mm"));
@@ -152,7 +152,7 @@ const CreateStadiumPage = () => {
   const handleSubmit = async () => {
     try {
       // Validate bắt buộc
-      if (!stadiumName.trim()) {
+      if (!serviceName.trim()) {
         toast.error("Vui lòng nhập tên dịch vụ");
         return;
       }
@@ -216,7 +216,7 @@ const CreateStadiumPage = () => {
 
       // Chuẩn bị dữ liệu gửi lên server
       const data = {
-        stadiumName,
+        serviceName,
         description,
         location,
         locationDetail,
@@ -232,11 +232,11 @@ const CreateStadiumPage = () => {
       };
 
       // Gửi request thêm dịch vụ
-      const res = await SendRequest("POST", "/api/stadiums", data);
+      const res = await SendRequest("POST", "/api/services", data);
 
       toast.success("Thêm dịch vụ thành công");
       // reset form
-      setStadiumName("");
+      setServiceName("");
       setDescription("");
       setImages([]);
       setLocation("");
@@ -266,8 +266,8 @@ const CreateStadiumPage = () => {
               label="Tên dịch vụ"
               fullWidth
               variant="outlined"
-              value={stadiumName}
-              onChange={(e) => setStadiumName(e.target.value)}
+              value={serviceName}
+              onChange={(e) => setServiceName(e.target.value)}
             />
           </Grid>
 
@@ -407,7 +407,7 @@ const CreateStadiumPage = () => {
             <Typography variant="h6">Gói dịch vụ và giá</Typography>
           </Grid>
 
-          <SelectStadiumComponent
+          <SelectServiceComponent
             fields={fields}
             setFields={setFields}
             openingTime={openingTime}
@@ -423,4 +423,4 @@ const CreateStadiumPage = () => {
   );
 };
 
-export default CreateStadiumPage;
+export default CreateServicePage;

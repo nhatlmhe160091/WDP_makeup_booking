@@ -3,8 +3,8 @@ import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
 import { validateToken } from "@muahub/lib/auth";
 
-const DB_NAME = "stadiums";
-const STADIUM_COLLECTION_NAME = "stadium";
+const DB_NAME = "services";
+const STADIUM_COLLECTION_NAME = "service";
 const COLLECTION_NAME = "orders";
 
 // API GET - Lấy danh sách dịch vụ makeup
@@ -13,7 +13,7 @@ export async function GET(req) {
     const client = await clientPromise;
     const db = client.db(DB_NAME);
     const ordersCollection = db.collection(COLLECTION_NAME);
-    const stadiumCollection = db.collection(STADIUM_COLLECTION_NAME);
+    const serviceCollection = db.collection(STADIUM_COLLECTION_NAME);
 
     const dbUser = client.db("accounts");
     const accountsCollection = dbUser.collection("users");
@@ -22,7 +22,7 @@ export async function GET(req) {
     const searchParams = new URLSearchParams(url.search);
 
     const userId = searchParams.get("userId");
-    const stadiumId = searchParams.get("stadiumId");
+    const serviceId = searchParams.get("serviceId");
     const ownerId = searchParams.get("ownerId");
     const date = searchParams.get("date");
 
@@ -32,9 +32,9 @@ export async function GET(req) {
       fieldSlot: { $exists: true }
     };
     if (userId) searchQuery.userId = getObjectId(userId);
-    if (stadiumId) searchQuery.stadiumId = getObjectId(stadiumId);
+    if (serviceId) searchQuery.serviceId = getObjectId(serviceId);
     if (ownerId) searchQuery.ownerId = getObjectId(ownerId);
-    let projection = { stadiumName: 1, location: 1, locationDetail: 1, openingTime: 1, closingTime: 1 };
+    let projection = { serviceName: 1, location: 1, locationDetail: 1, openingTime: 1, closingTime: 1 };
     if (date) {
       searchQuery.date = date;
       projection = { ...projection, fields: 1 };
@@ -47,22 +47,22 @@ export async function GET(req) {
       .sort({ created_at: -1 }) // Sort by created_at in ascending order
       .toArray();
 
-    // get all stadiumId from orders
-    const stadiumIds = orders.map((order) => order.stadiumId);
+    // get all serviceId from orders
+    const serviceIds = orders.map((order) => order.serviceId);
     const userIds = orders.map((order) => order.userId);
 
-    // Fetch all the stadiums
-    const stadiums = await stadiumCollection.find({ _id: { $in: stadiumIds } }, { projection: projection }).toArray();
+    // Fetch all the services
+    const services = await serviceCollection.find({ _id: { $in: serviceIds } }, { projection: projection }).toArray();
 
     // Fetch all the users
     const users = await accountsCollection
       .find({ _id: { $in: userIds } }, { projection: { name: 1, email: 1, phone: 1 } })
       .toArray();
 
-    // Map the orders to include the stadium details
+    // Map the orders to include the service details
     orders = orders.map((order) => {
-      const stadium = stadiums.find((stadium) => stadium._id.equals(order.stadiumId));
-      return { ...order, stadium };
+      const service = services.find((service) => service._id.equals(order.serviceId));
+      return { ...order, service };
     });
 
     // Map the orders to include the user details
@@ -89,7 +89,7 @@ export async function POST(req) {
 
     const objectId = await validateToken(req);
 
-    let { stadiumId, ownerId, field, time, date, deposit, fieldSlot } = await req.json();
+    let { serviceId, ownerId, field, time, date, deposit, fieldSlot } = await req.json();
 
     deposit = parseInt(deposit);
 
@@ -102,7 +102,7 @@ export async function POST(req) {
 
     let newOrder = {
       userId: objectId,
-      stadiumId: getObjectId(stadiumId),
+      serviceId: getObjectId(serviceId),
       ownerId: getObjectId(ownerId),
       field,
       time,
@@ -151,12 +151,12 @@ export async function PUT(req) {
     const ObjectId = getObjectId(id);
     await validateToken(req);
 
-    const stadium = await ordersCollection.findOne({ _id: ObjectId });
-    if (!stadium) {
+    const service = await ordersCollection.findOne({ _id: ObjectId });
+    if (!service) {
       return NextResponse.json({ success: false, message: "Dịch vụ makeup không tồn tại" }, { status: 404 });
     }
 
-    const ownerId = stadium.ownerId;
+    const ownerId = service.ownerId;
 
     const ownerData = await accountsCollection.findOne({
       _id: ownerId
@@ -166,7 +166,7 @@ export async function PUT(req) {
       { _id: ownerId },
       {
         $set: {
-          totalPrice: (ownerData.totalPrice || 0) + stadium.deposit
+          totalPrice: (ownerData.totalPrice || 0) + service.deposit
         }
       }
     );

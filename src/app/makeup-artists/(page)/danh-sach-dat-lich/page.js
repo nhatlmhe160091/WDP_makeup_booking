@@ -95,9 +95,9 @@ const BookingHistoryPage = () => {
               {currentItems.map((booking) => (
                 <TableRow key={booking._id}>
                   <TableCell>
-                    <Typography variant="h6">{booking.stadium.stadiumName}</Typography>
+                    <Typography variant="h6">{booking.service.serviceName}</Typography>
                     <br />
-                    {booking.stadium.locationDetail}, {booking.stadium.location}
+                    {booking.service.locationDetail}, {booking.service.location}
                   </TableCell>
                   <TableCell>{convertDate(booking.date)}</TableCell>
                   <TableCell>{booking.time}</TableCell>

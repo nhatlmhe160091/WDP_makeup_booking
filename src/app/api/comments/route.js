@@ -8,33 +8,33 @@ export async function GET(req) {
     const url = new URL(req.url);
     const searchParams = new URLSearchParams(url.search);
 
-    const stadiumId = searchParams.get("stadiumId");
+    const serviceId = searchParams.get("serviceId");
 
     const db = client.db("accounts");
-    const dbStadium = client.db("stadiums");
+    const dbService = client.db("services");
     const commentsCollection = db.collection("comments");
     const accountsCollection = db.collection("users");
-    const stadiumsCollection = dbStadium.collection("stadium");
+    const servicesCollection = dbService.collection("service");
     let comments;
-    if (stadiumId) {
+    if (serviceId) {
       comments = await commentsCollection.find({
-      stadiumId: getObjectId(stadiumId)
+      serviceId: getObjectId(serviceId)
       }).sort({ created_at: -1 }).toArray();
     } else {
       comments = await commentsCollection.find({}).sort({ created_at: -1 }).toArray();
     }
     const userIds = comments.map((comment) => comment.userId);
-    const stadiumIds = comments.map((comment) => comment.stadiumId);
+    const serviceIds = comments.map((comment) => comment.serviceId);
     const users = await accountsCollection.find({ _id: { $in: userIds } }).toArray();
-    const stadiums = await stadiumsCollection.find({ _id: { $in: stadiumIds } }).toArray();
+    const services = await servicesCollection.find({ _id: { $in: serviceIds } }).toArray();
     const newComments = comments.map((comment) => {
       const user = users.find((user) => user._id.toString() === comment.userId.toString());
-      const stadium = stadiums.find((stadium) => stadium._id.toString() === comment.stadiumId.toString());
+      const service = services.find((service) => service._id.toString() === comment.serviceId.toString());
       return {
         ...comment,
         user: user ? { name: user.name, email: user.email, avatar: user.avatar } : {},
-        stadium: stadium
-          ? { stadiumName: stadium.stadiumName, location: stadium.location, locationDetail: stadium.locationDetail }
+        service: service
+          ? { serviceName: service.serviceName, location: service.location, locationDetail: service.locationDetail }
           : {}
       };
     });
@@ -59,16 +59,16 @@ export async function POST(request) {
     console.log("Request body:", body); // Debug
 
     // Kiểm tra dữ liệu đầu vào
-    if (!body.stadiumId || !body.content || !body.userId) {
+    if (!body.serviceId || !body.content || !body.userId) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields: stadiumId, content, or userId" },
+        { success: false, error: "Missing required fields: serviceId, content, or userId" },
         { status: 400 }
       );
     }
 
     // Tạo comment mới
     const newComment = {
-      stadiumId: getObjectId(body.stadiumId),
+      serviceId: getObjectId(body.serviceId),
       content: body.content,
       userId: getObjectId(body.userId),
       images: Array.isArray(body.images) ? body.images : [],

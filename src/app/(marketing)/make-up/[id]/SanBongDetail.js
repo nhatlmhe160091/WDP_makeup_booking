@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import SendRequest from "@muahub/utils/SendRequest";
 import { usePathname } from "next/navigation";
 import { formatCurrency } from "@muahub/utils/Main";
-import OrderStadiumModal from "./OrderStadiumModal";
+import OrderServiceModal from "./OrderServiceModal";
 import { ROLE_MANAGER } from "@muahub/constants/System";
 import Link from "next/link";
 import { Button, Card, Form, Modal, Collapse } from "react-bootstrap";
@@ -22,7 +22,7 @@ const SanBongDetail = () => {
   const pathUrl = usePathname();
   const id = pathUrl.split("/").pop();
 
-  const [stadiumData, setStadiumData] = useState(null);
+  const [serviceData, setServiceData] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
   const [showReplyModal, setShowReplyModal] = useState(false);
@@ -44,14 +44,14 @@ const SanBongDetail = () => {
   const [commentImagePreviews, setCommentImagePreviews] = useState([]); // string[]
 
   useEffect(() => {
-    const fetchStadiumData = async (id) => {
-      const res = await SendRequest("get", `/api/stadiums/${id}`);
+    const fetchServiceData = async (id) => {
+      const res = await SendRequest("get", `/api/services/${id}`);
       if (res.payload) {
-        setStadiumData(res.payload);
+        setServiceData(res.payload);
       }
     };
     if (id) {
-      fetchStadiumData(id);
+      fetchServiceData(id);
     }
   }, [id]);
 
@@ -59,10 +59,10 @@ const SanBongDetail = () => {
     const fetchFeedbacks = async () => {
       const res = await SendRequest("GET", "/api/feedbacks");
       if (res) {
-        const stadiumFeedbacks = res.payload.filter(
-          (feedback) => feedback.stadiumId && feedback.stadiumId.toString() === id
+        const serviceFeedbacks = res.payload.filter(
+          (feedback) => feedback.serviceId && feedback.serviceId.toString() === id
         );
-        setFeedbacks(stadiumFeedbacks);
+        setFeedbacks(serviceFeedbacks);
       }
     };
     if (id) {
@@ -92,7 +92,7 @@ const SanBongDetail = () => {
   useEffect(() => {
     const fetchComments = async () => {
       if (id) {
-        const res = await SendRequest("GET", `/api/comments?stadiumId=${id}`);
+        const res = await SendRequest("GET", `/api/comments?serviceId=${id}`);
 
         if (res) {
           setComments(res.payload);
@@ -179,7 +179,7 @@ const SanBongDetail = () => {
       const res = await SendRequest("DELETE", "/api/comments", { _id: commentId });
       if (res) {
         toast.success("Đã xóa bình luận");
-        const commentsRes = await SendRequest("GET", `/api/comments?stadiumId=${id}`);
+        const commentsRes = await SendRequest("GET", `/api/comments?serviceId=${id}`);
         if (commentsRes) setComments(commentsRes.payload);
       } else {
         toast.error(res?.error || "Xóa bình luận thất bại");
@@ -219,7 +219,7 @@ const SanBongDetail = () => {
       }
 
       const payload = {
-        stadiumId: id,
+        serviceId: id,
         userId: currentUser._id,
         content: newComment.trim(),
         images: imageUrls
@@ -233,8 +233,8 @@ const SanBongDetail = () => {
         setCommentImages([]);
         setCommentImagePreviews([]);
 
-        // Refresh comments - PHẢI có stadiumId
-        const commentsRes = await SendRequest("GET", `/api/comments?stadiumId=${id}`);
+        // Refresh comments - PHẢI có serviceId
+        const commentsRes = await SendRequest("GET", `/api/comments?serviceId=${id}`);
         if (commentsRes) {
           setComments(commentsRes.payload);
         }
@@ -303,11 +303,11 @@ const SanBongDetail = () => {
     return (totalRating / feedbacks.length).toFixed(1);
   };
 
-  const isStadiumOwner = (userId) => {
-    return stadiumData && stadiumData.owner && stadiumData.owner._id === userId;
+  const isServiceOwner = (userId) => {
+    return serviceData && serviceData.owner && serviceData.owner._id === userId;
   };
 
-  if (!stadiumData) return <p className="text-center">Đang tải dữ liệu...</p>;
+  if (!serviceData) return <p className="text-center">Đang tải dữ liệu...</p>;
 
   return (
     <div className="container py-5">
@@ -317,11 +317,11 @@ const SanBongDetail = () => {
             <div className="card-body">
               <div className="d-flex align-items-center mb-4">
                 <div className="flex-shrink-0">
-                  <Link href={`/makeup-artists/${stadiumData.owner._id}`} className="text-decoration-none">
+                  <Link href={`/makeup-artists/${serviceData.owner._id}`} className="text-decoration-none">
                     <div className="position-relative">
                       <Avatar
-                        alt={stadiumData.owner.name}
-                        src={stadiumData.owner.avatar}
+                        alt={serviceData.owner.name}
+                        src={serviceData.owner.avatar}
                         sx={{ width: 80, height: 80, cursor: 'pointer' }}
                       />
                       <div 
@@ -341,17 +341,17 @@ const SanBongDetail = () => {
                   </Link>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{stadiumData.stadiumName}</h2>
+                  <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{serviceData.serviceName}</h2>
                   <p className="text-muted mb-0">
                     <i className="fas fa-user-circle me-2"></i>
                     Chuyên viên: {' '}
-                    <Link href={`/makeup-artists/${stadiumData.owner._id}`} className="text-decoration-none">
-                      <strong className="text-primary" style={{ cursor: 'pointer' }}>{stadiumData.owner.name}</strong>
+                    <Link href={`/makeup-artists/${serviceData.owner._id}`} className="text-decoration-none">
+                      <strong className="text-primary" style={{ cursor: 'pointer' }}>{serviceData.owner.name}</strong>
                     </Link>
-                    {stadiumData.owner.phone && (
-                      <a href={`tel:${stadiumData.owner.phone}`} className="ms-2 text-decoration-none">
+                    {serviceData.owner.phone && (
+                      <a href={`tel:${serviceData.owner.phone}`} className="ms-2 text-decoration-none">
                         <i className="fas fa-phone-alt me-1"></i>
-                        {stadiumData.owner.phone}
+                        {serviceData.owner.phone}
                       </a>
                     )}
                   </p>
@@ -364,7 +364,7 @@ const SanBongDetail = () => {
                     <i className="fas fa-map-marker-alt text-primary me-2"></i>
                     <div>
                       <small className="text-muted d-block">Địa điểm</small>
-                      <strong>{stadiumData.locationDetail}, {stadiumData.location}</strong>
+                      <strong>{serviceData.locationDetail}, {serviceData.location}</strong>
                     </div>
                   </div>
                 </div>
@@ -373,18 +373,18 @@ const SanBongDetail = () => {
                     <i className="fas fa-clock text-primary me-2"></i>
                     <div>
                       <small className="text-muted d-block">Giờ làm việc</small>
-                      <strong>{stadiumData.openingTime} - {stadiumData.closingTime}</strong>
+                      <strong>{serviceData.openingTime} - {serviceData.closingTime}</strong>
                     </div>
                   </div>
                 </div>
-                {(stadiumData.experienceYears || stadiumData.experienceMonths) && (
+                {(serviceData.experienceYears || serviceData.experienceMonths) && (
                   <div className="col-md-6">
                     <div className="d-flex align-items-center">
                       <i className="fas fa-medal text-primary me-2"></i>
                       <div>
                         <small className="text-muted d-block">Kinh nghiệm</small>
                         <strong>
-                          {stadiumData.experienceYears || 0} năm {stadiumData.experienceMonths || 0} tháng
+                          {serviceData.experienceYears || 0} năm {serviceData.experienceMonths || 0} tháng
                         </strong>
                       </div>
                     </div>
@@ -398,7 +398,7 @@ const SanBongDetail = () => {
                   Bảng giá dịch vụ
                 </h5>
                 <div className="row g-3">
-                  {Object.values(stadiumData.fields)
+                  {Object.values(serviceData.fields)
                     .filter((f) => f.isAvailable)
                     .map((service, index) => (
                       <div key={index} className="col-md-6">
@@ -430,7 +430,7 @@ const SanBongDetail = () => {
                   Tiện ích & Dịch vụ đi kèm
                 </h5>
                 <div className="d-flex flex-wrap gap-2">
-                  {stadiumData?.amenities?.map((amenity, index) => (
+                  {serviceData?.amenities?.map((amenity, index) => (
                     <span
                       key={index}
                       className="badge"
@@ -486,18 +486,18 @@ const SanBongDetail = () => {
     </div>
 
         {showModal && (
-          <OrderStadiumModal
+          <OrderServiceModal
             show={showModal}
             handleClose={() => setShowModal(false)}
-            stadiumData={stadiumData}
+            serviceData={serviceData}
             currentUser={currentUser}
           />
         )}
         <div className="col-md-12 mt-4">
           <h4>Mô tả dịch vụ</h4>
-          <p>{stadiumData.description}</p>
+          <p>{serviceData.description}</p>
           <Swiper modules={[Navigation, Pagination]} navigation pagination={{ clickable: true }} className="mb-4">
-            {stadiumData.images.map((image, index) => (
+            {serviceData.images.map((image, index) => (
               <SwiperSlide key={index}>
                 {/* <img src={image} className="img-fluid w-100 rounded" alt="Dịch vụ makeup" /> */}
                  <img src={"/img/ab0.jpg"} className="img-fluid w-100 rounded" alt="Dịch vụ makeup" />
@@ -507,10 +507,10 @@ const SanBongDetail = () => {
         </div>
         <div className="col-md-12 mt-4">
           <h4>Vị trí trên bản đồ</h4>
-          {stadiumData && (
+          {serviceData && (
             <iframe
               src={`https://maps.google.com/maps?width=600&height=400&hl=en&q=${encodeURIComponent(
-                stadiumData.locationDetail + ", " + stadiumData.location
+                serviceData.locationDetail + ", " + serviceData.location
               )}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
               width="100%"
               height="300"
@@ -569,7 +569,7 @@ const SanBongDetail = () => {
                             <div className="d-flex justify-content-between align-items-start">
                               <div className="d-flex align-items-center">
                                 <strong className="me-2">{reply.user?.name || "Người dùng ẩn danh"}</strong>
-                                {isStadiumOwner(reply.userId) && (
+                                {isServiceOwner(reply.userId) && (
                                   <span className="badge bg-success">
                                     <i className="fas fa-crown me-1"></i>
                                     Chuyên viên
@@ -753,7 +753,7 @@ const SanBongDetail = () => {
                             <div>
                               <h6 className="mb-1 d-flex align-items-center">
                                 {comment.user?.name || "Người dùng ẩn danh"}
-                                {isStadiumOwner(comment.user?._id) && (
+                                {isServiceOwner(comment.user?._id) && (
                                   <span className="badge bg-success ms-2">
                                     <i className="fas fa-crown me-1"></i>
                                     Chuyên viên
@@ -897,7 +897,7 @@ const SanBongDetail = () => {
       </div>
 
       {/* Modal đặt lịch */}
-      <OrderStadiumModal open={showModal} onClose={() => setShowModal(false)} stadiumData={stadiumData} />
+      <OrderServiceModal open={showModal} onClose={() => setShowModal(false)} serviceData={serviceData} />
 
       {/* Modal phản hồi */}
       <Modal show={showReplyModal} onHide={() => setShowReplyModal(false)} centered>
