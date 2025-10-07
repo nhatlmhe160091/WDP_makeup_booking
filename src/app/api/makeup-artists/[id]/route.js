@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import clientPromise from "@muahub/lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -5,24 +6,23 @@ import { ObjectId } from "mongodb";
 export async function GET(request, { params }) {
   try {
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db("accounts");
     const id = params.id;
 
-    // Get the makeup artist data
+    // Lấy thông tin user cơ bản
     const artist = await db.collection("users").findOne(
-      { 
+      {
         _id: new ObjectId(id),
         role: "makeup_artist"
       },
       {
         projection: {
-          password: 0, // Exclude sensitive data
+          password: 0,
           resetPasswordToken: 0,
           resetPasswordExpires: 0
         }
       }
     );
-
     if (!artist) {
       return NextResponse.json(
         { error: "Makeup artist not found" },
@@ -30,7 +30,10 @@ export async function GET(request, { params }) {
       );
     }
 
-    // Get reviews for this artist
+    // Lấy profile chuyên biệt từ makeup_artist_profiles
+    const profile = await db.collection("makeup_artist_profiles").findOne({ artistId: new ObjectId(id) });
+
+    // Lấy reviews cho artist
     const reviews = await db.collection("feedbacks")
       .aggregate([
         {
@@ -44,9 +47,7 @@ export async function GET(request, { params }) {
             as: "user"
           }
         },
-        {
-          $unwind: "$user"
-        },
+        { $unwind: "$user" },
         {
           $project: {
             rating: 1,
@@ -59,32 +60,40 @@ export async function GET(request, { params }) {
       ])
       .toArray();
 
-    // Get portfolio items
-    const portfolio = await db.collection("portfolios")
-      .find({ artistId: new ObjectId(id) })
-      .toArray();
+    // Lấy portfolio và certificates từ profile (nếu có), fallback sang collection cũ nếu chưa chuyển đổi dữ liệu
+    let portfolio = [];
+    let certificates = [];
+    if (profile) {
+      portfolio = profile.portfolio || [];
+      certificates = profile.certificates || [];
+    } else {
+      portfolio = await db.collection("portfolios").find({ artistId: new ObjectId(id) }).toArray();
+      certificates = await db.collection("certificates").find({ artistId: new ObjectId(id) }).toArray();
+    }
 
-    // Get certificates
-    const certificates = await db.collection("certificates")
-      .find({ artistId: new ObjectId(id) })
-      .toArray();
+    // console.log("artist.name", artist.name);
+    // console.log("artist.avatar", artist.avatar);
+    // console.log("profile?.bio", profile?.bio);
+    // console.log("artist.bio", artist.bio);
+    // console.log("artist.phone", artist.phone);
+    // console.log("artist.email", artist.email);
 
-    // Combine all data
     const artistData = {
       ...artist,
+      ...profile,
       reviews,
       portfolio,
       certificates,
       profileComplete: Boolean(
         artist.name &&
         artist.avatar &&
-        artist.bio &&
+        (profile?.bio || artist.bio) &&
         artist.phone &&
         artist.email
       )
     };
 
-    return NextResponse.json({ payload: artistData });
+  return NextResponse.json({ data: artistData });
   } catch (error) {
     console.error("Error fetching makeup artist:", error);
     return NextResponse.json(

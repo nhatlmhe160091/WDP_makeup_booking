@@ -1,263 +1,108 @@
 "use client";
 
+
 import { useState } from "react";
-import Image from "next/image";
-import { Avatar, Box, Typography, Grid, Button, Rating, Paper, Divider, Chip } from "@mui/material";
-import {
-  Person,
-  Email,
-  Phone,
-  AccessTime,
-  WorkHistory,
-  Star,
-  Message,
-  AccountBalance,
-  Lock,
-  Warning
-} from "@mui/icons-material";
 
 const MakeupArtistProfile = ({ artist }) => {
   const [selectedPortfolioImage, setSelectedPortfolioImage] = useState(null);
   const [currentTab, setCurrentTab] = useState("portfolio"); // portfolio, reviews, certificates
 
-  if (!artist.isActive) {
+
+  // Hiển thị trạng thái hoạt động và hoàn thiện hồ sơ
+  if (artist.active === false) {
     return (
       <div className="container py-5">
-        <div className="alert alert-warning d-flex align-items-center">
-          <Lock sx={{ mr: 2 }} />
-          <Typography>This account is temporarily unavailable</Typography>
-        </div>
+        <div className="alert alert-warning">Tài khoản này chưa được kích hoạt.</div>
       </div>
     );
   }
-
   if (!artist.profileComplete) {
     return (
       <div className="container py-5">
-        <div className="alert alert-info d-flex align-items-center">
-          <Warning sx={{ mr: 2 }} />
-          <Typography>Profile is being updated</Typography>
-        </div>
+        <div className="alert alert-info">Hồ sơ đang được cập nhật.</div>
       </div>
     );
   }
 
   return (
     <div className="container py-5">
-      {/* Basic Info Section */}
-      <Paper elevation={3} className="p-4 mb-4">
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={3} className="text-center">
-            <Avatar
-              src={artist.avatar}
-              alt={artist.name}
-              sx={{ width: 200, height: 200, margin: "0 auto" }}
-            />
-          </Grid>
-          <Grid item xs={12} md={9}>
-            <Typography variant="h4" gutterBottom>
-              {artist.name}
-              {artist.isVerified && (
-                <Chip
-                  icon={<Star />}
-                  label="Verified Artist"
-                  color="primary"
-                  size="small"
-                  className="ms-2"
-                />
-              )}
-            </Typography>
-            
-            <Typography variant="body1" paragraph>
-              {artist.bio}
-            </Typography>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center" mb={1}>
-                  <WorkHistory sx={{ mr: 1 }} />
-                  <Typography>
-                    Experience: {artist.experienceYears} years {artist.experienceMonths} months
-                  </Typography>
-                </Box>
-                <Box display="flex" alignItems="center" mb={1}>
-                  <AccessTime sx={{ mr: 1 }} />
-                  <Typography>
-                    Available: {artist.workingHours}
-                  </Typography>
-                </Box>
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" alignItems="center" mb={1}>
-                  <Phone sx={{ mr: 1 }} />
-                  <Typography>
-                    <a href={`tel:${artist.phone}`}>{artist.phone}</a>
-                  </Typography>
-                </Box>
-                <Box display="flex" alignItems="center" mb={1}>
-                  <Email sx={{ mr: 1 }} />
-                  <Typography>
-                    <a href={`mailto:${artist.email}`}>{artist.email}</a>
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<Message />}
-                onClick={() => window.location.href = `/message/${artist._id}`}
-              >
-                Contact Now
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Navigation Tabs */}
-      <Box mb={3}>
-        <Button
-          variant={currentTab === "portfolio" ? "contained" : "outlined"}
-          onClick={() => setCurrentTab("portfolio")}
-          sx={{ mr: 2 }}
-        >
-          Portfolio
-        </Button>
-        <Button
-          variant={currentTab === "reviews" ? "contained" : "outlined"}
-          onClick={() => setCurrentTab("reviews")}
-          sx={{ mr: 2 }}
-        >
-          Reviews & Comments
-        </Button>
-        <Button
-          variant={currentTab === "certificates" ? "contained" : "outlined"}
-          onClick={() => setCurrentTab("certificates")}
-        >
-          Certificates
-        </Button>
-      </Box>
-
-      {/* Portfolio Section */}
-      {currentTab === "portfolio" && (
-        <Paper elevation={3} className="p-4">
-          <Typography variant="h5" gutterBottom>
-            Portfolio
-          </Typography>
-          <Grid container spacing={2}>
-            {artist.portfolio?.map((item, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <div 
-                  className="position-relative"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setSelectedPortfolioImage(item)}
-                >
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.description}
-                    width={300}
-                    height={300}
-                    objectFit="cover"
-                    className="rounded"
-                  />
-                  <div className="position-absolute bottom-0 start-0 w-100 p-2 bg-dark bg-opacity-75 text-white">
-                    <Typography variant="subtitle2">
-                      {item.description}
-                    </Typography>
-                  </div>
-                </div>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
-      )}
-
-      {/* Reviews Section */}
-      {currentTab === "reviews" && (
-        <Paper elevation={3} className="p-4">
-          <Typography variant="h5" gutterBottom>
-            Reviews & Comments
-          </Typography>
-          {artist.reviews?.map((review, index) => (
-            <Box key={index} mb={3}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <Avatar src={review.userAvatar} alt={review.userName} />
-                <Box ml={2}>
-                  <Typography variant="subtitle1">{review.userName}</Typography>
-                  <Rating value={review.rating} readOnly />
-                </Box>
-              </Box>
-              <Typography variant="body1">{review.comment}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {new Date(review.date).toLocaleDateString()}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Box>
-          ))}
-        </Paper>
-      )}
-
-      {/* Certificates Section */}
-      {currentTab === "certificates" && (
-        <Paper elevation={3} className="p-4">
-          <Typography variant="h5" gutterBottom>
-            Professional Certificates
-          </Typography>
-          <Grid container spacing={2}>
-            {artist.certificates?.map((cert, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Paper elevation={2} className="p-3">
-                  <Typography variant="h6">{cert.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Issued by: {cert.issuedBy}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Date: {new Date(cert.issueDate).toLocaleDateString()}
-                  </Typography>
-                  {cert.imageUrl && (
-                    <Image
-                      src={cert.imageUrl}
-                      alt={cert.name}
-                      width={300}
-                      height={200}
-                      objectFit="contain"
-                      className="mt-2"
-                    />
-                  )}
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
-      )}
-
-      {/* Portfolio Image Modal */}
-      {selectedPortfolioImage && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center"
-          style={{ zIndex: 1050 }}
-          onClick={() => setSelectedPortfolioImage(null)}
-        >
-          <div className="position-relative" style={{ maxWidth: "90vw", maxHeight: "90vh" }}>
-            <Image
-              src={selectedPortfolioImage.imageUrl}
-              alt={selectedPortfolioImage.description}
-              width={800}
-              height={600}
-              objectFit="contain"
-            />
-            <Typography
-              className="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white"
-            >
-              {selectedPortfolioImage.description}
-            </Typography>
+      <div className="row g-4 align-items-center">
+        <div className="col-md-4 text-center">
+          <img
+            src={artist.avatar || "/img/avatar.jpg"}
+            alt={artist.name}
+            className="rounded-circle mb-3"
+            style={{ width: 160, height: 160, objectFit: "cover", border: "4px solid #eee" }}
+          />
+          <h3 className="mb-1">{artist.name}</h3>
+          <div className="mb-2 text-muted">{artist.address}</div>
+          <div className="mb-2">
+            <span className={`badge ${artist.active ? "bg-success" : "bg-secondary"}`}>
+              {artist.active ? "Đang hoạt động" : "Chưa kích hoạt"}
+            </span>
+          </div>
+          <div className="mb-2">
+            <a href={`tel:${artist.phone}`} className="me-2"><i className="bi bi-telephone"></i> {artist.phone}</a>
+            <a href={`mailto:${artist.email}`}><i className="bi bi-envelope"></i> {artist.email}</a>
+          </div>
+          <div className="mb-2">
+            {artist.socialLinks?.facebook && (
+              <a href={artist.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="me-2">
+                <i className="bi bi-facebook"></i>
+              </a>
+            )}
+            {artist.socialLinks?.instagram && (
+              <a href={artist.socialLinks.instagram} target="_blank" rel="noopener noreferrer">
+                <i className="bi bi-instagram"></i>
+              </a>
+            )}
           </div>
         </div>
-      )}
+        <div className="col-md-8">
+          <h4>Giới thiệu</h4>
+          <p>{artist.bio || "Chưa có mô tả."}</p>
+          <div className="mb-2">
+            <strong>Kinh nghiệm:</strong> {artist.experienceYears || 0} năm
+          </div>
+          <div className="mb-2">
+            <strong>Giờ làm việc:</strong> {artist.workingHours || "Chưa cập nhật"}
+          </div>
+          <div className="mb-2">
+            <strong>CCCD:</strong> {artist.cccd}
+          </div>
+          <div className="mb-2">
+            <strong>Trạng thái hồ sơ:</strong> {artist.profileComplete ? "Đầy đủ" : "Chưa hoàn thiện"}
+          </div>
+          <hr />
+          <h5 className="mt-4">Portfolio</h5>
+          <div className="row g-2">
+            {artist.portfolio && artist.portfolio.length > 0 ? (
+              artist.portfolio.map((item, idx) => (
+                <div className="col-4" key={idx}>
+                  <img src={item.image} alt={item.desc} className="img-fluid rounded" style={{ height: 120, objectFit: "cover" }} />
+                  <div className="small mt-1">{item.desc}</div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-muted">Chưa có portfolio.</div>
+            )}
+          </div>
+          <h5 className="mt-4">Chứng chỉ</h5>
+          <div className="row g-2">
+            {artist.certificates && artist.certificates.length > 0 ? (
+              artist.certificates.map((item, idx) => (
+                <div className="col-6 col-md-4" key={idx}>
+                  <img src={item.image} alt={item.name} className="img-fluid rounded" style={{ height: 80, objectFit: "cover" }} />
+                  <div className="small mt-1">{item.name}</div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-muted">Chưa có chứng chỉ.</div>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* Có thể bổ sung hiển thị reviews ở đây nếu muốn */}
     </div>
   );
 };
