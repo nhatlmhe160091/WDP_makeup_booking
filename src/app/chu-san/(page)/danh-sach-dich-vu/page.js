@@ -18,8 +18,8 @@ import PageContainer from "../../components/container/PageContainer";
 import Link from "next/link";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER } from "@muahub/constants/System";
-import AddStadiumModal from "./components/modalThemSan";
-import EditStadiumModal from "./components/modalSuaSan";
+import AddStadiumModal from "./components/modalThemDichVu";
+import EditStadiumModal from "./components/modalSuaDichVu";
 
 const StadiumListPage = () => {
   const { currentUser } = useApp();
