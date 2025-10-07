@@ -1,7 +1,7 @@
-import clientPromise from "@quanlysanbong/lib/mongodb";
-import getObjectId from "@quanlysanbong/lib/getObjectId";
+import clientPromise from "@muahub/lib/mongodb";
+import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
-import { validateToken } from "@quanlysanbong/lib/auth";
+import { validateToken } from "@muahub/lib/auth";
 
 const DB_NAME = "stadiums";
 const STADIUM_COLLECTION_NAME = "stadium";

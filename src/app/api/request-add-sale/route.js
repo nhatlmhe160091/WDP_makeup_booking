@@ -1,6 +1,6 @@
-import { htmlUpdateAccount } from "@quanlysanbong/constants/System";
-import clientPromise from "@quanlysanbong/lib/mongodb";
-import { sendEmail } from "@quanlysanbong/lib/sendEmail";
+import { htmlUpdateAccount } from "@muahub/constants/System";
+import clientPromise from "@muahub/lib/mongodb";
+import { sendEmail } from "@muahub/lib/sendEmail";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {

@@ -1,5 +1,5 @@
 "use client";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -40,7 +40,7 @@ const SignInComponent = () => {
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
         if (res.payload.role === "admin" || res.payload.role === "sale") {
-          window.location.href = `/chu-san`;
+          window.location.href = `/makeup-artists`;
         }else{
           window.location.href = "/";
         }

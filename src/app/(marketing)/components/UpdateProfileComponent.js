@@ -1,10 +1,10 @@
 "use client";
 
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 import { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import SearchAddressComponent from "./SearchAddressComponent";
-import SendRequest, { loadingUi } from "@quanlysanbong/utils/SendRequest";
+import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 
 const UpdateProfileComponent = ({ currentUser, updateUser }) => {

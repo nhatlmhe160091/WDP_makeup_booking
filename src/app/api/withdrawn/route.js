@@ -1,5 +1,5 @@
-import getObjectId from "@quanlysanbong/lib/getObjectId";
-import clientPromise from "@quanlysanbong/lib/mongodb";
+import getObjectId from "@muahub/lib/getObjectId";
+import clientPromise from "@muahub/lib/mongodb";
 import { NextResponse } from "next/server";
 
 // API GET để lấy danh sách users

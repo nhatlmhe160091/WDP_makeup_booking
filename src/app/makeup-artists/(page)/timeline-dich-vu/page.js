@@ -1,2 +1,2 @@
-export { default } from "../../../chu-san/(page)/timeline-dat-san/page";
+export { default } from "../../../makeup-artists/(page)/timeline-dat-lich-makeup/page";
 

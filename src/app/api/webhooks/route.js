@@ -1,4 +1,4 @@
-import clientPromise from "@quanlysanbong/lib/mongodb";
+import clientPromise from "@muahub/lib/mongodb";
 import { NextResponse } from "next/server";
 
 const DB_NAME = "accounts";

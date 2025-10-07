@@ -1,5 +1,5 @@
 // lib/mongodb.js
-import { MONGODB_CONNECT } from "@quanlysanbong/constants/MainContent";
+import { MONGODB_CONNECT } from "@muahub/constants/MainContent";
 import { MongoClient } from "mongodb";
 
 const uri = MONGODB_CONNECT;

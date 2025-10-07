@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Tab, Tabs, Form, Button } from "react-bootstrap";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
+import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
 import toast from "react-hot-toast";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import SendRequest from "@muahub/utils/SendRequest";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 import HistoryBookingComponent from "./HistoryBookingComponent";
 import { Alert, AlertTitle, Stack } from "@mui/material";
 import UpgradeIcon from "@mui/icons-material/Upgrade";

@@ -1,4 +1,4 @@
-import { ADDRESS, EMAIL, MAIN_URL_APP, PHONE_NUMBER, WEB_NAME } from "@quanlysanbong/constants/MainContent";
+import { ADDRESS, EMAIL, MAIN_URL_APP, PHONE_NUMBER, WEB_NAME } from "@muahub/constants/MainContent";
 
 const FooterComponent = () => {
   return (

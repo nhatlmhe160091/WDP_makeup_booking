@@ -1,5 +1,5 @@
 "use client"
-import { PHONE_NUMBER } from "@quanlysanbong/constants/MainContent";
+import { PHONE_NUMBER } from "@muahub/constants/MainContent";
 import Link from "next/link";
 
 const AboutUsComponent = () => {

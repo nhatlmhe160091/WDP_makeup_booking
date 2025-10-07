@@ -1,13 +1,13 @@
 "use client";
 
-import { WEB_NAME } from "@quanlysanbong/constants/MainContent";
+import { WEB_NAME } from "@muahub/constants/MainContent";
 import CarouselComponent from "./CarouselComponent";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useState, useRef } from "react";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import { useApp } from "@muahub/app/contexts/AppContext";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 
 const HeaderComponent = () => {
   const pathUrl = usePathname();

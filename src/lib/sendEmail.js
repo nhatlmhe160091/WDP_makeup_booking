@@ -1,5 +1,5 @@
 // lib/sendEmail.ts
-import { EMAIL_NAME, MAIL_VERIFIED, RESEND_API_KEY } from "@quanlysanbong/constants/MainContent";
+import { EMAIL_NAME, MAIL_VERIFIED, RESEND_API_KEY } from "@muahub/constants/MainContent";
 import { Resend } from "resend";
 
 const resend = new Resend(RESEND_API_KEY);

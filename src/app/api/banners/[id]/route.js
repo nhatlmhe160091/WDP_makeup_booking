@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@quanlysanbong/lib/mongodb";
+import clientPromise from "@muahub/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { writeFile, unlink } from "fs/promises";
 import path from "path";

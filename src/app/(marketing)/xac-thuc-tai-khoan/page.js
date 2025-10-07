@@ -1,6 +1,6 @@
 "use client";
 
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 import { useEffect, useState } from "react";
 
 export default function Page() {

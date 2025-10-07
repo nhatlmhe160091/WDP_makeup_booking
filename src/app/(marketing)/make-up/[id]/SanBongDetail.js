@@ -6,13 +6,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
+import { useApp } from "@muahub/app/contexts/AppContext";
 import toast from "react-hot-toast";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 import { usePathname } from "next/navigation";
-import { formatCurrency } from "@quanlysanbong/utils/Main";
+import { formatCurrency } from "@muahub/utils/Main";
 import OrderStadiumModal from "./OrderStadiumModal";
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 import Link from "next/link";
 import { Button, Card, Form, Modal, Collapse } from "react-bootstrap";
 import { Avatar, Box, Typography } from "@mui/material";
@@ -317,32 +317,37 @@ const SanBongDetail = () => {
             <div className="card-body">
               <div className="d-flex align-items-center mb-4">
                 <div className="flex-shrink-0">
-                  <div className="position-relative">
-                    <Avatar
-                      alt={stadiumData.owner.name}
-                      src={stadiumData.owner.avatar}
-                      sx={{ width: 80, height: 80 }}
-                    />
-                    <div 
-                      className="position-absolute" 
-                      style={{ 
-                        bottom: -5, 
-                        right: -5, 
-                        background: '#ff5c95ff', 
-                        borderRadius: '50%',
-                        padding: '4px',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                      }}
-                    >
-                      <i className="fas fa-crown text-white"></i>
+                  <Link href={`/makeup-artists/${stadiumData.owner._id}`} className="text-decoration-none">
+                    <div className="position-relative">
+                      <Avatar
+                        alt={stadiumData.owner.name}
+                        src={stadiumData.owner.avatar}
+                        sx={{ width: 80, height: 80, cursor: 'pointer' }}
+                      />
+                      <div 
+                        className="position-absolute" 
+                        style={{ 
+                          bottom: -5, 
+                          right: -5, 
+                          background: '#ff5c95ff', 
+                          borderRadius: '50%',
+                          padding: '4px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                      >
+                        <i className="fas fa-crown text-white"></i>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{stadiumData.stadiumName}</h2>
                   <p className="text-muted mb-0">
                     <i className="fas fa-user-circle me-2"></i>
-                    Chuyên viên: <strong>{stadiumData.owner.name}</strong>
+                    Chuyên viên: {' '}
+                    <Link href={`/makeup-artists/${stadiumData.owner._id}`} className="text-decoration-none">
+                      <strong className="text-primary" style={{ cursor: 'pointer' }}>{stadiumData.owner.name}</strong>
+                    </Link>
                     {stadiumData.owner.phone && (
                       <a href={`tel:${stadiumData.owner.phone}`} className="ms-2 text-decoration-none">
                         <i className="fas fa-phone-alt me-1"></i>

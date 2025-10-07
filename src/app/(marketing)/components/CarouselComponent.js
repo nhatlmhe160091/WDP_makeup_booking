@@ -1,10 +1,10 @@
 "use client";
-import { VIDEO_LINK, WEB_NAME } from "@quanlysanbong/constants/MainContent";
+import { VIDEO_LINK, WEB_NAME } from "@muahub/constants/MainContent";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { useState, useEffect } from "react";
-// import SendRequest from "@quanlysanbong/utils/SendRequest";
+// import SendRequest from "@muahub/utils/SendRequest";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";

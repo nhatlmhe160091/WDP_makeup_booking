@@ -13,11 +13,11 @@ import {
   CardContent
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 import PageContainer from "../../components/container/PageContainer";
 import Link from "next/link";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import { useApp } from "@muahub/app/contexts/AppContext";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 import AddStadiumModal from "./components/modalThemSan";
 import EditStadiumModal from "./components/modalSuaSan";
 
@@ -96,7 +96,7 @@ const StadiumListPage = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Danh sách dịch vụ</Typography>
         <Box display="flex" gap={2}>
-          <Link href="/chu-san/them-dich-vu">
+          <Link href="/makeup-artists/them-dich-vu">
             <Button
               variant="contained"
               startIcon={<Add />}
@@ -123,7 +123,7 @@ const StadiumListPage = () => {
                 <Typography variant="h6" color="textSecondary" mb={2}>
                   Chưa có dịch vụ nào
                 </Typography>
-                <Link href="/chu-san/them-dich-vu">
+                <Link href="/makeup-artists/them-dich-vu">
                   <Button
                     variant="contained"
                     startIcon={<Add />}

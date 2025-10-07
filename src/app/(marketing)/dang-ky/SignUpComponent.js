@@ -1,6 +1,6 @@
 "use client";
 
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

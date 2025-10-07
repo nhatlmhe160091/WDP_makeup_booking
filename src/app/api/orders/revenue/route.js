@@ -1,5 +1,5 @@
-import clientPromise from "@quanlysanbong/lib/mongodb";
-import getObjectId from "@quanlysanbong/lib/getObjectId";
+import clientPromise from "@muahub/lib/mongodb";
+import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
 
 const DB_NAME = "stadiums";

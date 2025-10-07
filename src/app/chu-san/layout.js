@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import LoadingFullScreen from "./components/Loading/LoadingFullScreen";
 import "./baseCss.css";
 import { useApp } from "../contexts/AppContext";
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
+import { ROLE_MANAGER } from "@muahub/constants/System";
 
 const AdminLayout = ({ children }) => {
   const { currentUser, loading } = useApp();
@@ -20,10 +20,10 @@ const AdminLayout = ({ children }) => {
     return;
   }
 
-  const url = ["/chu-san/dang-nhap", "/chu-san/dang-ky"];
+  const url = ["/makeup-artists/dang-nhap", "/makeup-artists/dang-ky"];
 
   if (!loading && Object.keys(currentUser).length === 0 && !url.includes(pathUrl)) {
-    window.location.href = "/chu-san/dang-nhap";
+    window.location.href = "/makeup-artists/dang-nhap";
     return;
   }
 
@@ -35,7 +35,7 @@ const AdminLayout = ({ children }) => {
         <div className="loading position-fixed" id="loading-full-screen">
           <LoadingFullScreen />
         </div>
-      ) : pathUrl === "/chu-san/dang-nhap" || pathUrl === "/chu-san/dang-ky" ? (
+      ) : pathUrl === "/makeup-artists/dang-nhap" || pathUrl === "/makeup-artists/dang-ky" ? (
         <>{children}</>
       ) : (
         <RootAdminLayout>{children}</RootAdminLayout>

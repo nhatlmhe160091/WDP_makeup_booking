@@ -1,4 +1,4 @@
-import { MAIN_URL_APP } from "@quanlysanbong/constants/MainContent";
+import { MAIN_URL_APP } from "@muahub/constants/MainContent";
 
 const META_DATA = {
   TITLE: "MuaHub - Đặt lịch Makeup",

@@ -25,32 +25,32 @@ const Menuitems = [
     id: uniqueId(),
     title: "Tổng quan đặt lịch",
     icon: IconLayoutDashboard,
-    href: "/chu-san"
+    href: "/makeup-artists"
   },
   {
     id: uniqueId(),
     title: "Chi tiết doanh thu",
     icon: IconChartBar,
-    href: "/chu-san/doanh-thu"
+    href: "/makeup-artists/doanh-thu"
   },
   {
     id: uniqueId(),
     title: "Lịch sử rút tiền",
     icon: IconHistory,
-    href: "/chu-san/nap-rut"
+    href: "/makeup-artists/nap-rut"
   },
   {
     id: uniqueId(),
     title: "Thanh toán cho nền tảng",
     icon: IconMoneybag,
-    href: "/chu-san/thanh-toan-nen-tang",
+    href: "/makeup-artists/thanh-toan-nen-tang",
     onlyUser: true
   },
   {
     id: uniqueId(),
     title: "Lịch sử giao dịch",
     icon: IconHistory,
-    href: "/chu-san/lich-su-giao-dich",
+    href: "/makeup-artists/lich-su-giao-dich",
     onlyAdmin: true
   },
   {
@@ -61,7 +61,7 @@ const Menuitems = [
     id: uniqueId(),
     title: "Lịch sử đặt lịch",
     icon: IconListCheck,
-    href: "/makeup-artists/danh-sach-dat-san"
+    href: "/makeup-artists/danh-sach-dat-lich-makeup"
   },
   {
     id: uniqueId(),
@@ -78,28 +78,28 @@ const Menuitems = [
     id: uniqueId(),
     title: "Danh sách người dùng",
     icon: IconUsers,
-    href: "/chu-san/danh-sach-nguoi-dung",
+    href: "/makeup-artists/danh-sach-nguoi-dung",
     onlyAdmin: true
   },
   {
     id: uniqueId(),
     title: "Danh sách chủ sân",
     icon: IconUsers,
-    href: "/chu-san/danh-sach-chu-san",
+    href: "/makeup-artists/danh-sach-makeup-artists",
     onlyAdmin: true
   },
   {
     id: uniqueId(),
     title: "Danh sách khiếu nại",
     icon: IconMessage,
-    href: "/chu-san/danh-sach-feedback",
+    href: "/makeup-artists/danh-sach-feedback",
     onlyAdmin: true
   },
   {
     id: uniqueId(),
     title: "Danh sách duyệt chủ sân",
     icon: IconAlignBoxLeftBottom,
-    href: "/chu-san/danh-sach-duyet-chu-san",
+    href: "/makeup-artists/danh-sach-duyet-makeup-artists",
     onlyAdmin: true
   },
   {
@@ -129,14 +129,14 @@ const Menuitems = [
     id: uniqueId(),
     title: "Quản lý banner",
     icon: IconSettings,
-    href: "/chu-san/quan-ly-banner",
+    href: "/makeup-artists/quan-ly-banner",
     onlyAdmin: true
   },
   // {
   //   id: uniqueId(),
   //   title: "Quản trị website",
   //   icon: IconSettings,
-  //   href: "/chu-san/quan-tri-website",
+  //   href: "/makeup-artists/quan-tri-website",
   //   onlyAdmin: true
   // }
 ];

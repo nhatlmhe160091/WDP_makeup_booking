@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 
 const COOLDOWN_HOURS = 1;
 

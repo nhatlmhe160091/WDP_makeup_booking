@@ -1,8 +1,8 @@
 "use client";
 
-import { formatCurrency } from "@quanlysanbong/utils/Main";
+import { formatCurrency } from "@muahub/utils/Main";
 import Link from "next/link";
-import "@quanlysanbong/styles/makeup-artist-enhancements.css";
+import "@muahub/styles/makeup-artist-enhancements.css";
 
 const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingCount = false, bookingCount = 0 }) => {
   // Xử lý tên artist - ưu tiên artistName, sau đó stadiumName

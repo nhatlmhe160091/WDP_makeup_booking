@@ -19,10 +19,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
 import SelectStadiumComponent from "../../../components/SelectStadiumComponent";
-import ImagePreview from "@quanlysanbong/app/chu-san/components/ImagePreview";
+import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
 import toast from "react-hot-toast";
-import SendRequest, { loadingUi } from "@quanlysanbong/utils/SendRequest";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
+import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
+import { useApp } from "@muahub/app/contexts/AppContext";
 
 const fieldSizes = {
   5: {

@@ -3,7 +3,7 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/chu-san/:path*',
+        source: '/makeup-artists/:path*',
         destination: '/makeup-artists/:path*',
         permanent: false,
       },

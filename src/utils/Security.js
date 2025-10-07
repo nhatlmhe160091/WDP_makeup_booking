@@ -1,6 +1,6 @@
 "use strict";
 
-import { CRYPTO_IV, CRYPTO_KEY } from "@quanlysanbong/constants/MainContent";
+import { CRYPTO_IV, CRYPTO_KEY } from "@muahub/constants/MainContent";
 import CryptoJS from "crypto-js";
 
 const key = CryptoJS.enc.Hex.parse(CRYPTO_KEY);

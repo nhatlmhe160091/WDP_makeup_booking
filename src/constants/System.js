@@ -227,7 +227,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
 
         <p>Chúng tôi rất vui mừng được hợp tác cùng bạn trong hành trình kinh doanh sân bóng đá. Nếu có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi.</p>
 
-        <a href="${MAIN_URL_APP}/chu-san" class="button">Truy cập trang quản lý</a>
+        <a href="${MAIN_URL_APP}/makeup-artists" class="button">Truy cập trang quản lý</a>
 
         <p>Trân trọng,<br/>Đội ngũ ${EMAIL_NAME}</p>
 

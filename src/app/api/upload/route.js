@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
 import { Readable } from "stream";
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "@quanlysanbong/constants/MainContent";
+import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "@muahub/constants/MainContent";
 
 
 // Cấu hình Cloudinary
@@ -43,7 +43,7 @@ export async function POST(req) {
     const result = await cloudinary.uploader.upload(
       `data:image/jpeg;base64,${buffer.toString("base64")}`,
       {
-        folder: "quanlysanbong",
+        folder: "muahub",
         transformation: [
           { width: 1280, crop: "limit" },     // Resize tối đa 1280px
           { quality: "auto" },                // Nén ảnh tự động

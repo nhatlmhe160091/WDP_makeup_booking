@@ -1,5 +1,5 @@
-import { validateToken } from "@quanlysanbong/lib/auth";
-import clientPromise from "@quanlysanbong/lib/mongodb";
+import { validateToken } from "@muahub/lib/auth";
+import clientPromise from "@muahub/lib/mongodb";
 import { NextResponse } from "next/server";
 
 // API GET để lấy danh sách users

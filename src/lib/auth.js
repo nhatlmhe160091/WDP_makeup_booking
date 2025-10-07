@@ -1,4 +1,4 @@
-import { decrypt } from "@quanlysanbong/utils/Security";
+import { decrypt } from "@muahub/utils/Security";
 import getObjectId from "./getObjectId";
 
 export function getToken(req) {

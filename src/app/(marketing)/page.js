@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import "@quanlysanbong/styles/style.css";
+import "@muahub/styles/style.css";
 import Script from "next/script";
 import AboutUsComponent from "./components/AboutUsComponent";
 import OurFeaturesComponent from "./components/OurFeaturesComponent";

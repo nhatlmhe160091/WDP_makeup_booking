@@ -18,9 +18,9 @@ import {
   Avatar
 } from "@mui/material";
 import PageContainer from "./components/container/PageContainer";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
-import { convertDate, convertDateTime } from "@quanlysanbong/utils/Main";
-import { ROLE_MANAGER, ROLE_MANAGER_TEXT } from "@quanlysanbong/constants/System";
+import { useApp } from "@muahub/app/contexts/AppContext";
+import { convertDate, convertDateTime } from "@muahub/utils/Main";
+import { ROLE_MANAGER, ROLE_MANAGER_TEXT } from "@muahub/constants/System";
 import SalesOverview from "./components/dashboard/SalesOverview";
 import MonthlyEarnings from "./components/dashboard/MonthlyEarnings";
 import RecentNotifies from "./components/dashboard/RecentTransactions";

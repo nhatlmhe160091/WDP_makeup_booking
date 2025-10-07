@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import "@quanlysanbong/styles/style.css";
+import "@muahub/styles/style.css";
 import META_DATA from "./metaData";
 import SignInComponent from "./SignInComponent";
 

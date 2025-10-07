@@ -1,7 +1,7 @@
-import { ROLE_MANAGER } from "@quanlysanbong/constants/System";
-import getObjectId from "@quanlysanbong/lib/getObjectId";
-import clientPromise from "@quanlysanbong/lib/mongodb";
-import { encrypt } from "@quanlysanbong/utils/Security";
+import { ROLE_MANAGER } from "@muahub/constants/System";
+import getObjectId from "@muahub/lib/getObjectId";
+import clientPromise from "@muahub/lib/mongodb";
+import { encrypt } from "@muahub/utils/Security";
 import { NextResponse } from "next/server";
 
 // API GET để lấy danh sách feedbacks

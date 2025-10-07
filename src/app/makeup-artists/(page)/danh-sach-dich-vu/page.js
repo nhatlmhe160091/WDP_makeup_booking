@@ -1,2 +1,2 @@
-export { default } from "../../../chu-san/(page)/danh-sach-dich-vu/page";
+export { default } from "../danh-sach-san/page";
 

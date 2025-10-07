@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BoxFieldComponent from "../components/BoxFieldComponent";
-import SendRequest from "@quanlysanbong/utils/SendRequest";
+import SendRequest from "@muahub/utils/SendRequest";
 
 const itemsPerPage = 12;
 

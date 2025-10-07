@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -19,10 +19,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
 import SelectStadiumComponent from "../../../components/SelectStadiumComponent";
-import ImagePreview from "@quanlysanbong/app/chu-san/components/ImagePreview";
+import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
 import toast from "react-hot-toast";
-import SendRequest, { loadingUi } from "@quanlysanbong/utils/SendRequest";
-import { useApp } from "@quanlysanbong/app/contexts/AppContext";
+import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
+import { useApp } from "@muahub/app/contexts/AppContext";
 
 const fieldSizes = {
   5: {
@@ -103,7 +103,7 @@ const availableAmenities = [
   "Có hợp đồng cam kết"
 ];
 
-const AddStadiumModal = ({ open, onClose, onSuccess }) => {
+const EditStadiumModal = ({ open, onClose, onSuccess, stadiumData={} }) => {
   const { currentUser } = useApp();
 
   const [stadiumName, setStadiumName] = useState("");
@@ -117,6 +117,52 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
   const [longitude, setLongitude] = useState("");
   const [amenities, setAmenities] = useState([]);
   const [fields, setFields] = useState(fieldSizes);
+  const [experienceYears, setExperienceYears] = useState(0);
+  const [experienceMonths, setExperienceMonths] = useState(0);
+
+  // Load dữ liệu khi mở modal và có stadiumData
+  useEffect(() => {
+    if (open && stadiumData) {
+      setStadiumName(stadiumData.stadiumName || "");
+      setDescription(stadiumData.description || "");
+      setImages(stadiumData.images || []);
+
+      // Sửa lại cách parse thời gian
+      if (stadiumData.openingTime) {
+        const [hour, minute] = stadiumData.openingTime.split(":");
+        setOpeningTime(dayjs().hour(parseInt(hour)).minute(parseInt(minute)));
+      }
+      if (stadiumData.closingTime) {
+        const [hour, minute] = stadiumData.closingTime.split(":");
+        setClosingTime(dayjs().hour(parseInt(hour)).minute(parseInt(minute)));
+      }
+      setLocation((prev)=> stadiumData.location || prev);
+      setLocationDetail(stadiumData.locationDetail || "");
+      setLatitude(stadiumData.latitude ? stadiumData.latitude.toString() : "");
+      setLongitude(stadiumData.longitude ? stadiumData.longitude.toString() : "");
+      setAmenities(stadiumData.amenities || []);
+      setExperienceYears(stadiumData.experienceYears || 0);
+      setExperienceMonths(stadiumData.experienceMonths || 0);
+
+      // Merge fields data với default fields
+      const mergedFields = { ...fieldSizes };
+      if (stadiumData.fields) {
+        Object.keys(stadiumData.fields).forEach((key) => {
+          if (mergedFields[key]) {
+            mergedFields[key] = { ...mergedFields[key], ...stadiumData.fields[key] };
+          }
+        });
+      }
+      setFields(mergedFields);
+    }
+  }, [open, stadiumData]);
+
+  // Reset form khi đóng modal
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -150,6 +196,8 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
     setLongitude("");
     setAmenities([]);
     setFields(fieldSizes);
+    setExperienceYears(0);
+    setExperienceMonths(0);
   };
 
   const handleSubmit = async () => {
@@ -185,8 +233,11 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
 
       loadingUi(true);
 
-      // Upload images
-      const uploadImages = images.map(async (image) => {
+      // Upload images mới (chỉ upload những file mới)
+      const newImages = images.filter((image) => image instanceof File);
+      const existingImages = images.filter((image) => typeof image === "string");
+
+      const uploadImages = newImages.map(async (image) => {
         const formData = new FormData();
         formData.append("file", image);
 
@@ -201,7 +252,8 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
         return data.url;
       });
 
-      const imgs = await Promise.all(uploadImages);
+      const newImageUrls = await Promise.all(uploadImages);
+      const allImages = [...existingImages, ...newImageUrls];
 
       // Prepare data
       const data = {
@@ -214,15 +266,16 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
         amenities,
         openingTime: openingTime.format("HH:mm"),
         closingTime: closingTime.format("HH:mm"),
-        images: imgs,
-        fields
+        images: allImages,
+        fields,
+        experienceYears: Number.isFinite(Number(experienceYears)) ? Number(experienceYears) : 0,
+        experienceMonths: Number.isFinite(Number(experienceMonths)) ? Number(experienceMonths) : 0
       };
 
-      // Send request
-      const res = await SendRequest("POST", "/api/stadiums", data);
+      // Send request - sử dụng PUT để cập nhật
+      const res = await SendRequest("PUT", `/api/stadiums/${stadiumData._id}`, data);
 
-      toast.success("Thêm dịch vụ makeup thành công");
-      resetForm();
+      toast.success("Cập nhật dịch vụ makeup thành công");
       onSuccess(); // Callback để refresh danh sách
       onClose(); // Đóng modal
       loadingUi(false);
@@ -240,7 +293,7 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>Thêm dịch vụ mới</DialogTitle>
+      <DialogTitle>Sửa thông tin dịch vụ</DialogTitle>
       <DialogContent>
         <Box sx={{ mt: 2 }}>
           <Grid container spacing={3}>
@@ -255,7 +308,12 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
             </Grid>
 
             <Grid item xs={12}>
-              <SearchAddressComponent className="" onSearch={setLocation} oldSearch={currentUser?.address || ""} />
+              <SearchAddressComponent
+                className=""
+                onSearch={setLocation}
+                oldSearch={stadiumData.location || ""}
+                value={location} // Thêm prop value để auto-fill
+              />
               <TextField
                 label="Địa chỉ chi tiết"
                 fullWidth
@@ -263,6 +321,31 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
                 variant="outlined"
                 value={locationDetail}
                 onChange={(e) => setLocationDetail(e.target.value)}
+              />
+            </Grid>
+
+            {/* Kinh nghiệm chuyên viên - đặt ngay sau địa chỉ, giống trang thêm */}
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Kinh nghiệm (năm)"
+                fullWidth
+                variant="outlined"
+                type="number"
+                inputProps={{ min: 0 }}
+                value={experienceYears}
+                onChange={(e) => setExperienceYears(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                label="Kinh nghiệm (tháng)"
+                fullWidth
+                variant="outlined"
+                type="number"
+                inputProps={{ min: 0, max: 11 }}
+                helperText="0 - 11 tháng"
+                value={experienceMonths}
+                onChange={(e) => setExperienceMonths(e.target.value)}
               />
             </Grid>
 
@@ -377,13 +460,15 @@ const AddStadiumModal = ({ open, onClose, onSuccess }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Hủy</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Thêm dịch vụ
+        <Button onClick={handleClose} color="secondary">
+          Hủy
+        </Button>
+        <Button onClick={handleSubmit} color="primary" variant="contained">
+          Cập nhật dịch vụ
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default AddStadiumModal;
+export default EditStadiumModal;

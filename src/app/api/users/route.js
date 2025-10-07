@@ -1,10 +1,10 @@
-import { htmlTemplateEmail, ROLE_MANAGER } from "@quanlysanbong/constants/System";
-import getObjectId from "@quanlysanbong/lib/getObjectId";
-import clientPromise from "@quanlysanbong/lib/mongodb";
-import { encrypt } from "@quanlysanbong/utils/Security";
+import { htmlTemplateEmail, ROLE_MANAGER } from "@muahub/constants/System";
+import getObjectId from "@muahub/lib/getObjectId";
+import clientPromise from "@muahub/lib/mongodb";
+import { encrypt } from "@muahub/utils/Security";
 import { NextResponse } from "next/server";
-import { sendEmail } from "@quanlysanbong/lib/sendEmail";
-import { MAIN_URL_APP } from "@quanlysanbong/constants/MainContent";
+import { sendEmail } from "@muahub/lib/sendEmail";
+import { MAIN_URL_APP } from "@muahub/constants/MainContent";
 import { v4 as uuidv4 } from "uuid";
 
 // API GET để lấy danh sách users

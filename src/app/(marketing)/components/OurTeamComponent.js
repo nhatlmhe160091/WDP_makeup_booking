@@ -1,4 +1,4 @@
-import { OUR_TEAM } from "@quanlysanbong/constants/MainContent";
+import { OUR_TEAM } from "@muahub/constants/MainContent";
 
 const OurTeamComponent = () => {
   return (

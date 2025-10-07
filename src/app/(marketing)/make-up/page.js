@@ -1,4 +1,4 @@
-import "@quanlysanbong/styles/style.css";
+import "@muahub/styles/style.css";
 import META_DATA from "./metaData";
 import SanBongModal from "./SanBongModal";
 

@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-import "@quanlysanbong/styles/style.css";
+import "@muahub/styles/style.css";
 import Script from "next/script";
 import META_DATA from "./metaData";
-import { ADDRESS, EMAIL, MAIN_URL_APP, PHONE_NUMBER } from "@quanlysanbong/constants/MainContent";
+import { ADDRESS, EMAIL, MAIN_URL_APP, PHONE_NUMBER } from "@muahub/constants/MainContent";
 import ContactFormComponent from "../components/ContactFormComponent";
 
 export const metadata = {
