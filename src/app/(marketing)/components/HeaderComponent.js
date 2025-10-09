@@ -145,11 +145,11 @@ const HeaderComponent = () => {
         <Link href="/" className="navbar-brand p-0">
           <h1 className="text-primary" style={{ display: "flex", alignItems: "center", gap: 0, margin: 0 }}>
             <img
-              src="/img/MuaHub.png"
+              src="/img/MuaHubLogo.png"
               alt="MuaHub"
-              style={{ height: "180px", objectFit: "contain", mixBlendMode: "darken", backgroundColor: "transparent", marginRight: 0 }}
+              style={{ height: "100px", objectFit: "contain", mixBlendMode: "darken", backgroundColor: "transparent", marginRight: 0 }}
             />
-            <span style={{ color: "#ff5c95ff", marginLeft: "-20px", fontWeight: 700 }}>{WEB_NAME}</span>
+            <span style={{ color: "#ff5c95ff", marginLeft: "-1px", fontWeight: 700 }}>{WEB_NAME}</span>
           </h1>
         </Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
