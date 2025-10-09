@@ -138,14 +138,14 @@ const HeaderComponent = () => {
     window.location.href = "/";
   };
   // console.log(11111, currentUser);
-
+console.log("showResults", showResults);
   return (
     <div className="container-fluid position-relative p-0 header-container">
       <nav className="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
         <Link href="/" className="navbar-brand p-0">
           <h1 className="text-primary" style={{ display: "flex", alignItems: "center", gap: 0, margin: 0 }}>
             <img
-              src="/img/MuaHubLogo.png"
+              src="/img/MuaHubLogoWhite.png"
               alt="MuaHub"
               style={{ height: "100px", objectFit: "contain", mixBlendMode: "darken", backgroundColor: "transparent", marginRight: 0 }}
             />
@@ -179,7 +179,7 @@ const HeaderComponent = () => {
                     className={`list-group-item list-group-item-action ${index === focusedIndex ? 'active' : ''}`}
                     onClick={() => setShowResults(false)}
                   >
-                    {makeup.serviceName} {makeup.location ? `- ${makeup.location}` : ''}
+                    {makeup.artistName} {makeup.location ? `- ${makeup.location}` : ''}
                   </Link>
                 ))}
                 {getFilteredMakeups().length === 0 && searchValue.trim() && (

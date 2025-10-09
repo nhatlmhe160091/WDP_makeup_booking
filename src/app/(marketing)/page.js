@@ -9,6 +9,7 @@ import OurTeamComponent from "./components/OurTeamComponent";
 import TestimonialComponent from "./components/TestimonialComponent";
 import META_DATA from "./metaData";
 import BoxFieldComponent from "./components/BoxFieldComponent";
+import PopularServicesComponent from "./components/PopularServicesComponent";
 import MakeupServiceNoiBatComponent from "./components/MakeupServiceNoiBatComponent";
 
 export const metadata = {
@@ -26,47 +27,12 @@ export const metadata = {
   }
 };
 export default function Home() {
-  const packages = [
-    {
-      id: 1,
-      name: "Sân 5 người",
-      image: "/assets/img/service-1.jpg",
-      description: "Sân bóng đá 5 người với mặt cỏ nhân tạo chất lượng cao, hệ thống chiếu sáng hiện đại, đảm bảo trải nghiệm tốt nhất cho người chơi.",
-      link: "/san-bong-da-5-nguoi"
-    },
-    {
-      id: 2,
-      name: "Sân 7 người",
-      image: "/assets/img/service-2.jpg",
-      description: "Sân bóng đá 7 người rộng rãi, phù hợp cho các trận đấu nhóm và sự kiện thể thao, với cơ sở vật chất tiện nghi.",
-      link: "/san-bong-da-7-nguoi"
-    },
-    {
-      id: 3,
-      name: "Sân 11 người",
-      image: "/assets/img/service-3.jpg",
-      description: "Sân bóng đá 11 người đạt tiêu chuẩn thi đấu, với mặt cỏ tự nhiên hoặc nhân tạo, phục vụ cho các giải đấu chuyên nghiệp.",
-      link: "/san-bong-da-11-nguoi"
-    }
-  ];
+
   return (
     <div>
       <AboutUsComponent />
       <MakeupServiceNoiBatComponent />
-
-      <div className="container-fluid service pb-5">
-        <div className="container">
-          <div className="text-center mx-auto pb-3 wow fadeInUp" data-wow-delay="0.2s" style={{ maxWidth: "800px" }}>
-            <h4 className="text-primary">Dịch vụ phổ biến</h4>
-            <h1 className="display-5">Các dịch vụ phổ biến tại Hà Nội</h1>
-          </div>
-          <div className="row g-3">
-            {packages.map((field) => (
-              <BoxFieldComponent key={field.id} field={field} />
-            ))}
-          </div>
-        </div>
-      </div>
+      <PopularServicesComponent />
       <OurTeamComponent />
       <TestimonialComponent />
       <OurFeaturesComponent />

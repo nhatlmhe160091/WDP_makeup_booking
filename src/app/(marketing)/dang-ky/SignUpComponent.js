@@ -80,6 +80,20 @@ const SignUpComponent = () => {
 
     if (!formData.password) {
       validationErrors.password = "Mật khẩu là bắt buộc.";
+    } else {
+      // Mật khẩu phải tối thiểu 8 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt
+      const pw = formData.password;
+      if (pw.length < 8) {
+        validationErrors.password = "Mật khẩu phải có ít nhất 8 ký tự.";
+      } else if (!/[A-Z]/.test(pw)) {
+        validationErrors.password = "Mật khẩu phải có ít nhất 1 chữ hoa.";
+      } else if (!/[a-z]/.test(pw)) {
+        validationErrors.password = "Mật khẩu phải có ít nhất 1 chữ thường.";
+      } else if (!/[0-9]/.test(pw)) {
+        validationErrors.password = "Mật khẩu phải có ít nhất 1 số.";
+      } else if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw)) {
+        validationErrors.password = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt.";
+      }
     }
     if (formData.password !== formData.confirmPassword) {
       validationErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";

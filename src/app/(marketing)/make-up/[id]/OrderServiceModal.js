@@ -85,7 +85,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 
   const today = new Date();
   const dateOptions = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 30; i++) { // Cho phép chọn 30 ngày tới
     const futureDate = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
     dateOptions.push(
       `${futureDate.getFullYear()}-${(futureDate.getMonth() + 1).toString().padStart(2, "0")}-${futureDate
@@ -252,51 +252,37 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         ) : (
           <Form>
             <p className="mb-2">Chọn ngày đặt lịch</p>
-            <Form.Group className="mb-3" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-              {dateOptions.map((date, index) => (
-                <Button
-                  key={index}
-                  variant={selectedDate === date ? "primary" : "light"}
-                  size="sm"
-                  onClick={() => setSelectedDate(date)}
-                  className="mb-2"
-                  style={{
-                    flex: "1 0 18%",
-                    margin: "2px",
-                    textAlign: "center"
-                  }}
-                >
-                  <div>
+            <Form.Group className="mb-3">
+              <div style={{ display: "flex", overflowX: "auto", gap: 8, paddingBottom: 4 }}>
+                {dateOptions.map((date, index) => (
+                  <Button
+                    key={index}
+                    variant={selectedDate === date ? "primary" : "light"}
+                    size="sm"
+                    onClick={() => setSelectedDate(date)}
+                    style={{
+                      minWidth: 70,
+                      margin: 0,
+                      textAlign: "center",
+                      borderRadius: 8,
+                      border: selectedDate === date ? "2px solid #ff5c95" : undefined,
+                      fontWeight: selectedDate === date ? 700 : 400
+                    }}
+                  >
                     <div className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      <p
-                        style={{
-                          color: selectedDate === date ? "#fff" : "#adafb3"
-                        }}
-                      >
-                        {new Date(date).toLocaleString("default", { month: "short" })}{" "}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: "1.2rem",
-                          fontWeight: "bold",
-
-                          color: selectedDate === date ? "#fff" : "#000"
-                        }}
-                      >
+                      <div style={{ color: selectedDate === date ? "#fff" : "#adafb3" }}>
+                        {new Date(date).toLocaleString("default", { month: "short" })}
+                      </div>
+                      <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: selectedDate === date ? "#fff" : "#000" }}>
                         {new Date(date).getDate()}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: "0.8rem",
-                          color: selectedDate === date ? "#fff" : "#adafb3"
-                        }}
-                      >
+                      </div>
+                      <div style={{ fontSize: "0.8rem", color: selectedDate === date ? "#fff" : "#adafb3" }}>
                         {new Date(date).toLocaleString("default", { weekday: "short" })}
-                      </p>
+                      </div>
                     </div>
-                  </div>
-                </Button>
-              ))}
+                  </Button>
+                ))}
+              </div>
             </Form.Group>
 
             <Form.Group className="mb-3">
