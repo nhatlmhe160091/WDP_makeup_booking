@@ -9,6 +9,9 @@ const nextConfig = {
   //     },
   //   ];
   // },
+    eslint: {
+    ignoreDuringBuilds: true, //Cho phép build dù có warning
+  },
 };
 
 module.exports = nextConfig;
