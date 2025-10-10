@@ -15,6 +15,9 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     [orderDone, setOrderDone] = useState(false);
 
   const [qrCode, setQrCode] = useState("");
+  const [payosQr, setPayosQr] = useState("");
+  const [payosInfo, setPayosInfo] = useState(null); // lưu toàn bộ object trả về từ PayOS
+  const [paymentMethod, setPaymentMethod] = useState("vietqr"); // 'vietqr' | 'payos'
   const [dataOrder, setDataOrder] = useState([]);
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
@@ -58,29 +61,55 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     onClose();
   };
 
-  const handleGetQr = async (uuid, amount = 10000) => {
+  // Nhận thêm orderCode nếu là PayOS
+  const handleGetQr = async (uuid, amount = 10000, orderCode = null) => {
     const content = `dat coc ${uuid}`;
-
-    const payload = {
-      accountNo: ACCOUNT_NO,
-      accountName: `${WEB_NAME} Thanh toán`,
-      acqId: ACQ_ID,
-      amount: amount,
-      addInfo: content,
-      format: "text",
-      template: "compact2"
-    };
-
-    const res = await fetch("https://api.vietqr.io/v2/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    setQrCode(data?.data?.qrDataURL || "");
+    if (paymentMethod === "vietqr") {
+      const payload = {
+        accountNo: ACCOUNT_NO,
+        accountName: `${WEB_NAME} Thanh toán`,
+        acqId: ACQ_ID,
+        amount: 2000,
+        addInfo: content,
+        format: "text",
+        template: "compact2"
+      };
+      const res = await fetch("https://api.vietqr.io/v2/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      setQrCode(data?.data?.qrDataURL || "");
+      setPayosQr("");
+    } else if (paymentMethod === "payos") {
+      try {
+        let safeContent = content;
+        if (safeContent.length > 25) safeContent = safeContent.slice(0, 25);
+        const res = await fetch("/api/payos-link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderCode: orderCode,
+            amount: 2000,
+            description: safeContent,
+            cancelUrl: window.location.origin + "/thanh-toan-that-bai",
+            returnUrl: window.location.origin + "/thanh-toan-thanh-cong"
+          })
+        });
+        const raw = await res.json();
+        const data = raw.data || raw;
+        setPayosInfo(data);
+        setPayosQr(data.qrCode || "");
+        setQrCode("");
+      } catch (err) {
+        setErrorMessage("Không thể tạo QR PayOS. Vui lòng thử lại.");
+        setPayosQr("");
+        setQrCode("");
+      }
+    }
   };
 
   const today = new Date();
@@ -129,36 +158,50 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
       payloadArr.push(payload);
     });
 
-    let uuid = uuidv4(); // Tạo UUID cho đơn hàng
-    uuid = uuid.replace(/-/g, ""); // Loại bỏ dấu gạch ngang để sử dụng trong nội dung
+    let uuid = uuidv4();
+    uuid = uuid.replace(/-/g, "");
 
-    await handleGetQr(uuid, orderCost);
+    let orderCode = null;
+    if (paymentMethod === "payos") {
+      orderCode = Math.floor(Math.random() * 1000000);
+      await handleGetQr(uuid, orderCost, orderCode);
+    } else {
+      await handleGetQr(uuid, orderCost);
+    }
 
     setTimeout(() => {
       const intervalId = setInterval(async () => {
         const resPayment = await SendRequest("get", `/api/webhooks`);
         let paymentDone = false;
         if (resPayment.payload) {
+          // console.log('resPayment.payload:', resPayment.payload);
           resPayment.payload.forEach((item) => {
-            if (item.content.includes(`dat coc ${uuid}`)) {
-              paymentDone = true;
+            // console.log("paymentMethod:", paymentMethod);
+            if (paymentMethod === "vietqr") {
+              // console.log('item.content vietqr:', item.content, 'looking for:', `dat coc ${uuid}`);
+              if (item.content && item.content.includes(`dat coc ${uuid}`)) {
+                paymentDone = true;
+              }
+            } else if (paymentMethod === "payos") {
+              // console.log('item.data payos:', item.data, 'looking for:', `orderCode ${orderCode}`);
+              if (item.data) {
+                console.log('item.data.orderCode:', item.data.orderCode, 'orderCode:', orderCode, 'equal:', item.data.orderCode === orderCode);
+                if (item.data.orderCode === orderCode) {
+                  console.log('Payment confirmed for orderCode:', orderCode);
+                  paymentDone = true;
+                }
+              }
             }
           });
         }
         if (!paymentDone) return;
-        // Cập nhật trạng thái đơn hàng thành confirmed ngay lập tức
         payloadArr.forEach(async (payload) => {
           await SendRequest("post", "/api/orders", payload);
         });
-        // Cập nhật state với trạng thái đã xác nhận
         setOrderDone(true);
-        clearInterval(intervalId); // Stop polling when success
-      }, 1500);
-    }, 5000); // Simulate loading
-
-    // setSelectedDate("");
-    // setSelectedField("");
-    // setSelectedFieldSlot([]);
+        clearInterval(intervalId);
+      }, 5000);
+    }, 5000);
   };
 
   const toggleSelectedFieldSlot = ({ time, fieldIndex }) => {
@@ -181,7 +224,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         <Modal.Title>Đặt lịch trang điểm cho {serviceData.serviceName}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {qrCode.length ? (
+        {(qrCode.length || payosQr.length) ? (
           <div className="card shadow-sm p-4 border-0">
             <h5 className="mb-3">
               <strong>Thông tin đặt lịch</strong>
@@ -232,25 +275,52 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
             ) : (
               <div>
                 <h6 className="mb-2">
-                  <strong>Chuyển khoản qua ngân hàng:</strong>
+                  <strong>Phương thức thanh toán:</strong> {paymentMethod === "vietqr" ? "Chuyển khoản ngân hàng (VietQR)" : "Thanh toán PayOS"}
                 </h6>
                 <div className="d-flex justify-content-center mt-3">
-                  {qrCode.length > 0 ? (
+                  {paymentMethod === "vietqr" && qrCode.length > 0 && (
                     <img
                       src={qrCode}
-                      alt="Mã QR chuyển khoản"
+                      alt="Mã QR chuyển khoản VietQR"
                       className="img-fluid rounded border"
                       style={{ maxWidth: 250 }}
                     />
-                  ) : (
-                    <Spinner animation="border" variant="primary" />
                   )}
+                  {paymentMethod === "payos" && payosQr.length > 0 && (
+                    <img
+                      src={`https://img.vietqr.io/image/${ACQ_ID}-${payosInfo?.accountNumber || ''}-compact2.png?amount=${2000}&addInfo=${encodeURIComponent(payosInfo?.description || '')}&accountName=${encodeURIComponent(payosInfo?.accountName || '')}`}
+                      alt="Mã QR PayOS"
+                      className="img-fluid rounded border"
+                      style={{ maxWidth: 250 }}
+                    />
+                  )}
+                  {/* Nếu muốn hiển thị raw QR text: <div>{payosQr}</div> */}
+                  {(!qrCode.length && !payosQr.length) && <Spinner animation="border" variant="primary" />}
                 </div>
               </div>
             )}
           </div>
         ) : (
           <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Chọn phương thức thanh toán</Form.Label>
+              <div className="d-flex gap-2">
+                <Button
+                  variant={paymentMethod === "vietqr" ? "primary" : "outline-primary"}
+                  onClick={() => setPaymentMethod("vietqr")}
+                  size="sm"
+                >
+                  Chuyển khoản ngân hàng (VietQR)
+                </Button>
+                <Button
+                  variant={paymentMethod === "payos" ? "primary" : "outline-primary"}
+                  onClick={() => setPaymentMethod("payos")}
+                  size="sm"
+                >
+                  Thanh toán PayOS
+                </Button>
+              </div>
+            </Form.Group>
             <p className="mb-2">Chọn ngày đặt lịch</p>
             <Form.Group className="mb-3">
               <div style={{ display: "flex", overflowX: "auto", gap: 8, paddingBottom: 4 }}>
@@ -347,10 +417,10 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                         const [startTime] = time.split("-");
                         if (
                           selectedDate ===
-                            `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today
-                              .getDate()
-                              .toString()
-                              .padStart(2, "0")}` &&
+                          `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${today
+                            .getDate()
+                            .toString()
+                            .padStart(2, "0")}` &&
                           (() => {
                             // Lấy giờ phút hiện tại
                             const now = new Date();
@@ -421,9 +491,9 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                       <strong>Đã chọn:</strong>
                       <ul>
                         {selectedFieldSlot.map((slot, index) => (
-                              <li key={index}>
-                                {slot.time} - Slot {slot.fieldIndex + 1}
-                              </li>
+                          <li key={index}>
+                            {slot.time} - Slot {slot.fieldIndex + 1}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -441,6 +511,17 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
+        {/* Hiển thị thông tin PayOS nếu có */}
+        {/* {paymentMethod === "payos" && payosInfo && (
+              <div className="alert alert-info mt-3">
+                <div><b>Số tài khoản:</b> {payosInfo.accountNumber}</div>
+                <div><b>Tên tài khoản:</b> {payosInfo.accountName}</div>
+                <div><b>Số tiền:</b> {formatCurrency(payosInfo.amount)} VND</div>
+                <div><b>Nội dung:</b> {payosInfo.description}</div>
+                <div><b>Trạng thái:</b> {payosInfo.status}</div>
+                <div><b>Link thanh toán:</b> <a href={payosInfo.checkoutUrl} target="_blank" rel="noopener noreferrer">{payosInfo.checkoutUrl}</a></div>
+              </div>
+            )} */}
         {orderDone ? (
           <>
             <Link href="/trang-ca-nhan">

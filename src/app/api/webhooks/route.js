@@ -22,10 +22,11 @@ export async function GET() {
     const db = client.db(DB_NAME);
     const bankingsCollection = db.collection(COLLECTION_NAME);
 
+
     const bankings = await bankingsCollection
       .find({})
-      .sort({ transactionDate: -1 })
-      .limit(10)
+      .sort({ _id: -1 })
+      .limit(3)
       .toArray();
 
     return new NextResponse(
