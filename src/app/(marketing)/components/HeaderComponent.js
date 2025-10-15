@@ -200,6 +200,9 @@ console.log("showResults", showResults);
             <Link href="/dich-vu" className={`nav-item nav-link ${pathUrl === "/dich-vu" ? "active" : ""}`}>
               Danh sách dịch vụ
             </Link>
+            <Link href="/yeu-thich" className={`nav-item nav-link ${pathUrl === "/yeu-thich" ? "active" : ""}`}>
+              Yêu thích
+            </Link>
             <Link href="/lien-he" className={`nav-item nav-link ${pathUrl === "/lien-he" ? "active" : ""}`}>
               Liên hệ
             </Link>

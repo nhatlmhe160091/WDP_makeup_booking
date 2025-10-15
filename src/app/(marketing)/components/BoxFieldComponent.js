@@ -1,10 +1,36 @@
 "use client";
 
+
+import { useEffect, useState } from "react";
 import { formatCurrency } from "@muahub/utils/Main";
 import Link from "next/link";
 import "@muahub/styles/makeup-artist-enhancements.css";
 
 const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingCount = false, bookingCount = 0 }) => {
+  // Yêu thích: lưu trong localStorage theo id dịch vụ
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && field?._id) {
+      const favs = JSON.parse(localStorage.getItem("favoriteServices") || "[]");
+      setIsFavorite(favs.includes(field._id));
+    }
+  }, [field?._id]);
+
+  const handleToggleFavorite = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!field?._id) return;
+    let favs = JSON.parse(localStorage.getItem("favoriteServices") || "[]");
+    if (favs.includes(field._id)) {
+      favs = favs.filter((id) => id !== field._id);
+      setIsFavorite(false);
+    } else {
+      favs.push(field._id);
+      setIsFavorite(true);
+    }
+    localStorage.setItem("favoriteServices", JSON.stringify(favs));
+  };
   // Xử lý tên artist - ưu tiên artistName, sau đó serviceName
   const displayName = field.artistName || field.serviceName;
   
@@ -80,6 +106,15 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
           >
             <i className="fas fa-palette"></i>
           </div>
+          {/* Icon trái tim yêu thích */}
+          <button
+            className="favorite-btn position-absolute top-0 start-0 m-2 btn btn-link p-0"
+            style={{ zIndex: 2, fontSize: 24, color: isFavorite ? '#ff5c95' : '#ccc' }}
+            aria-label={isFavorite ? "Bỏ khỏi yêu thích" : "Thêm vào yêu thích"}
+            onClick={handleToggleFavorite}
+          >
+            <i className={isFavorite ? "fas fa-heart" : "far fa-heart"}></i>
+          </button>
           <div className="position-absolute top-0 end-0 p-2">
             <span className="badge bg-primary">
               <i className="fas fa-star me-1"></i>

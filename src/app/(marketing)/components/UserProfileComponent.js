@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Tab, Tabs, Form, Button } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Tab, Tabs, Form, Button, Modal } from "react-bootstrap";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
 import UpdateMakeupArtistProfileComponent from "./UpdateMakeupArtistProfileComponent";
@@ -18,6 +18,22 @@ import HistoryBankComponent from "./HistoryBankComponent";
 const UserProfileComponent = () => {
   const { currentUser, updateUser } = useApp();
   const [key, setKey] = useState("account");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeProfileData, setUpgradeProfileData] = useState(null); // optional, for collecting profile data
+  const [isPending, setIsPending] = useState(false);
+  // Kiểm tra trạng thái pending khi vào tab "Yêu cầu nâng cấp"
+  useEffect(() => {
+    if (key === "upgrade" && currentUser && currentUser._id) {
+      fetch(`/api/request-add-MUA/check-pending/${currentUser._id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setIsPending(!!data.isPending);
+        })
+        .catch(() => {
+          setIsPending(false);
+        });
+    }
+  }, [key, currentUser]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -53,24 +69,33 @@ const UserProfileComponent = () => {
     });
   };
 
-  const handleUpgradeRequest = async () => {
+
+  // Khi nhấn nút gửi yêu cầu nâng cấp, mở modal
+  const handleUpgradeRequest = () => {
+    setShowUpgradeModal(true);
+  };
+
+  // Hàm gửi yêu cầu nâng cấp sau khi user submit form trong modal
+  const handleUpgradeProfileSubmit = async (profileData) => {
     try {
       // Kiểm tra xem đã có yêu cầu pending chưa
-      const checkRes = await fetch(`/api/request-add-sale?email=${currentUser.email}`);
+      const checkRes = await fetch(`/api/request-add-MUA?email=${currentUser.email}`);
       const checkData = await checkRes.json();
       const isPending = checkData.data?.some((item) => item.email === currentUser.email && item.status === "pending");
       if (isPending) {
         toast("Bạn đã gửi yêu cầu nâng cấp trước đó. Vui lòng chờ xác nhận từ quản trị viên.");
+        setShowUpgradeModal(false);
         return;
       }
 
-      // Nếu chưa có thì gửi yêu cầu mới
-      const res = await fetch("/api/request-add-sale", {
+      // Gửi thông tin hồ sơ + yêu cầu nâng cấp
+      const res = await fetch("/api/request-add-MUA", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: currentUser._id,
-          email: currentUser.email
+          email: currentUser.email,
+          profile: profileData // gửi kèm thông tin hồ sơ
         })
       });
       const data = await res.json();
@@ -79,6 +104,7 @@ const UserProfileComponent = () => {
     } catch {
       toast.error("Gửi yêu cầu thất bại!");
     }
+    setShowUpgradeModal(false);
   };
 
   return (
@@ -135,33 +161,54 @@ const UserProfileComponent = () => {
           <Tab eventKey="upgrade" title="Yêu cầu nâng cấp">
             <div className="mt-3">
               {currentUser.active ? (
-                <Alert severity="info" className="mb-3">
-                  <AlertTitle>
-                    <UpgradeIcon fontSize="small" /> Yêu cầu nâng cấp thành Chủ dịch vụ
-                  </AlertTitle>
-                  <p>Nếu bạn muốn trở thành quản lý/chủ dịch vụ trên hệ thống, vui lòng gửi yêu cầu xác nhận.</p>
-                  <div className="d-flex justify-content-end">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<UpgradeIcon />}
-                      onClick={handleUpgradeRequest}
-                    >
-                      Gửi yêu cầu nâng cấp
-                    </Button>
-                  </div>
-                </Alert>
+                isPending ? (
+                  <Alert severity="info" className="mb-3">
+                    <AlertTitle>
+                      <UpgradeIcon fontSize="small" /> Yêu cầu nâng cấp đang chờ duyệt
+                    </AlertTitle>
+                    <p>Bạn đã gửi yêu cầu nâng cấp và đang chờ quản trị viên xác nhận. Vui lòng chờ phản hồi.</p>
+                  </Alert>
+                ) : (
+                  <Alert severity="info" className="mb-3">
+                    <AlertTitle>
+                      <UpgradeIcon fontSize="small" /> Yêu cầu nâng cấp thành Chủ dịch vụ
+                    </AlertTitle>
+                    <p>Nếu bạn muốn trở thành quản lý/chủ dịch vụ trên hệ thống, vui lòng gửi yêu cầu xác nhận và cập nhật hồ sơ chuyên gia.</p>
+                    <div className="d-flex justify-content-end">
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<UpgradeIcon />}
+                        onClick={handleUpgradeRequest}
+                      >
+                        Gửi yêu cầu nâng cấp
+                      </Button>
+                    </div>
+                  </Alert>
+                )
               ) : (
                 <Alert severity="warning">
                   <AlertTitle>
                     <EmailIcon fontSize="small" /> Tài khoản chưa xác thực
                   </AlertTitle>
                   <p>
-                    Bạn cần xác minh tài khoản để gửi yêu cầu nâng cấp. Vui lòng kiểm tra email xác nhận và làm theo
-                    hướng dẫn.
+                    Bạn cần xác minh tài khoản để gửi yêu cầu nâng cấp. Vui lòng kiểm tra email xác nhận và làm theo hướng dẫn.
                   </p>
                 </Alert>
               )}
+              {/* Modal cập nhật hồ sơ chuyên gia khi gửi yêu cầu nâng cấp */}
+              <Modal show={showUpgradeModal} onHide={() => setShowUpgradeModal(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>Cập nhật hồ sơ chuyên gia trước khi gửi yêu cầu nâng cấp</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <UpdateMakeupArtistProfileComponent
+                    currentUser={currentUser}
+                    onSubmit={handleUpgradeProfileSubmit}
+                    isUpgradeRequest={true}
+                  />
+                </Modal.Body>
+              </Modal>
             </div>
           </Tab>
         )}

@@ -28,11 +28,14 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser }) => {
   const [loading, setLoading] = useState(false);
 
   // Load profile khi mount
+  const [requestStatus, setRequestStatus] = useState(null);
+  const [requestReason, setRequestReason] = useState("");
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const res = await SendRequest("get", `/api/makeup-artists/${currentUser._id}`);
+        const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
         if (res.payload) {
           let wh = res.payload.workingHours || "08:00-18:00";
           let [start, end] = wh.split("-");
@@ -43,13 +46,70 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser }) => {
             workingHoursStart: start || "08:00",
             workingHoursEnd: end || "18:00"
           });
+        } else {
+          // Nếu chưa có profile thì tạo mới
+          const createRes = await SendRequest("post", "/api/makeup-artist-profiles", {
+            artistId: currentUser._id,
+            name: currentUser.name || "",
+            avatar: currentUser.avatar || "",
+            email: currentUser.email || "",
+            phone: currentUser.phone || "",
+            address: currentUser.address || "",
+            bio: "",
+            experienceYears: 0,
+            experienceMonths: 0,
+            workingHours: "08:00-18:00",
+            bankInfo: { bankName: "", bankAccount: "", accountHolder: "" },
+            socialLinks: { facebook: "", instagram: "" },
+            portfolio: [],
+            certificates: []
+          });
+          if (createRes.success) {
+            setProfile({ ...defaultProfile, ...createRes.data });
+            toast.success("Đã tạo mới hồ sơ chuyên gia!");
+          } else {
+            setProfile(defaultProfile);
+            toast.error("Không thể tạo mới hồ sơ!");
+          }
         }
       } catch (e) {
         toast.error("Không thể tải hồ sơ!");
       }
       setLoading(false);
     };
-    if (currentUser?._id) fetchProfile();
+
+    const fetchRequestStatus = async () => {
+      if (!currentUser?.email) return;
+      try {
+        const res = await fetch(`/api/request-add-MUA?email=${currentUser.email}`);
+        const data = await res.json();
+        const req = data.data?.find((item) => item.email === currentUser.email);
+        if (req) {
+          setRequestStatus(req.status);
+          setRequestReason(req.reason || "");
+        } else {
+          setRequestStatus(null);
+          setRequestReason("");
+        }
+      } catch {
+        setRequestStatus(null);
+        setRequestReason("");
+      }
+    };
+
+    if (currentUser?._id) {
+      // Nếu là makeup_artist hoặc đã có request thì fetch profile
+      if (currentUser.role === "makeup_artist") {
+        fetchProfile();
+      } else {
+        // Kiểm tra có request không
+        fetchRequestStatus().then(() => {
+          fetchProfile();
+        });
+      }
+    } else {
+      setProfile(defaultProfile);
+    }
   }, [currentUser]);
 
   // Xử lý thay đổi input
@@ -144,18 +204,31 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser }) => {
     // Đảm bảo workingHours luôn đúng định dạng
     let wh = `${profile.workingHoursStart || "08:00"}-${profile.workingHoursEnd || "18:00"}`;
     try {
-      const res = await SendRequest("put", "/api/makeup-artist-profiles", {
-        artistId: currentUser._id,
-        ...profile,
-        workingHours: wh
-      });
-      if (res.success !== false) {
-        toast.success("Cập nhật hồ sơ thành công!");
+      // Kiểm tra đã có profile chưa bằng cách gọi GET
+      const checkRes = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
+      let res;
+      if (checkRes.payload) {
+        // Đã có profile, cập nhật
+        res = await SendRequest("put", "/api/makeup-artist-profiles", {
+          artistId: currentUser._id,
+          ...profile,
+          workingHours: wh
+        });
       } else {
-        toast.error(res.message || "Cập nhật thất bại!");
+        // Chưa có profile, tạo mới
+        res = await SendRequest("post", "/api/makeup-artist-profiles", {
+          artistId: currentUser._id,
+          ...profile,
+          workingHours: wh
+        });
+      }
+      if (res.success !== false) {
+        toast.success(res.message || "Lưu hồ sơ thành công!");
+      } else {
+        toast.error(res.message || "Lưu hồ sơ thất bại!");
       }
     } catch {
-      toast.error("Cập nhật thất bại!");
+      toast.error("Lưu hồ sơ thất bại!");
     }
     setLoading(false);
   };
@@ -163,6 +236,12 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser }) => {
   return (
     <form className="p-3" onSubmit={handleSubmit}>
       <h4 className="mb-3">Cập nhật hồ sơ chuyên gia</h4>
+      {/* Nếu có request bị từ chối, hiển thị lý do */}
+      {requestStatus === "rejected" && (
+        <div className="alert alert-danger">
+          <b>Yêu cầu nâng cấp bị từ chối.</b> {requestReason && (<span>Lý do: {requestReason}</span>)}
+        </div>
+      )}
       <div className="row">
         <div className="col-md-6 mb-2">
           <label>Tên</label>

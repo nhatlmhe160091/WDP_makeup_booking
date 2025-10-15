@@ -8,7 +8,7 @@ import { useApp } from "@muahub/app/contexts/AppContext";
 
 let Chart = null;
 
-const SalesOverview = () => {
+const MUAsOverview = () => {
   const { currentUser } = useApp();
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [data, setData] = useState([]);
@@ -25,7 +25,7 @@ const SalesOverview = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/orders", {
-        ownerId: currentUser.role === ROLE_MANAGER.SALE ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
       });
       if (res.payload) {
         setData(res.payload);
@@ -156,4 +156,4 @@ const SalesOverview = () => {
   );
 };
 
-export default SalesOverview;
+export default MUAsOverview;

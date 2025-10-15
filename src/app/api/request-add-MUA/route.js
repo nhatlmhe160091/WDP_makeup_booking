@@ -1,3 +1,4 @@
+
 import { htmlUpdateAccount } from "@muahub/constants/System";
 import clientPromise from "@muahub/lib/mongodb";
 import { sendEmail } from "@muahub/lib/sendEmail";
@@ -7,7 +8,7 @@ export async function POST(req) {
   try {
     const client = await clientPromise;
     const db = client.db("accounts"); // Đổi tên db nếu cần
-    const collection = db.collection("sale_requests");
+    const collection = db.collection("MUA_requests");
 
     const { userId, email } = await req.json();
     console.log(collection);
@@ -15,7 +16,7 @@ export async function POST(req) {
     await collection.insertOne({
       userId,
       email,
-      requestedRole: "SALE",
+      requestedRole: "MUA",
       status: "pending",
       createdAt: new Date()
     });
@@ -30,7 +31,7 @@ export async function GET(req) {
   try {
     const client = await clientPromise;
     const db = client.db("accounts");
-    const collection = db.collection("sale_requests");
+    const collection = db.collection("MUA_requests");
 
     const email = req.nextUrl.searchParams.get("email");
     let query = {};
@@ -48,7 +49,7 @@ export async function DELETE(req) {
   try {
     const client = await clientPromise;
     const db = client.db("accounts");
-    const collection = db.collection("sale_requests");
+    const collection = db.collection("MUA_requests");
     const { email, name, phone, address } = await req.json();
 
     await collection.deleteMany({ email });
@@ -64,6 +65,24 @@ export async function DELETE(req) {
       })
     });
 
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+// API PATCH: cập nhật trạng thái và lý do bị hủy
+export async function PATCH(req) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("accounts");
+    const collection = db.collection("MUA_requests");
+    const { email, status, reason } = await req.json();
+    if (!email) {
+      return NextResponse.json({ success: false, error: "Thiếu email" }, { status: 400 });
+    }
+    const update = { status };
+    if (reason) update.reason = reason;
+    await collection.updateMany({ email }, { $set: update });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

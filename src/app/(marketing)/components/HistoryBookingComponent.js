@@ -17,7 +17,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
   const [modalHuySan, setModalHuySan] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
-  const onHuySan = (booking) => {
+  const onHuyDichVu = (booking) => {
     setSelectedBooking(booking);
     setModalHuySan(true);
   };
@@ -185,26 +185,52 @@ const HistoryBookingComponent = ({ currentUser }) => {
 
   const checkTime = (booking) => {
     const isAlreadyRated = ratedOrderIds.includes(booking._id);
-    // Kiểm tra xem dịch vụ này đã qua chưa
-    // Parse booking date and time range
+    
+    // Parse booking date and time
     const [startTime] = booking.time.split(" - ");
-    // booking.date is in 'YYYY-MM-DD' format, ensure it's parsed as local date
     const [year, month, day] = booking.date.split("-").map(Number);
     const [hour, minute] = startTime.split(":").map(Number);
-    // Create bookingDateTime as local time
     const bookingDateTime = new Date(year, month - 1, day, hour, minute);
 
-    // Tính thời gian kết thúc cho phép hủy (trước giờ bắt đầu 6 tiếng)
-    const cancelDeadline = new Date(bookingDateTime.getTime() - 3 * 60 * 60 * 1000);
-    const now = new Date();
+    // Kiểm tra xem có phải đặt trong ngày không
+    const today = new Date();
+    const bookingDate = new Date(booking.date);
+    today.setHours(0, 0, 0, 0);
+    bookingDate.setHours(0, 0, 0, 0);
+    const isToday = bookingDate.getTime() === today.getTime();
 
-    // Nếu đã qua thời gian cho phép hủy thì ẩn nút hủy
+    // Nếu đặt trong ngày, không cho phép hủy
+    if (isToday) {
+      return {
+        isAlreadyRated,
+        canCancel: false,
+        canRate: false,
+        bookingDateTime,
+        isToday: true,
+        remainingTimeToCancel: 0
+      };
+    }
+
+    const now = new Date();
+    
+    // Tính thời gian còn lại để hủy (trước giờ bắt đầu 3 tiếng)
+    const cancelDeadline = new Date(bookingDateTime.getTime() - 3 * 60 * 60 * 1000);
+    const remainingTimeToCancel = Math.floor((cancelDeadline - now) / (60 * 1000)); // Còn bao nhiêu phút
+
+    // Cho phép hủy nếu chưa tới deadline
     const canCancel = now < cancelDeadline;
 
-    // Nếu đã qua thời gian đặt dịch vụ thì cho phép đánh giá
+    // Cho phép đánh giá nếu đã qua thời gian dịch vụ
     const canRate = now > bookingDateTime;
 
-    return { isAlreadyRated, canCancel, canRate, bookingDateTime };
+    return { 
+      isAlreadyRated, 
+      canCancel, 
+      canRate, 
+      bookingDateTime,
+      isToday: false,
+      remainingTimeToCancel: remainingTimeToCancel
+    };
   };
 
   return (
@@ -260,11 +286,25 @@ const HistoryBookingComponent = ({ currentUser }) => {
                         {isAlreadyRated && <span className="ms-1">✓</span>}
                       </button>
 
-                      <button
-                        disabled={!canCancel}
-                      className="btn btn-sm btn-danger ms-2" title="Hủy dịch vụ" onClick={() => onHuySan(booking)}>
-                        Hủy dịch vụ
-                      </button>
+                      {!isToday && (
+                        <div className="d-inline-block">
+                          <button
+                            disabled={!canCancel}
+                            className="btn btn-sm btn-danger ms-2"
+                            title={canCancel 
+                              ? `Còn ${Math.floor(remainingTimeToCancel / 60)} giờ ${remainingTimeToCancel % 60} phút để hủy` 
+                              : "Đã hết thời gian hủy dịch vụ"}
+                            onClick={() => onHuyDichVu(booking)}
+                          >
+                            Hủy dịch vụ
+                          </button>
+                          {canCancel && (
+                            <small className="d-block text-muted mt-1">
+                              Còn {Math.floor(remainingTimeToCancel / 60)} giờ {remainingTimeToCancel % 60} phút để hủy
+                            </small>
+                          )}
+                        </div>
+                      )}
                   </td>
                 </tr>
               );
@@ -322,7 +362,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
                     </button>
 
                   {/* Hủy dịch vụ */}
-                    <button disabled={!canCancel} className="btn btn-sm btn-danger ms-2" title="Hủy dịch vụ" onClick={() => onHuySan(booking)}>
+                    <button disabled={!canCancel} className="btn btn-sm btn-danger ms-2" title="Hủy dịch vụ" onClick={() => onHuyDichVu(booking)}>
                       Hủy dịch vụ
                     </button>
                 </div>

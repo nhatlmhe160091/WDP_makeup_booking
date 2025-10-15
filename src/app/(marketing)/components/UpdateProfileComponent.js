@@ -147,7 +147,7 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
         </div>
         {errors.address && <div className="text-danger">{errors.address}</div>}
       </Form.Group>
-      {currentUser.role === ROLE_MANAGER.SALE && (
+      {currentUser.role === ROLE_MANAGER.MUA && (
         <Form.Group className="mb-3">
           <Form.Label>Tiểu sử</Form.Label>
           <Form.Control as="textarea" name="bio" value={formData.bio} onChange={handleChange} />

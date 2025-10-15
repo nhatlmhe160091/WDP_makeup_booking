@@ -3,13 +3,13 @@ import { EMAIL_NAME, MAIN_URL_APP } from "./MainContent";
 export const ROLE_MANAGER = {
   ADMIN: "admin",
   USER: "user",
-  SALE: "sale"
+  MUA: "makeup_artist"
 };
 
 export const ROLE_MANAGER_TEXT = {
   [ROLE_MANAGER.ADMIN]: "Quản trị viên",
   [ROLE_MANAGER.USER]: "Người dùng",
-  [ROLE_MANAGER.SALE]: "Chủ sân"
+  [ROLE_MANAGER.MUA]: "Chủ dịch vụ makeup"
 };
 
 export const htmlTemplateEmail = ({ name, email, phone = "Không có", address, confirm_link }) => {

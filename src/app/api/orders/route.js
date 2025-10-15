@@ -27,6 +27,7 @@ export async function GET(req) {
     const date = searchParams.get("date");
 
     // Build the search query dynamically based on the provided parameters
+    // Mặc định chỉ lấy các order đã xác nhận hoàn toàn (confirmed)
     const searchQuery = {
       status: "confirmed",
       fieldSlot: { $exists: true }
@@ -100,6 +101,14 @@ export async function POST(req) {
     // làm tròn số tiền cọc
     deposit = Math.ceil(deposit / 1000) * 1000;
 
+    // Check if booking is for today
+    const today = new Date();
+    const bookingDate = new Date(date);
+    today.setHours(0, 0, 0, 0);
+    bookingDate.setHours(0, 0, 0, 0);
+    
+    const isToday = bookingDate.getTime() === today.getTime();
+    
     let newOrder = {
       userId: objectId,
       serviceId: getObjectId(serviceId),
@@ -108,30 +117,59 @@ export async function POST(req) {
       time,
       deposit,
       remaining: total - deposit,
-      status: "confirmed",
+      status: isToday ? "deposit_confirmed" : "pending", // Tự động xác nhận cọc nếu đặt trong ngày
       fieldSlot,
       date,
-      created_at: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
     const dataOrder = await ordersCollection.insertOne(newOrder);
 
-    const ownerData = await accountsCollection.findOne({
-      _id: getObjectId(ownerId)
-    });
-
-    await accountsCollection.updateOne(
-      { _id: getObjectId(ownerId) },
-      {
-        $set: {
-          totalPrice: (ownerData.totalPrice || 0) + deposit
-        }
-      }
-    );
-
     newOrder = { ...newOrder, _id: dataOrder.insertedId };
 
-    return NextResponse.json({ success: true, message: "Tạo dịch vụ makeup thành công", data: newOrder });
+    // Notification logic
+    const notificationsCollection = db.collection("notifications");
+    const now = new Date();
+    
+    // Only notify admin for future bookings that need deposit confirmation
+    if (!isToday) {
+      await notificationsCollection.insertOne({
+        userId: null, // or 'admin', adjust as needed
+        type: "admin",
+        orderId: newOrder._id,
+        message: `Có đơn đặt dịch vụ mới từ user ${objectId}`,
+        isRead: false,
+        created_at: now,
+        updated_at: now
+      });
+    }
+
+    // Notify owner
+    await notificationsCollection.insertOne({
+      userId: getObjectId(ownerId),
+      type: "owner",
+      orderId: newOrder._id,
+      message: `Bạn có đơn đặt dịch vụ mới từ user ${objectId}${isToday ? ' (đã xác nhận cọc tự động)' : ''}`,
+      isRead: false,
+      created_at: now,
+      updated_at: now
+    });
+    
+    // If same-day booking, notify user that deposit is automatically confirmed
+    if (isToday) {
+      await notificationsCollection.insertOne({
+        userId: objectId,
+        type: "user",
+        orderId: newOrder._id,
+        message: "Đặt lịch trong ngày đã được tự động xác nhận cọc, vui lòng xác nhận dịch vụ để hoàn tất đặt lịch.",
+        isRead: false,
+        created_at: now,
+        updated_at: now
+      });
+    }
+
+    return NextResponse.json({ success: true, message: "Tạo dịch vụ makeup thành công, chờ xác nhận cọc", data: newOrder });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -151,25 +189,49 @@ export async function PUT(req) {
     const ObjectId = getObjectId(id);
     await validateToken(req);
 
-    const service = await ordersCollection.findOne({ _id: ObjectId });
-    if (!service) {
+    const order = await ordersCollection.findOne({ _id: ObjectId });
+    if (!order) {
       return NextResponse.json({ success: false, message: "Dịch vụ makeup không tồn tại" }, { status: 404 });
     }
 
-    const ownerId = service.ownerId;
+    // Quy trình xác nhận:
+    // pending -> deposit_confirmed (admin xác nhận cọc) -> confirmed (MUA xác nhận dịch vụ)
+    let updateOwnerTotal = false;
+    let notificationForUser = null;
+    // Nếu admin xác nhận cọc
+    if (order.status === "pending" && status === "deposit_confirmed") {
+      notificationForUser = {
+        userId: order.userId,
+        type: "user",
+        orderId: order._id,
+        message: "Admin đã xác nhận cọc, vui lòng xác nhận dịch vụ để hoàn tất đặt lịch.",
+        isRead: false,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+    }
+    // Nếu MUA xác nhận dịch vụ
+    if (order.status === "deposit_confirmed" && status === "confirmed") {
+      updateOwnerTotal = true;
+    }
 
-    const ownerData = await accountsCollection.findOne({
-      _id: ownerId
-    });
-
-    await accountsCollection.updateOne(
-      { _id: ownerId },
-      {
-        $set: {
-          totalPrice: (ownerData.totalPrice || 0) + service.deposit
+    if (updateOwnerTotal) {
+      const ownerId = order.ownerId;
+      const ownerData = await accountsCollection.findOne({ _id: ownerId });
+      await accountsCollection.updateOne(
+        { _id: ownerId },
+        {
+          $set: {
+            totalPrice: (ownerData.totalPrice || 0) + order.deposit
+          }
         }
-      }
-    );
+      );
+    }
+
+    if (notificationForUser) {
+      const notificationsCollection = db.collection("notifications");
+      await notificationsCollection.insertOne(notificationForUser);
+    }
 
     await ordersCollection.updateOne(
       { _id: ObjectId },
