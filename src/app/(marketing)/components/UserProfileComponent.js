@@ -12,15 +12,17 @@ import HistoryBookingComponent from "./HistoryBookingComponent";
 import { Alert, AlertTitle, Stack } from "@mui/material";
 import UpgradeIcon from "@mui/icons-material/Upgrade";
 import EmailIcon from "@mui/icons-material/Email";
-import { ArrowCircleDownOutlined, ExpandCircleDownOutlined, MailOutlined } from "@mui/icons-material";
+//import { ArrowCircleDownOutlined, ExpandCircleDownOutlined, MailOutlined } from "@mui/icons-material";
 import HistoryBankComponent from "./HistoryBankComponent";
+import CreateMakeupArtistProfileComponent from "./CreateMakeupArtistProfileComponent";
 
 const UserProfileComponent = () => {
   const { currentUser, updateUser } = useApp();
   const [key, setKey] = useState("account");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeProfileData, setUpgradeProfileData] = useState(null); // optional, for collecting profile data
+  const [upgradeProfileData, setUpgradeProfileData] = useState(null);
   const [isPending, setIsPending] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
   // Kiểm tra trạng thái pending khi vào tab "Yêu cầu nâng cấp"
   useEffect(() => {
     if (key === "upgrade" && currentUser && currentUser._id) {
@@ -70,9 +72,17 @@ const UserProfileComponent = () => {
   };
 
 
-  // Khi nhấn nút gửi yêu cầu nâng cấp, mở modal
-  const handleUpgradeRequest = () => {
-    setShowUpgradeModal(true);
+  // Khi nhấn nút gửi yêu cầu nâng cấp, mở modal và kiểm tra profile
+  const handleUpgradeRequest = async () => {
+    try {
+      const response = await fetch(`/api/makeup-artist-profiles/check/${currentUser._id}`);
+      const data = await response.json();
+      setHasProfile(data.exists);
+      setShowUpgradeModal(true);
+    } catch (error) {
+      console.error("Error checking profile:", error);
+      toast.error("Đã có lỗi xảy ra khi kiểm tra thông tin profile");
+    }
   };
 
   // Hàm gửi yêu cầu nâng cấp sau khi user submit form trong modal
@@ -99,12 +109,19 @@ const UserProfileComponent = () => {
         })
       });
       const data = await res.json();
-      if (data.success) toast.success(data.message);
-      else toast.error(data.message || "Gửi yêu cầu thất bại!");
-    } catch {
+      
+      if (data.success) {
+        toast.success(data.message);
+        // Cập nhật lại trạng thái sau khi tạo/cập nhật profile thành công
+        setIsPending(true);
+        setShowUpgradeModal(false);
+      } else {
+        toast.error(data.message || "Gửi yêu cầu thất bại!");
+      }
+    } catch (error) {
+      console.error("Error submitting upgrade request:", error);
       toast.error("Gửi yêu cầu thất bại!");
     }
-    setShowUpgradeModal(false);
   };
 
   return (
@@ -202,11 +219,19 @@ const UserProfileComponent = () => {
                   <Modal.Title>Cập nhật hồ sơ chuyên gia trước khi gửi yêu cầu nâng cấp</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <UpdateMakeupArtistProfileComponent
-                    currentUser={currentUser}
-                    onSubmit={handleUpgradeProfileSubmit}
-                    isUpgradeRequest={true}
-                  />
+                  {!hasProfile ? (
+                    <CreateMakeupArtistProfileComponent
+                      currentUser={currentUser}
+                      onSubmit={handleUpgradeProfileSubmit}
+                      isUpgradeRequest={true}
+                    />
+                  ) : (
+                    <UpdateMakeupArtistProfileComponent
+                      currentUser={currentUser}
+                      onSubmit={handleUpgradeProfileSubmit}
+                      isUpgradeRequest={true}
+                    />
+                  )}
                 </Modal.Body>
               </Modal>
             </div>

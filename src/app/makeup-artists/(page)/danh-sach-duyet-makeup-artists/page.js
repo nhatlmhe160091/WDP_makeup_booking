@@ -79,7 +79,7 @@ const UserListUpgradeToOwnerPage = () => {
     try {
       await SendRequest("PUT", "/api/users", {
         id: selectedUser._id,
-        role: "MUA"
+        role: "makeup_artist"
       });
       await fetch("/api/request-add-MUA", {
         method: "DELETE",

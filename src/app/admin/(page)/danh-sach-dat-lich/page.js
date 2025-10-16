@@ -77,11 +77,9 @@ const BookingHistoryPage = () => {
     }
   };
 
-  // Hàm điều chỉnh thời gian MongoDB (trừ 7 tiếng)
+  // Hàm điều chỉnh thời gian MongoDB
   const adjustMongoDBTime = (mongoTime) => {
-    const time = new Date(mongoTime);
-    time.setHours(time.getHours() - 7); // Trừ 7 tiếng để có thời gian Việt Nam thực
-    return time;
+    return new Date(mongoTime); // MongoDB đã lưu ở UTC, Date() sẽ tự động chuyển sang giờ địa phương
   };
 
   // Hàm kiểm tra xem đã đủ 1 tiếng từ lúc tạo chưa

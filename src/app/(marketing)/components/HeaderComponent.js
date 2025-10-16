@@ -179,7 +179,7 @@ console.log("showResults", showResults);
                     className={`list-group-item list-group-item-action ${index === focusedIndex ? 'active' : ''}`}
                     onClick={() => setShowResults(false)}
                   >
-                    {makeup.artistName} {makeup.location ? `- ${makeup.location}` : ''}
+                    {makeup.serviceName} {makeup.location ? `- ${makeup.location}` : ''}
                   </Link>
                 ))}
                 {getFilteredMakeups().length === 0 && searchValue.trim() && (
@@ -235,10 +235,17 @@ console.log("showResults", showResults);
                 )}
               </div>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {currentUser.role !== ROLE_MANAGER.USER && (
+                {currentUser.role === ROLE_MANAGER.ADMIN && (
+                  <li>
+                    <a href="/admin" className="dropdown-item">
+                      Trang quản trị
+                    </a>
+                  </li>
+                )}
+                {currentUser.role === ROLE_MANAGER.MUA && (
                   <li>
                     <a href="/makeup-artists" className="dropdown-item">
-                      Trang quản trị
+                      Trang quản lý dịch vụ
                     </a>
                   </li>
                 )}

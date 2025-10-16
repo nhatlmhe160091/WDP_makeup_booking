@@ -23,107 +23,91 @@ const defaultProfile = {
   certificates: []
 };
 
-const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRequest }) => {
-  const [profile, setProfile] = useState(defaultProfile);
+const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRequest }) => {
+  const [profile, setProfile] = useState({
+    ...defaultProfile,
+    name: currentUser?.name || "",
+    avatar: currentUser?.avatar || "",
+    email: currentUser?.email || "",
+    phone: currentUser?.phone || "",
+    address: currentUser?.address || "",
+  });
   const [loading, setLoading] = useState(false);
-
-  // Load profile khi mount
   const [requestStatus, setRequestStatus] = useState(null);
   const [requestReason, setRequestReason] = useState("");
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
-        // console.log("fetchProfile res", res);
-        if (res.payload) {
-          // console.log("res.payload", res.payload);
-          let wh = res.payload.workingHours || "08:00-18:00";
-          let [start, end] = wh.split("-");
-          setProfile({
-            ...defaultProfile,
-            ...res.payload,
-            workingHours: wh,
-            workingHoursStart: start || "08:00",
-            workingHoursEnd: end || "18:00"
-          });
-        } else {
-          toast.error("Không tìm thấy hồ sơ chuyên gia!");
-          setProfile(defaultProfile);
-        }
-      } catch (e) {
-        toast.error("Không thể tải hồ sơ!");
-        setProfile(defaultProfile);
-      }
-      setLoading(false);
-    };
+    if (currentUser?.email) {
+      fetchRequestStatus();
+      fetchBasicInfo();
+    }
+  }, [currentUser]);
 
-    const fetchRequestStatus = async () => {
-      if (!currentUser?.email) return;
-      try {
-        const res = await fetch(`/api/request-add-MUA?email=${currentUser.email}`);
-        const data = await res.json();
-        const req = data.data?.find((item) => item.email === currentUser.email);
-        if (req) {
-          setRequestStatus(req.status);
-          setRequestReason(req.reason || "");
-        } else {
-          setRequestStatus(null);
-          setRequestReason("");
-        }
-      } catch {
+  const fetchBasicInfo = async () => {
+    try {
+      const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
+      if (res.data) {
+        // Cập nhật chỉ các thông tin cơ bản
+        setProfile(prev => ({
+          ...prev,
+          email: res.data.email || prev.email,
+          name: res.data.name || prev.name,
+          address: res.data.address || prev.address,
+          phone: res.data.phone || prev.phone,
+          cccd: res.data.cccd || prev.cccd
+        }));
+      }
+    } catch (error) {
+      console.error("Không thể tải thông tin cơ bản:", error);
+    }
+  };
+
+  const fetchRequestStatus = async () => {
+    if (!currentUser?.email) return;
+    try {
+      const res = await fetch(`/api/request-add-MUA?email=${currentUser.email}`);
+      const data = await res.json();
+      const req = data.data?.find((item) => item.email === currentUser.email);
+      if (req) {
+        setRequestStatus(req.status);
+        setRequestReason(req.reason || "");
+      } else {
         setRequestStatus(null);
         setRequestReason("");
       }
-    };
-
-    if (currentUser?._id) {
-      // Nếu là makeup_artist hoặc đã có request thì fetch profile
-      if (currentUser.role === "makeup_artist") {
-        fetchProfile();
-      } else {
-        // Kiểm tra có request không
-        fetchRequestStatus().then(() => {
-          fetchProfile();
-        });
-      }
-    } else {
-      setProfile(defaultProfile);
+    } catch {
+      setRequestStatus(null);
+      setRequestReason("");
     }
-  }, [currentUser]);
-// Submit cập nhật
+  };
+// Submit tạo mới profile
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Đảm bảo workingHours luôn đúng định dạng
-    let wh = `${profile.workingHoursStart || "08:00"}-${profile.workingHoursEnd || "18:00"}`;
+    
     try {
-      // Cập nhật profile
-      const res = await SendRequest("put", "/api/makeup-artist-profiles", {
+      // Tạo mới profile
+      const profileData = {
         artistId: currentUser._id,
         ...profile,
-        workingHours: wh
-      });
-      
+        workingHours: `${profile.workingHoursStart}-${profile.workingHoursEnd}`
+      };
+
+      const res = await SendRequest("post", "/api/makeup-artist-profiles", profileData);
+
       if (res.success !== false) {
-        toast.success(res.message || "Cập nhật hồ sơ thành công!");
+        toast.success("Tạo hồ sơ chuyên gia thành công!");
         
         // Nếu là yêu cầu nâng cấp, gọi callback onSubmit
         if (isUpgradeRequest && onSubmit) {
-          const profileData = {
-            ...profile,
-            workingHours: wh,
-            artistId: currentUser._id
-          };
           await onSubmit(profileData);
         }
       } else {
-        toast.error(res.message || "Cập nhật hồ sơ thất bại!");
+        toast.error(res.message || "Tạo hồ sơ thất bại!");
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Cập nhật hồ sơ thất bại!");
+      console.error("Error creating profile:", error);
+      toast.error("Tạo hồ sơ thất bại!");
     }
     setLoading(false);
   };
@@ -216,7 +200,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
 
   return (
     <form className="p-3" onSubmit={handleSubmit}>
-      <h4 className="mb-3">Cập nhật hồ sơ chuyên gia</h4>
+      <h4 className="mb-3">Tạo hồ sơ chuyên gia</h4>
       {/* Nếu có request bị từ chối, hiển thị lý do */}
       {requestStatus === "rejected" && (
         <div className="alert alert-danger">
@@ -226,7 +210,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
       <div className="row">
         <div className="col-md-6 mb-2">
           <label>Tên</label>
-          <input className="form-control" name="name" value={profile.name} onChange={handleChange} required maxLength={100} />
+          <input className="form-control" name="name" value={profile.name} readOnly />
         </div>
         <div className="col-md-6 mb-2">
           <label>Ảnh đại diện (URL)</label>
@@ -270,7 +254,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         </div>
         <div className="col-md-6 mb-2">
           <label>Số điện thoại</label>
-          <input className="form-control" name="phone" value={profile.phone} onChange={handleChange} />
+          <input className="form-control" name="phone" value={profile.phone} readOnly />
         </div>
         <div className="col-md-6 mb-2">
           <label>Email</label>
@@ -282,7 +266,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         </div>
         <div className="col-12 mb-2">
           <label>Địa chỉ</label>
-          <input className="form-control" name="address" value={profile.address} onChange={handleChange} />
+          <input className="form-control" name="address" value={profile.address} readOnly />
         </div>
         <div className="col-md-4 mb-2">
           <label>Ngân hàng</label>
@@ -339,10 +323,10 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
       <button type="button" className="btn btn-outline-primary btn-sm mb-3" onClick={handleAddCertificate}>+ Thêm chứng chỉ</button>
       <hr />
       <button className="btn btn-success" type="submit" disabled={loading}>
-        {loading ? "Đang lưu..." : "Lưu thay đổi"}
+        {loading ? "Đang tạo..." : "Tạo hồ sơ"}
       </button>
     </form>
   );
 };
 
-export default UpdateMakeupArtistProfileComponent;
+export default CreateMakeupArtistProfileComponent;

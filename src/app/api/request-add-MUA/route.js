@@ -11,7 +11,7 @@ export async function POST(req) {
     const collection = db.collection("MUA_requests");
 
     const { userId, email } = await req.json();
-    console.log(collection);
+    // console.log(collection);
 
     await collection.insertOne({
       userId,

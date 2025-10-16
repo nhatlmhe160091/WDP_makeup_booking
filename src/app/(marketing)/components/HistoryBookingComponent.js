@@ -24,7 +24,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
-    const res = await SendRequest("GET", "/api/orders", { userId: currentUser._id });
+    const res = await SendRequest("GET", "/api/orders/user", { userId: currentUser._id });
     if (res.payload) {
       setBookings(res.payload);
     }
@@ -211,9 +211,8 @@ const HistoryBookingComponent = ({ currentUser }) => {
       };
     }
 
-    // Điều chỉnh thời gian tạo về múi giờ Việt Nam
+    // Lấy thời gian tạo (MongoDB lưu UTC, new Date() sẽ tự chuyển sang giờ địa phương)
     const createdTime = new Date(booking.created_at);
-    createdTime.setHours(createdTime.getHours() - 7); // Trừ 7 tiếng cho múi giờ VN
     
     const now = new Date();
     const oneHourInMs = 60 * 60 * 1000; // 1 tiếng tính bằng milliseconds

@@ -31,8 +31,8 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
     }
     localStorage.setItem("favoriteServices", JSON.stringify(favs));
   };
-  // Xử lý tên artist - ưu tiên artistName, sau đó serviceName
-  const displayName = field.artistName || field.serviceName;
+  // Xử lý tên artist - ưu tiên serviceName, sau đó serviceName
+  const displayName = field.serviceName || field.serviceName;
   
   // Xử lý kinh nghiệm - tính từ experienceYears hoặc experienceMonths
   const getExperience = () => {

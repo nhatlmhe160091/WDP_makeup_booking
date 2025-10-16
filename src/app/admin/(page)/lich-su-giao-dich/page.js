@@ -29,8 +29,8 @@ const TransactionHistoryPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/webhooks", {});
-      if (res.payload) {
-        setTransactions(res.payload);
+      if (res.data) {
+        setTransactions(res.data);
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
@@ -75,25 +75,25 @@ const TransactionHistoryPage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Ngân hàng</TableCell>
-                  <TableCell>Ngày giao dịch</TableCell>
-                  <TableCell>Số tài khoản</TableCell>
+                  <TableCell>Thời gian giao dịch</TableCell>
+                  <TableCell>Số tài khoản ảo</TableCell>
                   <TableCell>Số tiền</TableCell>
                   <TableCell>Nội dung</TableCell>
-                  <TableCell>Mã tham chiếu</TableCell>
+                  <TableCell>Mã giao dịch</TableCell>
                   <TableCell>Loại giao dịch</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {currentItems.map((transaction) => (
                   <TableRow key={transaction._id}>
-                    <TableCell>{transaction.gateway}</TableCell>
-                    <TableCell>{convertDateTime(transaction.transactionDate)}</TableCell>
-                    <TableCell>{transaction.accountNumber}</TableCell>
-                    <TableCell>{transaction?.transferAmount?.toLocaleString()} VND</TableCell>
-                    <TableCell>{transaction.content}</TableCell>
-                    <TableCell>{transaction.referenceCode}</TableCell>
-                    <TableCell style={{ color: transaction.transferType === "in" ? "green" : "red" }}>
-                      {transaction.transferType === "in" ? "Nạp" : "Rút"}
+                    <TableCell>CAKE</TableCell>
+                    <TableCell>{convertDateTime(transaction.data.transactionDateTime)}</TableCell>
+                    <TableCell>{transaction.data.accountNumber}</TableCell>
+                    <TableCell>{transaction.data.amount?.toLocaleString()} VND</TableCell>
+                    <TableCell>{transaction.data.description}</TableCell>
+                    <TableCell>{transaction.data.reference}</TableCell>
+                    <TableCell style={{ color: "green" }}>
+                      Nạp
                     </TableCell>
                   </TableRow>
                 ))}

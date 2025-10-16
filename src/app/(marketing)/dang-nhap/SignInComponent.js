@@ -39,9 +39,11 @@ const SignInComponent = () => {
         }
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
-        if (res.payload.role === "admin" || res.payload.role === "makeup_artist") {
-          window.location.href = `/makeup-artists`;
-        }else{
+        if (res.payload.role === "admin") {
+          window.location.href = "/admin";
+        } else if (res.payload.role === "makeup_artist") {
+          window.location.href = "/makeup-artists";
+        } else {
           window.location.href = "/";
         }
       } else {
