@@ -29,7 +29,7 @@ export async function GET(req) {
     // Build the search query dynamically based on the provided parameters
     // Mặc định chỉ lấy các order đã xác nhận hoàn toàn (confirmed)
     const searchQuery = {
-      status: "confirmed",
+      // status: "confirmed",
       fieldSlot: { $exists: true }
     };
     if (userId) searchQuery.userId = getObjectId(userId);

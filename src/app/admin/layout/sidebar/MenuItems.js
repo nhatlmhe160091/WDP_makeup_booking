@@ -59,9 +59,15 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Lịch sử đặt lịch",
+    title: "Danh sách đặt lịch",
     icon: IconListCheck,
     href: "/admin/danh-sach-dat-lich"
+  },
+  {
+    id: uniqueId(),
+    title: "Lịch sử đặt lịch",
+    icon: IconListCheck,
+    href: "/admin/lich-su-dat-lich"
   },
   {
     id: uniqueId(),

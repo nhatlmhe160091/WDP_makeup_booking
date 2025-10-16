@@ -57,11 +57,17 @@ const Menuitems = [
     navlabel: true,
     subheader: "Quản lý đặt lịch makeup"
   },
+    {
+    id: uniqueId(),
+    title: "Danh sách đặt lịch",
+    icon: IconListCheck,
+    href: "/makeup-artists/danh-sach-dat-lich"
+  },
   {
     id: uniqueId(),
     title: "Lịch sử đặt lịch",
     icon: IconListCheck,
-    href: "/makeup-artists/danh-sach-dat-lich"
+    href: "/makeup-artists/lich-su-dat-lich"
   },
   {
     id: uniqueId(),
