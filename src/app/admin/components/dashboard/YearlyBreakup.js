@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { useTheme } from "@mui/material/styles";
 import { Grid, Stack, Typography, Avatar, CircularProgress, Box } from "@mui/material";
 import { IconArrowUpLeft } from "@tabler/icons-react";
-import DashboardCard from "@muahub/app/makeup-artists/components/shared/DashboardCard";
+import DashboardCard from "@muahub/app/admin/components/shared/DashboardCard";
 import SendRequest from "@muahub/utils/SendRequest";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { formatCurrency } from "@muahub/utils/Main";

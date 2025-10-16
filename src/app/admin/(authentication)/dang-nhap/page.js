@@ -1,8 +1,8 @@
 "use client";
 import { Grid, Box, Card, Stack, Typography, Link } from "@mui/material";
 // components
-import PageContainer from "@muahub/app/makeup-artists/components/container/PageContainer";
-import Logo from "@muahub/app/makeup-artists/layout/shared/logo/Logo";
+import PageContainer from "@muahub/app/admin/components/container/PageContainer";
+import Logo from "@muahub/app/admin/layout/shared/logo/Logo";
 import AuthLogin from "../auth/AuthLogin";
 
 const Login2 = () => {
@@ -38,7 +38,7 @@ const Login2 = () => {
                 subtitle={
                   <Typography variant="subtitle1" textAlign="center" color="textSecondary" mt={1}>
                     Nếu bạn có dịch vụ makeup và muốn quản lý dịch vụ makeup của mình, hãy đăng ký tài khoản{" "}
-                    <Link href="/makeup-artists/dang-ky">tại đây</Link>
+                    <Link href="/admin/dang-ky">tại đây</Link>
                   </Typography>
                 }
               />

@@ -19,7 +19,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
 import SelectServiceComponent from "../../../components/SelectServiceComponent";
-import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
+import ImagePreview from "@muahub/app/admin/components/ImagePreview";
 import toast from "react-hot-toast";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
 import { useApp } from "@muahub/app/contexts/AppContext";

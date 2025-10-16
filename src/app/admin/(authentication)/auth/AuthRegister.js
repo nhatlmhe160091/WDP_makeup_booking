@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, FormGroup, FormControlLabel, Button, Stack, Checkbox, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import CustomTextField from "@muahub/app/makeup-artists/components/forms/theme-elements/CustomTextField";
+import CustomTextField from "@muahub/app/admin/components/forms/theme-elements/CustomTextField";
 import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 import SearchAddressComponent from "../../components/SearchAddressComponent";
@@ -50,7 +50,7 @@ const AuthRegister = ({ title, subtitle, subtext }) => {
       const res = await SendRequest("POST", "/api/users", { ...account, address: location, role: ROLE_MANAGER.ADMIN });
       if (res.payload) {
         toast.success("Đăng ký thành công");
-        window.location.href = "/makeup-artists/dang-nhap";
+        window.location.href = "/admin/dang-nhap";
       } else {
         toast.error("Đăng ký thất bại, vui lòng kiểm tra thông tin của bạn.");
       }

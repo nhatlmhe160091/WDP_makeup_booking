@@ -13,9 +13,9 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
   const pathDirect = pathname;
 
   if (currentUser.role === ROLE_MANAGER.MUA && !currentUser.payment_type) {
-    if (pathname !== "/makeup-artists/thanh-toan-nen-tang") {
+    if (pathname !== "/admin/thanh-toan-nen-tang") {
       if (typeof window !== "undefined") {
-        window.location.href = "/makeup-artists/thanh-toan-nen-tang";
+        window.location.href = "/admin/thanh-toan-nen-tang";
       }
       return null;
     }

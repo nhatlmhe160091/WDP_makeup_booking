@@ -1,7 +1,7 @@
 'use client';
 import { Paper, Box, Grid } from '@mui/material';
-import PageContainer from '@muahub/app/makeup-artists/components/container/PageContainer';
-import DashboardCard from '@muahub/app/makeup-artists/components/shared/DashboardCard';
+import PageContainer from '@muahub/app/admin/components/container/PageContainer';
+import DashboardCard from '@muahub/app/admin/components/shared/DashboardCard';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
 

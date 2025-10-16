@@ -96,7 +96,7 @@ const ServiceListPage = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Danh sách dịch vụ</Typography>
         <Box display="flex" gap={2}>
-          <Link href="/makeup-artists/them-dich-vu">
+          <Link href="/admin/them-dich-vu">
             <Button
               variant="contained"
               startIcon={<Add />}
@@ -123,7 +123,7 @@ const ServiceListPage = () => {
                 <Typography variant="h6" color="textSecondary" mb={2}>
                   Chưa có dịch vụ nào
                 </Typography>
-                <Link href="/makeup-artists/them-dich-vu">
+                <Link href="/admin/them-dich-vu">
                   <Button
                     variant="contained"
                     startIcon={<Add />}

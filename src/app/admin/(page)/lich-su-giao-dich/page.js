@@ -29,8 +29,9 @@ const TransactionHistoryPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/webhooks", {});
-      if (res.data) {
-        setTransactions(res.data);
+      if (res.payload && res.payload.length > 0) {
+        // console.log("Fetched transactions:", res.payload);
+        setTransactions(res.payload);
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
@@ -55,7 +56,7 @@ const TransactionHistoryPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = transactions.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
-
+console.log(" transactions", transactions);
   return (
     <PageContainer title="Lịch sử giao dịch" description="Danh sách các giao dịch trong hệ thống">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -86,7 +87,7 @@ const TransactionHistoryPage = () => {
               <TableBody>
                 {currentItems.map((transaction) => (
                   <TableRow key={transaction._id}>
-                    <TableCell>CAKE</TableCell>
+                    <TableCell>BIDV</TableCell>
                     <TableCell>{convertDateTime(transaction.data.transactionDateTime)}</TableCell>
                     <TableCell>{transaction.data.accountNumber}</TableCell>
                     <TableCell>{transaction.data.amount?.toLocaleString()} VND</TableCell>

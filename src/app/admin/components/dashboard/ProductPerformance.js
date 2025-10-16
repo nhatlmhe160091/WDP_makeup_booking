@@ -12,7 +12,7 @@ import {
   Link
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import DashboardCard from "@muahub/app/makeup-artists/components/shared/DashboardCard";
+import DashboardCard from "@muahub/app/admin/components/shared/DashboardCard";
 import SendRequest from "@muahub/utils/SendRequest";
 import { ROLE_MANAGER } from "@muahub/constants/System";
 import { useApp } from "@muahub/app/contexts/AppContext";
@@ -67,7 +67,7 @@ const ProductPerformance = () => {
     <DashboardCard
       title="Top 5 dịch vụ makeup được đặt nhiều nhất"
       action={
-        <Link href="/makeup-artists/danh-sach-dat-lich-makeup">
+        <Link href="/admin/danh-sach-dat-lich-makeup">
           <Button variant="contained" color="primary" size="small">
             Xem tất cả
           </Button>

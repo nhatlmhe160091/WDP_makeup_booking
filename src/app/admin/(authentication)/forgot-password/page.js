@@ -1,8 +1,8 @@
 "use client";
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 // components
-import PageContainer from "@muahub/app/makeup-artists/components/container/PageContainer";
-import Logo from "@muahub/app/makeup-artists/layout/shared/logo/Logo";
+import PageContainer from "@muahub/app/admin/components/container/PageContainer";
+import Logo from "@muahub/app/admin/layout/shared/logo/Logo";
 import AuthForgotPassword from "../auth/AuthForgotPassword";
 
 const ForgotPassword = () => {

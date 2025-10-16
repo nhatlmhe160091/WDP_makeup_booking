@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import DashboardCard from "@muahub/app/makeup-artists/components/shared/DashboardCard";
+import DashboardCard from "@muahub/app/admin/components/shared/DashboardCard";
 import {
   Timeline,
   TimelineItem,

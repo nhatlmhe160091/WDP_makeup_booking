@@ -1,8 +1,8 @@
 'use client';
 import { Typography, Grid, CardContent } from '@mui/material';
-import PageContainer from '@muahub/app/makeup-artists/components/container/PageContainer';
-import DashboardCard from '@muahub/app/makeup-artists/components/shared/DashboardCard';
-import BlankCard from '@muahub/app/makeup-artists/components/shared/BlankCard';
+import PageContainer from '@muahub/app/admin/components/container/PageContainer';
+import DashboardCard from '@muahub/app/admin/components/shared/DashboardCard';
+import BlankCard from '@muahub/app/admin/components/shared/BlankCard';
 
 
 const TypographyPage = () => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, FormGroup, FormControlLabel, Button, Stack, Checkbox, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import CustomTextField from "@muahub/app/makeup-artists/components/forms/theme-elements/CustomTextField";
+import CustomTextField from "@muahub/app/admin/components/forms/theme-elements/CustomTextField";
 import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 
@@ -40,7 +40,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       if (res.payload) {
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
-        window.location.href = "/makeup-artists";
+        window.location.href = "/admin";
       } else {
         toast.error("Đăng nhập thất bại, vui lòng kiểm tra thông tin của bạn.");
       }

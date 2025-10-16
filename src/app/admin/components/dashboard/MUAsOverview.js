@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Select, MenuItem, CircularProgress, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import DashboardCard from "@muahub/app/makeup-artists/components/shared/DashboardCard";
+import DashboardCard from "@muahub/app/admin/components/shared/DashboardCard";
 import SendRequest from "@muahub/utils/SendRequest";
 import { ROLE_MANAGER } from "@muahub/constants/System";
 import { useApp } from "@muahub/app/contexts/AppContext";

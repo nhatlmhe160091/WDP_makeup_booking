@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, Button, Stack, CircularProgress } from "@mui/material";
 import Link from "next/link";
-import CustomTextField from "@muahub/app/makeup-artists/components/forms/theme-elements/CustomTextField";
+import CustomTextField from "@muahub/app/admin/components/forms/theme-elements/CustomTextField";
 import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 

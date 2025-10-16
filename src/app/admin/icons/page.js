@@ -1,6 +1,6 @@
 'use client';
-import PageContainer from '@muahub/app/makeup-artists/components/container/PageContainer';
-import DashboardCard from '@muahub/app/makeup-artists/components/shared/DashboardCard';
+import PageContainer from '@muahub/app/admin/components/container/PageContainer';
+import DashboardCard from '@muahub/app/admin/components/shared/DashboardCard';
 
 
 const Icons = () => {

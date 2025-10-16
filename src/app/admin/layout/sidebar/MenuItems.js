@@ -25,7 +25,7 @@ const Menuitems = [
     id: uniqueId(),
     title: "Tổng quan đặt lịch",
     icon: IconLayoutDashboard,
-    href: "/makeup-artists"
+    href: "/admin"
   },
   {
     id: uniqueId(),
@@ -136,7 +136,7 @@ const Menuitems = [
   //   id: uniqueId(),
   //   title: "Quản trị website",
   //   icon: IconSettings,
-  //   href: "/makeup-artists/quan-tri-website",
+  //   href: "/admin/quan-tri-website",
   //   onlyAdmin: true
   // }
 ];
