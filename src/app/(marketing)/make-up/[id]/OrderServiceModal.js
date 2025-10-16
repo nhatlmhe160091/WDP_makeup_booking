@@ -7,12 +7,15 @@ import SendRequest from "@muahub/utils/SendRequest";
 import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import FormMakeupLocation from "./FormMakeupLocation";
 
 const OrderServiceModal = ({ open, onClose, serviceData }) => {
-  const [selectedDate, setSelectedDate] = useState(""),
-    [selectedField, setSelectedField] = useState(""),
-    [errorMessage, setErrorMessage] = useState(""),
-    [orderDone, setOrderDone] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedField, setSelectedField] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [orderDone, setOrderDone] = useState(false);
+  const [latitude, setLatitude] = useState(16.0544);
+  const [longitude, setLongitude] = useState(108.2022);
 
   const [qrCode, setQrCode] = useState("");
   const [payosQr, setPayosQr] = useState("");
@@ -21,6 +24,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
   const [dataOrder, setDataOrder] = useState([]);
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
+  const [makeupLocation, setMakeupLocation] = useState(""); // 'at-home' | 'at-studio'
 
   // useEffect(() => {
   //   const fetchOrderData = async () => {
@@ -56,6 +60,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     setSelectedDate("");
     setSelectedField("");
     setSelectedFieldSlot([]);
+    setMakeupLocation("");
 
     // Gọi hàm onClose từ parent component
     onClose();
@@ -152,6 +157,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         time: slot.time,
         date: selectedDate,
         fieldSlot: slot.fieldIndex,
+        location: makeupLocation,
         status: "confirmed"
       };
       orderCost += payload.deposit * 0.3;
@@ -235,7 +241,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                 <strong>Ngày đặt:</strong> {convertDateFormat(selectedDate)}
               </div>
               <div className="col-sm-6">
-                <strong>Dịch vụ:</strong> {serviceData.packages[selectedField].name}
+                <strong>Dịch vụ:</strong> {selectedField && serviceData?.packages?.[selectedField]?.name || 'Chưa chọn'}
               </div>
             </div>
 
@@ -248,6 +254,10 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="mb-3">
+              <strong>Địa điểm:</strong> {makeupLocation === 'at-studio' ? 'Đến studio' : makeupLocation === 'at-home' ? 'Đến tận nơi' : 'Chưa chọn'}
             </div>
 
             <div className="row mb-2">
@@ -302,6 +312,13 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
           </div>
         ) : (
           <Form>
+            <FormMakeupLocation 
+              makeupLocation={makeupLocation} 
+              setMakeupLocation={setMakeupLocation}
+              latitude={latitude}
+              longitude={longitude}
+            />
+
             <Form.Group className="mb-3">
               <Form.Label>Chọn phương thức thanh toán</Form.Label>
               <div className="d-flex gap-2">
