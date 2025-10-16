@@ -90,9 +90,23 @@ export async function POST(req) {
 
     const objectId = await validateToken(req);
 
-    let { serviceId, ownerId, field, time, date, deposit, fieldSlot } = await req.json();
+    let { serviceId, ownerId, field, time, date, deposit, fieldSlot, serviceLocationType, serviceLocation } = await req.json();
+
+    // Lấy dữ liệu vị trí từ object serviceLocation
+    const {
+      extraFee = 0,
+      distanceKm = 0,
+      customerLat = null,
+      customerLng = null,
+      studioLat = null,
+      studioLng = null
+    } = serviceLocation || {};
 
     deposit = parseInt(deposit);
+
+  // Chuyển đổi kiểu dữ liệu nếu cần
+  const parsedExtraFee = extraFee ? parseInt(extraFee) : 0;
+  const parsedDistanceKm = distanceKm ? parseFloat(distanceKm) : 0;
 
     const total = deposit;
 
@@ -120,6 +134,15 @@ export async function POST(req) {
       status: isToday ? "deposit_confirmed" : "pending", // Tự động xác nhận cọc nếu đặt trong ngày
       fieldSlot,
       date,
+      serviceLocationType: serviceLocationType || null,
+      serviceLocation: {
+        extraFee: parsedExtraFee,
+        distanceKm: parsedDistanceKm,
+        customerLat,
+        customerLng,
+        studioLat,
+        studioLng
+      },
       created_at: new Date(),
       updated_at: new Date()
     };

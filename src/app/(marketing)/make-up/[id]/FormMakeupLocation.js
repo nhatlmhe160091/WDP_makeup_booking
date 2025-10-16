@@ -16,11 +16,26 @@ function getDistanceKm(lat1, lng1, lat2, lng2) {
   return (R * c).toFixed(2);
 }
 
-const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longitude }) => {
+const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longitude, serviceLocation, setServiceLocation }) => {
   const [showMapModal, setShowMapModal] = useState(false);
   const [userLat, setUserLat] = useState(null);
   const [userLng, setUserLng] = useState(null);
+  const [locationSaved, setLocationSaved] = useState(false);
 
+  // Update serviceLocation when userLat/userLng changes
+  React.useEffect(() => {
+    if (makeupLocation === "at-studio") {
+      setServiceLocation({
+        extraFee: 0,
+        distanceKm: 0,
+        customerLat: null,
+        customerLng: null,
+        studioLat: latitude,
+        studioLng: longitude
+      });
+      setLocationSaved(false);
+    }
+  }, [makeupLocation, latitude, longitude, setServiceLocation]);
   const handleHomeClick = () => {
     setMakeupLocation("at-home");
     setShowMapModal(true);
@@ -62,23 +77,26 @@ const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longi
         </div>
       )}
 
-      {/* <div className="mb-2">
-        <strong>Latitude:</strong> {latitude}
-        <br />
-        <strong>Longitude:</strong> {longitude}
-      </div> */}
+      {/* Hiển thị khoảng cách và phụ phí nếu đã lưu vị trí */}
+      {makeupLocation === "at-home" && locationSaved && serviceLocation && (
+        <div className="mb-2">
+          <strong>Khoảng cách:</strong> {serviceLocation.distanceKm} km<br />
+          <strong>Phụ phí vận chuyển:</strong> {serviceLocation.extraFee.toLocaleString()} VND
+        </div>
+      )}
 
-      <Modal show={showMapModal} onHide={() => setShowMapModal(false)} centered>
+  <Modal show={showMapModal} onHide={() => setShowMapModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Chọn vị trí trên bản đồ</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+  <Modal.Body>
           <div className="mb-3">
             <Button variant="info" onClick={() => {
               if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
                   setUserLat(pos.coords.latitude);
                   setUserLng(pos.coords.longitude);
+                  // setServiceLocation sẽ được gọi qua useEffect
                 });
               } else {
                 alert("Trình duyệt không hỗ trợ lấy vị trí!");
@@ -120,6 +138,22 @@ const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longi
           )}
         </Modal.Body>
         <Modal.Footer>
+          <Button variant="primary" disabled={!(userLat && userLng)} onClick={() => {
+            if (userLat && userLng) {
+              const distanceKm = parseFloat(getDistanceKm(userLat, userLng, latitude, longitude));
+              const extraFee = Math.round(distanceKm * 1000);
+              setServiceLocation({
+                extraFee,
+                distanceKm,
+                customerLat: userLat,
+                customerLng: userLng,
+                studioLat: latitude,
+                studioLng: longitude
+              });
+              setLocationSaved(true);
+              setShowMapModal(false);
+            }
+          }}>Lưu vị trí</Button>
           <Button variant="secondary" onClick={() => setShowMapModal(false)}>Đóng</Button>
         </Modal.Footer>
       </Modal>

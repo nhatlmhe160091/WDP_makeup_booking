@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import FormMakeupLocation from "./FormMakeupLocation";
 
 const OrderServiceModal = ({ open, onClose, serviceData }) => {
+
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedField, setSelectedField] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,7 +26,14 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
   const [makeupLocation, setMakeupLocation] = useState(""); // 'at-home' | 'at-studio'
-
+  const [serviceLocation, setServiceLocation] = useState({
+    extraFee: 0,
+    distanceKm: 0,
+    customerLat: null,
+    customerLng: null,
+    studioLat: latitude,
+    studioLng: longitude
+  });
   // useEffect(() => {
   //   const fetchOrderData = async () => {
   //     const res = await SendRequest("GET", `/api/orders?serviceId=${serviceData._id}`);
@@ -158,7 +166,16 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         date: selectedDate,
         fieldSlot: slot.fieldIndex,
         location: makeupLocation,
-        status: "confirmed"
+        status: "pending",
+        serviceLocationType: makeupLocation === 'at-home' ? 'home' : (makeupLocation === 'at-studio' ? 'studio' : null),
+        serviceLocation: {
+          extraFee: serviceLocation.extraFee,
+          distanceKm: serviceLocation.distanceKm,
+          customerLat: serviceLocation.customerLat,
+          customerLng: serviceLocation.customerLng,
+          studioLat: serviceLocation.studioLat,
+          studioLng: serviceLocation.studioLng
+        },
       };
       orderCost += payload.deposit * 0.3;
       payloadArr.push(payload);
@@ -223,7 +240,12 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     // Nếu chưa chọn, thêm vào
     setSelectedFieldSlot([...selectedFieldSlot, { time, fieldIndex }]);
   };
-
+// console.log('serviceLocation:', serviceLocation);
+// console.log('serviceLocation full detail', extra)
+  // Theo dõi thay đổi serviceLocation để debug
+  useEffect(() => {
+    console.log('serviceLocation (debug):', serviceLocation);
+  }, [serviceLocation]);
   return (
     <Modal show={open} onHide={onClose} centered size="lg" backdrop="static">
       <Modal.Header closeButton>
@@ -264,12 +286,12 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
               <div className="col-sm-6">
                 <strong>Tiền cọc (30%):</strong>
                 <br />
-                {formatCurrency(serviceData.packages[selectedField].price * 0.3 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData?.packages[selectedField]?.price * 0.3 * selectedFieldSlot?.length)}
               </div>
               <div className="col-sm-6">
                 <strong>Cần thanh toán (70%):</strong>
                 <br />
-                {formatCurrency(serviceData.packages[selectedField].price * 0.7 * selectedFieldSlot.length)}
+                {formatCurrency(serviceData?.packages[selectedField]?.price * 0.7 * selectedFieldSlot?.length)}
               </div>
             </div>
 
@@ -312,13 +334,14 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
           </div>
         ) : (
           <Form>
-            <FormMakeupLocation 
-              makeupLocation={makeupLocation} 
+            <FormMakeupLocation
+              makeupLocation={makeupLocation}
               setMakeupLocation={setMakeupLocation}
               latitude={latitude}
               longitude={longitude}
+              serviceLocation={serviceLocation}
+              setServiceLocation={setServiceLocation}
             />
-
             <Form.Group className="mb-3">
               <Form.Label>Chọn phương thức thanh toán</Form.Label>
               <div className="d-flex gap-2">
