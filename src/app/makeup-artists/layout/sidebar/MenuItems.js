@@ -9,7 +9,7 @@ import {
   IconUser,
   IconUsers,
   IconMessage,
-  // thêm icon danh sách chủ sân align-box-left-bottom
+  // thêm icon danh sách chuyên viên align-box-left-bottom
   IconAlignBoxLeftBottom,
   IconMoneybag,
   IconSettings
@@ -89,7 +89,7 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Danh sách chủ sân",
+    title: "Danh sách chuyên viên",
     icon: IconUsers,
     href: "/makeup-artists/danh-sach-makeup-artists",
     onlyAdmin: true
@@ -103,7 +103,7 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Danh sách duyệt chủ sân",
+    title: "Danh sách duyệt chuyên viên",
     icon: IconAlignBoxLeftBottom,
     href: "/makeup-artists/danh-sach-duyet-makeup-artists",
     onlyAdmin: true

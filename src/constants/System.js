@@ -160,7 +160,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
   <html>
     <head>
       <meta charset="UTF-8" />
-      <title>Nâng cấp tài khoản thành chủ sân - ${EMAIL_NAME}</title>
+      <title>Nâng cấp tài khoản thành chuyên viên - ${EMAIL_NAME}</title>
       <style>
         body {
           font-family: Arial, sans-serif;
@@ -205,7 +205,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
       <div class="container">
         <h2>Xin chúc mừng ${name}!</h2>
         
-        <p>Tài khoản của bạn tại <strong>${EMAIL_NAME}</strong> đã được nâng cấp thành công lên <strong>Chủ sân</strong>.</p>
+        <p>Tài khoản của bạn tại <strong>${EMAIL_NAME}</strong> đã được nâng cấp thành công lên <strong>chuyên viên</strong>.</p>
         
         <div class="highlight-box">
           <p><strong>Thông tin tài khoản:</strong></p>
@@ -214,7 +214,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
             <li><strong>Email:</strong> ${email}</li>
             <li><strong>Số điện thoại:</strong> ${phone}</li>
             <li><strong>Địa chỉ:</strong> ${address}</li>
-            <li><strong>Vai trò:</strong> Chủ sân</li>
+            <li><strong>Vai trò:</strong> chuyên viên</li>
           </ul>
         </div>
 

@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button, Menu, MenuItem, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import Link from "next/link";
 // components
@@ -24,6 +24,42 @@ const Header = ({ toggleMobileSidebar }) => {
     color: theme.palette.text.secondary
   }));
 
+  // State cho thông báo
+  const [notifications, setNotifications] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Lấy userId từ localStorage (giả sử đã lưu khi đăng nhập)
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setLoading(true);
+      try {
+        let userId = null;
+        if (typeof window !== 'undefined') {
+          userId = localStorage.getItem('userId');
+        }
+        const url = userId
+          ? `/api/notifications/owner?isRead=false&userId=${userId}`
+          : `/api/notifications/owner?isRead=false`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.success) setNotifications(data.data);
+      } catch (err) {
+        setNotifications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
@@ -43,15 +79,48 @@ const Header = ({ toggleMobileSidebar }) => {
 
         <IconButton
           size="large"
-          aria-label="show 11 new notifications"
+          aria-label="show notifications"
           color="inherit"
           aria-controls="msgs-menu"
           aria-haspopup="true"
+          onClick={handleOpenMenu}
         >
-          <Badge variant="dot" color="primary">
+          <Badge badgeContent={notifications.length} color="primary">
             <IconBellRinging size="21" stroke="1.5" />
           </Badge>
         </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+          PaperProps={{
+            sx: {
+              width: 350,
+              maxHeight: 400,
+              p: 0,
+              mt: 1.5,
+            }
+          }}
+        >
+          <Box sx={{ p: 2, borderBottom: "1px solid #eee", fontWeight: 600 }}>Thông báo mới</Box>
+          {loading ? (
+            <MenuItem disabled><Box sx={{ p: 2 }}>Đang tải...</Box></MenuItem>
+          ) : notifications.length === 0 ? (
+            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo mới</Box></MenuItem>
+          ) : (
+            notifications.map((item) => (
+              <MenuItem key={item._id} sx={{ alignItems: 'flex-start', whiteSpace: 'normal', borderBottom: '1px solid #eee' }}>
+                <Box>
+                  <Typography fontWeight={500}>{item.message}</Typography>
+                  <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+                </Box>
+              </MenuItem>
+            ))
+          )}
+          <Box sx={{ textAlign: "right", p: 1 }}>
+            <Button size="small" onClick={handleCloseMenu}>Đóng</Button>
+          </Box>
+        </Menu>
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
           <Profile />

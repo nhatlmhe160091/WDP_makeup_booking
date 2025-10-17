@@ -185,13 +185,13 @@ const HistoryBookingComponent = ({ currentUser }) => {
 
   const checkTime = (booking) => {
     const isAlreadyRated = ratedOrderIds.includes(booking._id);
-    
+
     // Parse booking date and time để tính thời gian đánh giá
     const [startTime] = booking.time.split(" - ");
     const [year, month, day] = booking.date.split("-").map(Number);
     const [hour, minute] = startTime.split(":").map(Number);
     const bookingDateTime = new Date(year, month - 1, day, hour, minute);
-    
+
     // Kiểm tra xem có phải đặt trong ngày không
     const today = new Date();
     const bookingDate = new Date(booking.date);
@@ -213,24 +213,24 @@ const HistoryBookingComponent = ({ currentUser }) => {
 
     // Lấy thời gian tạo (MongoDB lưu UTC, new Date() sẽ tự chuyển sang giờ địa phương)
     const createdTime = new Date(booking.created_at);
-    
+
     const now = new Date();
     const oneHourInMs = 60 * 60 * 1000; // 1 tiếng tính bằng milliseconds
-    
+
     // Tính thời gian còn lại để hủy (1 tiếng từ lúc tạo)
     const cancelDeadline = new Date(createdTime.getTime() + oneHourInMs);
     const remainingTimeToCancel = Math.floor((cancelDeadline - now) / (60 * 1000)); // Còn bao nhiêu phút
 
     // Cho phép hủy nếu trong vòng 1 tiếng từ lúc tạo
     const canCancel = now < cancelDeadline;
-    
+
     // Cho phép đánh giá nếu đã qua thời gian dịch vụ
     const canRate = now > bookingDateTime;
 
-    return { 
-      isAlreadyRated, 
-      canCancel, 
-      canRate, 
+    return {
+      isAlreadyRated,
+      canCancel,
+      canRate,
       bookingDateTime,
       isToday: false,
       remainingTimeToCancel: remainingTimeToCancel
@@ -251,6 +251,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
               <th className="text-center">Khung giờ</th>
               <th className="text-center">Tiền cọc</th>
               <th className="text-center">Còn lại</th>
+              <th className="text-center">Trạng thái</th>
               <th className="text-center">Đánh giá</th>
             </tr>
           </thead>
@@ -278,32 +279,50 @@ const HistoryBookingComponent = ({ currentUser }) => {
                   <td>{booking.time}</td>
                   <td>{formatCurrency(booking.deposit)}</td>
                   <td>{formatCurrency(booking.remaining)}</td>
+                  <td style={{
+                    color:
+                      booking.status === "confirmed" ? "green" :
+                        booking.status === "deposit_confirmed" ? "#ff9800" :
+                          booking.status === "pending" ? "#1976d2" :
+                            booking.status === "cancel" ? "#b71c1c" :
+                              booking.status === "completed" ? "#388e3c" :
+                                booking.status === "failed" ? "#d32f2f" :
+                                  "#888"
+                  }}>
+                    {booking.status === "confirmed" && "Đã xác nhận hoàn tất"}
+                    {booking.status === "deposit_confirmed" && "Đã xác nhận cọc"}
+                    {booking.status === "pending" && "Chờ xác nhận cọc"}
+                    {booking.status === "cancel" && "Đã hủy"}
+                    {booking.status === "completed" && "Hoàn thành"}
+                    {booking.status === "failed" && "Thất bại"}
+                    {!["confirmed", "deposit_confirmed", "pending", "cancel", "completed", "failed"].includes(booking.status) && booking.status}
+                  </td>
                   <td className="text-center">
-                      <button
-                        className={`btn btn-sm ${isAlreadyRated ? "btn-secondary" : "btn-primary"}`}
-                        onClick={() => onFeedBack(booking)}
-                        disabled={isAlreadyRated || !canRate}
-                        title={isAlreadyRated ? "Bạn đã đánh giá dịch vụ này rồi" : "Phản ánh và đánh giá"}
-                      >
-                        <i className="fas fa-comment me-1"></i>
-                        <i className="fas fa-star"></i>
-                        {isAlreadyRated && <span className="ms-1">✓</span>}
-                      </button>
+                    <button
+                      className={`btn btn-sm ${isAlreadyRated ? "btn-secondary" : "btn-primary"}`}
+                      onClick={() => onFeedBack(booking)}
+                      disabled={isAlreadyRated || !canRate}
+                      title={isAlreadyRated ? "Bạn đã đánh giá dịch vụ này rồi" : "Phản ánh và đánh giá"}
+                    >
+                      <i className="fas fa-comment me-1"></i>
+                      <i className="fas fa-star"></i>
+                      {isAlreadyRated && <span className="ms-1">✓</span>}
+                    </button>
 
-                      {!isToday && canCancel && remainingTimeToCancel > 0 && (
-                        <div className="d-inline-block">
-                          <button
-                            className="btn btn-sm btn-danger ms-2"
-                            title={`Còn ${Math.floor(remainingTimeToCancel / 60)} giờ ${remainingTimeToCancel % 60} phút để hủy`}
-                            onClick={() => onHuyDichVu(booking)}
-                          >
-                            Hủy dịch vụ
-                          </button>
-                          <small className="d-block text-muted mt-1">
-                            Còn {Math.floor(remainingTimeToCancel / 60)} giờ {remainingTimeToCancel % 60} phút để hủy
-                          </small>
-                        </div>
-                      )}
+                    {!isToday && canCancel && remainingTimeToCancel > 0 && (
+                      <div className="d-inline-block">
+                        <button
+                          className="btn btn-sm btn-danger ms-2"
+                          title={`Còn ${Math.floor(remainingTimeToCancel / 60)} giờ ${remainingTimeToCancel % 60} phút để hủy`}
+                          onClick={() => onHuyDichVu(booking)}
+                        >
+                          Hủy dịch vụ
+                        </button>
+                        <small className="d-block text-muted mt-1">
+                          Còn {Math.floor(remainingTimeToCancel / 60)} giờ {remainingTimeToCancel % 60} phút để hủy
+                        </small>
+                      </div>
+                    )}
                   </td>
                 </tr>
               );
@@ -321,8 +340,8 @@ const HistoryBookingComponent = ({ currentUser }) => {
             </div>
           </div>
         )}
-          {bookings.map((booking) => {
-          const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking);          return (
+        {bookings.map((booking) => {
+          const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking); return (
             <div key={booking._id} className="card mb-3 shadow-sm">
               <div className="card-body">
                 <h6 className="card-title mb-1">
@@ -346,33 +365,33 @@ const HistoryBookingComponent = ({ currentUser }) => {
                   <strong>Còn lại:</strong> {formatCurrency(booking.remaining)}
                 </div>
                 <div className="text-center">
-                  
-                    <button
-                      className={`btn btn-sm ${isAlreadyRated ? "btn-secondary" : "btn-primary"}`}
-                      onClick={() => onFeedBack(booking)}
-                      disabled={isAlreadyRated || !canRate}
-                      title={isAlreadyRated ? "Bạn đã đánh giá dịch vụ này rồi" : "Phản ánh và đánh giá"}
-                    >
-                      <i className="fas fa-comment me-1"></i>
-                      <i className="fas fa-star"></i>
-                      {isAlreadyRated && <span className="ms-1">✓</span>}
-                    </button>
+
+                  <button
+                    className={`btn btn-sm ${isAlreadyRated ? "btn-secondary" : "btn-primary"}`}
+                    onClick={() => onFeedBack(booking)}
+                    disabled={isAlreadyRated || !canRate}
+                    title={isAlreadyRated ? "Bạn đã đánh giá dịch vụ này rồi" : "Phản ánh và đánh giá"}
+                  >
+                    <i className="fas fa-comment me-1"></i>
+                    <i className="fas fa-star"></i>
+                    {isAlreadyRated && <span className="ms-1">✓</span>}
+                  </button>
 
                   {/* Hủy dịch vụ */}
-                    {!isToday && canCancel && remainingTimeToCancel > 0 && (
-                      <div className="d-inline-block">
-                        <button
-                          className="btn btn-sm btn-danger ms-2"
-                          title={`Còn ${Math.floor(remainingTimeToCancel / 60)} giờ ${remainingTimeToCancel % 60} phút để hủy`}
-                          onClick={() => onHuyDichVu(booking)}
-                        >
-                          Hủy dịch vụ
-                        </button>
-                        <small className="d-block text-muted mt-1">
-                          Còn {Math.floor(remainingTimeToCancel / 60)} giờ {remainingTimeToCancel % 60} phút để hủy
-                        </small>
-                      </div>
-                    )}
+                  {!isToday && canCancel && remainingTimeToCancel > 0 && (
+                    <div className="d-inline-block">
+                      <button
+                        className="btn btn-sm btn-danger ms-2"
+                        title={`Còn ${Math.floor(remainingTimeToCancel / 60)} giờ ${remainingTimeToCancel % 60} phút để hủy`}
+                        onClick={() => onHuyDichVu(booking)}
+                      >
+                        Hủy dịch vụ
+                      </button>
+                      <small className="d-block text-muted mt-1">
+                        Còn {Math.floor(remainingTimeToCancel / 60)} giờ {remainingTimeToCancel % 60} phút để hủy
+                      </small>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

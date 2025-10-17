@@ -166,7 +166,7 @@ const WebsitePaymentPage = () => {
           let paymentDone = false;
           if (resPayment.payload) {
             resPayment.payload.forEach((item) => {
-              if (item.content.includes(`dat coc ${uuid}`)) {
+              if (item?.content?.includes(`dat coc ${uuid}`)) {
                 paymentDone = true;
               }
             });
