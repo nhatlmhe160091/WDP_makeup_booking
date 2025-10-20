@@ -42,7 +42,7 @@ export async function GET(req) {
     const users = await accountsCollection.find({ _id: { $in: userIds } }).toArray();
     const orders = await ordersCollection.find({ _id: { $in: orderIds } }).toArray();
     const services = await servicesCollection.find({ _id: { $in: serviceIds } }).toArray();
-
+    console.log("  users: ", users);
     const newFeedbacks = feedbacks.map((feedback) => {
       const user = users.find((user) => user._id.toString() === feedback.userId.toString());
       const order = orders.find((order) => order._id.toString() === feedback.orderId.toString());
@@ -66,7 +66,7 @@ export async function GET(req) {
           : {}
       };
     });
-
+     console.log("  newFeedbacks: ", newFeedbacks);
     return NextResponse.json({
       success: true,
       data: newFeedbacks

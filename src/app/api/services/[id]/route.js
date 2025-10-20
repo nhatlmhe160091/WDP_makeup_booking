@@ -61,7 +61,7 @@ export async function PUT(req, { params }) {
   }
 }
 
-// API PATCH - Cập nhật thông tin từ sân sang dịch vụ makeup
+// API PATCH - Cập nhật thông tin sang dịch vụ makeup
 export async function PATCH(req, { params }) {
   try {
     const client = await clientPromise;
