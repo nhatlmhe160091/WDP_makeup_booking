@@ -67,9 +67,9 @@ const MakeupArtistProfile = ({ artist }) => {
           <div className="mb-2">
             <strong>Giờ làm việc:</strong> {artist.workingHours || "Chưa cập nhật"}
           </div>
-          <div className="mb-2">
+          {/* <div className="mb-2">
             <strong>CCCD:</strong> {artist.cccd}
-          </div>
+          </div> */}
           <div className="mb-2">
             <strong>Trạng thái hồ sơ:</strong> {artist.profileComplete ? "Đầy đủ" : "Chưa hoàn thiện"}
           </div>
