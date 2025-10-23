@@ -17,11 +17,17 @@ export async function GET(req) {
     const searchParams = new URLSearchParams(url.search);
 
     const ownerId = searchParams.get("ownerId");
+    const active = searchParams.get("active");
+
+    const findQuery = {
+      ownerId: ownerId ? getObjectId(ownerId) : { $exists: true }
+    };
+    // if (typeof active !== 'undefined') {
+    //   findQuery.active = active === 'true';
+    // }
 
     const services = await servicesCollection
-      .find({
-        ownerId: ownerId ? getObjectId(ownerId) : { $exists: true }
-      })
+      .find(findQuery)
       .sort({ created_at: -1 })
       .toArray();
 
@@ -55,6 +61,7 @@ export async function POST(req) {
       packages
     } = await req.json();
 
+
     const newService = {
       ownerId: objectId,
       serviceName,
@@ -68,7 +75,7 @@ export async function POST(req) {
       closingTime,
       images,
       packages,
-      active: true,
+      active: typeof req.body?.active !== 'undefined' ? req.body.active : true,
       created_at: new Date(),
       updated_at: new Date()
     };
@@ -101,7 +108,7 @@ export async function PUT(req) {
       closingTime,
       images,
       packages,
-      active = true
+  active = true
     } = await req.json();
 
     const ObjectId = getObjectId(id);
@@ -127,7 +134,7 @@ export async function PUT(req) {
           closingTime,
           images,
           packages,
-          active,
+          active: typeof active !== 'undefined' ? active : true,
           updated_at: new Date()
         }
       }

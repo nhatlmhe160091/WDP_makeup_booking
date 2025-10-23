@@ -29,7 +29,7 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Chi tiết doanh thu",
+    title: "Doanh thu theo ngày",
     icon: IconChartBar,
     href: "/makeup-artists/doanh-thu"
   },
@@ -127,17 +127,17 @@ const Menuitems = [
     href: "/makeup-artists/them-dich-vu",
     onlyUser: true
   },
-  {
-    navlabel: true,
-    subheader: "Quản trị website"
-  },
-  {
-    id: uniqueId(),
-    title: "Quản lý banner",
-    icon: IconSettings,
-    href: "/makeup-artists/quan-ly-banner",
-    onlyAdmin: true
-  },
+  // {
+  //   navlabel: true,
+  //   subheader: "Quản trị website"
+  // },
+  // {
+  //   id: uniqueId(),
+  //   title: "Quản lý banner",
+  //   icon: IconSettings,
+  //   href: "/makeup-artists/quan-ly-banner",
+  //   onlyAdmin: true
+  // },
   // {
   //   id: uniqueId(),
   //   title: "Quản trị website",

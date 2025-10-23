@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import SendRequest from "@muahub/utils/SendRequest";
 import PageContainer from "../../components/container/PageContainer";
+import MUAsOverview from "./MUAsOverview";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { convertDate } from "@muahub/utils/Main";
 import { ROLE_MANAGER } from "@muahub/constants/System";
@@ -52,6 +53,8 @@ const RevenueDetailPage = () => {
 
   return (
     <PageContainer title="Chi tiết doanh thu" description="Chi tiết doanh thu theo ngày">
+      {/* Weekly booking overview chart */}
+      <MUAsOverview />
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Chi tiết doanh thu</Typography>
         <Button variant="contained" color="primary" onClick={handleReload}>

@@ -33,7 +33,8 @@ const Header = ({ toggleMobileSidebar }) => {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/notifications/admin?isRead=false`);
+        // Lấy tất cả thông báo, không lọc isRead
+        const res = await fetch(`/api/notifications/admin`);
         const data = await res.json();
         if (data.success) setNotifications(data.data);
       } catch (err) {
@@ -50,6 +51,37 @@ const Header = ({ toggleMobileSidebar }) => {
   };
   const handleCloseMenu = () => {
     setAnchorEl(null);
+  };
+
+  // Hàm đánh dấu đã đọc
+  const markAsRead = async (id) => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      // Sau khi đánh dấu, cập nhật trạng thái isRead cho thông báo
+      setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, isRead: true } : n));
+    } catch (e) {}
+  };
+
+  // Hàm giải phóng thông báo quá hạn
+  const handleClearNotifications = async () => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tất cả thông báo quá hạn?')) return;
+    try {
+      setLoading(true);
+      const res = await fetch('/api/notifications', { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        // Sau khi xóa, reload lại danh sách
+        setNotifications((prev) => prev.filter(n => new Date(n.created_at) >= new Date()));
+        // Hoặc gọi lại fetchNotifications nếu muốn chắc chắn
+        // fetchNotifications();
+      }
+    } catch (e) {} finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,18 +130,40 @@ const Header = ({ toggleMobileSidebar }) => {
           {loading ? (
             <MenuItem disabled><Box sx={{ p: 2 }}>Đang tải...</Box></MenuItem>
           ) : notifications.length === 0 ? (
-            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo mới</Box></MenuItem>
+            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box></MenuItem>
           ) : (
             notifications.map((item) => (
-              <MenuItem key={item._id} sx={{ alignItems: 'flex-start', whiteSpace: 'normal', borderBottom: '1px solid #eee' }}>
-                <Box>
-                  <Typography fontWeight={500}>{item.message}</Typography>
-                  <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+              <MenuItem
+                key={item._id}
+                sx={{
+                  alignItems: 'flex-start',
+                  whiteSpace: 'normal',
+                  borderBottom: '1px solid #eee',
+                  cursor: item.isRead ? 'default' : 'pointer',
+                  opacity: item.isRead ? 0.6 : 1,
+                  backgroundColor: item.isRead ? '#f5f5f5' : 'inherit',
+                  '&:hover': { backgroundColor: item.isRead ? '#f5f5f5' : '#f0f7ff' }
+                }}
+                onClick={() => !item.isRead && markAsRead(item._id)}
+                disabled={item.isRead}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box>
+                    <Typography fontWeight={item.isRead ? 400 : 500}>{item.message}</Typography>
+                    <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+                  </Box>
+                  {item.isRead && (
+                    <Box display="flex" alignItems="center" gap={0.5} ml={1}>
+                      <span style={{ color: '#4caf50', fontSize: 16 }}>✔</span>
+                      <Typography fontSize={12} color="#4caf50">Đã đọc</Typography>
+                    </Box>
+                  )}
                 </Box>
               </MenuItem>
             ))
           )}
-          <Box sx={{ textAlign: "right", p: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1 }}>
+            <Button size="small" color="error" onClick={handleClearNotifications}>Giải phóng thông báo</Button>
             <Button size="small" onClick={handleCloseMenu}>Đóng</Button>
           </Box>
         </Menu>

@@ -10,7 +10,10 @@ let Chart = null;
 
 const MUAsOverview = () => {
   const { currentUser } = useApp();
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [years, setYears] = useState([now.getFullYear()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [series, setSeries] = useState([]);
@@ -39,9 +42,10 @@ const MUAsOverview = () => {
 
   // Xử lý dữ liệu giao dịch cho biểu đồ
   const processData = () => {
+    // Lọc theo tháng và năm
     const filteredData = data.filter((item) => {
-      const bookingMonth = new Date(item.date).getMonth() + 1;
-      return bookingMonth === month;
+      const d = new Date(item.date);
+      return d.getMonth() + 1 === month && d.getFullYear() === year;
     });
 
     let categories = filteredData.map((item) => new Date(item.date).toLocaleDateString("vi-VN"));
@@ -80,9 +84,12 @@ const MUAsOverview = () => {
 
   useEffect(() => {
     if (data.length) {
+      // Lấy danh sách năm có trong dữ liệu
+      const yearSet = new Set(data.map((item) => new Date(item.date).getFullYear()));
+      setYears(Array.from(yearSet).sort((a, b) => a - b));
       processData();
     }
-  }, [data, month]);
+  }, [data, month, year]);
 
   // Cấu hình biểu đồ
   const optionscolumnchart = {
@@ -134,11 +141,18 @@ const MUAsOverview = () => {
     <DashboardCard
       title="Tổng quan đặt lịch makeup"
       action={
-        <Select labelId="month-dd" id="month-dd" value={month} size="small" onChange={(e) => setMonth(e.target.value)}>
-          {[...Array(12).keys()].map((m) => (
-            <MenuItem key={m + 1} value={m + 1}>{`Tháng ${m + 1}`}</MenuItem>
-          ))}
-        </Select>
+        <Box display="flex" gap={2}>
+          <Select labelId="month-dd" id="month-dd" value={month} size="small" onChange={(e) => setMonth(Number(e.target.value))}>
+            {[...Array(12).keys()].map((m) => (
+              <MenuItem key={m + 1} value={m + 1}>{`Tháng ${m + 1}`}</MenuItem>
+            ))}
+          </Select>
+          <Select labelId="year-dd" id="year-dd" value={year} size="small" onChange={(e) => setYear(Number(e.target.value))}>
+            {years.map((y) => (
+              <MenuItem key={y} value={y}>{y}</MenuItem>
+            ))}
+          </Select>
+        </Box>
       }
     >
       {loading ? (

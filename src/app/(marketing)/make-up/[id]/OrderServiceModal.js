@@ -25,6 +25,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
   const [dataOrder, setDataOrder] = useState([]);
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
+  const [bookedSlots, setBookedSlots] = useState([]); // [{time, fieldSlot}]
   const [makeupLocation, setMakeupLocation] = useState(""); // 'at-home' | 'at-studio'
   const [serviceLocation, setServiceLocation] = useState({
     extraFee: 0,
@@ -148,14 +149,50 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 
   // Thêm state để lưu dịch vụ makeup đã chọn cụ thể
 
-  // Reset selectedFieldSlot khi thay đổi ngày hoặc loại dịch vụ makeup
+
+  // Lấy danh sách slot đã đặt khi thay đổi ngày hoặc dịch vụ
   useEffect(() => {
     setSelectedFieldSlot([]);
-  }, [selectedDate, selectedField]);
+    setBookedSlots([]);
+    if (!selectedDate || !serviceData?._id) return;
+    const fetchBookedSlots = async () => {
+      try {
+        const res = await fetch(`/api/orders/booked-slots?serviceId=${serviceData._id}&date=${selectedDate}`);
+        const data = await res.json();
+        if (data.success && Array.isArray(data.slots)) {
+          setBookedSlots(data.slots);
+        }
+      } catch (err) {
+        // silent
+      }
+    };
+    fetchBookedSlots();
+  }, [selectedDate, serviceData?._id]);
+
 
   const handleOrder = async () => {
+    setErrorMessage("");
     const payloadArr = [];
     let orderCost = 0;
+    // Kiểm tra trùng slot trước khi đặt
+    for (let slot of selectedFieldSlot) {
+      const checkRes = await fetch("/api/orders/check-slot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serviceId: serviceData._id,
+          date: selectedDate,
+          time: slot.time,
+          fieldSlot: slot.fieldIndex
+        })
+      });
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        setErrorMessage(`Khung giờ ${slot.time} - Slot ${slot.fieldIndex + 1} đã được đặt. Vui lòng chọn slot khác.`);
+        return;
+      }
+    }
+
     selectedFieldSlot.forEach((slot) => {
       const payload = {
         serviceId: serviceData._id,
@@ -486,8 +523,12 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
                               </p>
                             </td>
                             {Array.from({ length: maxCapacity }, (_, fieldIndex) => {
-                              const isOccupied = false;
-                              const canSelect = true;
+
+                              // Kiểm tra slot đã bị đặt chưa
+                              const isOccupied = bookedSlots.some(
+                                (s) => s.time === time && s.fieldSlot === fieldIndex
+                              );
+                              const canSelect = !isOccupied;
 
                               // Kiểm tra xem ô này có được chọn không
                               const isThisSlotSelected = selectedFieldSlot.some(

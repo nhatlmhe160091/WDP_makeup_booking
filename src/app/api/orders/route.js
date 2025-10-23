@@ -154,14 +154,18 @@ export async function POST(req) {
     // Notification logic
     const notificationsCollection = db.collection("notifications");
     const now = new Date();
-    
+
+    // Lấy thông tin user để lấy email hoặc phone
+    const userInfo = await accountsCollection.findOne({ _id: objectId }, { projection: { email: 1, phone: 1 } });
+    const userIdentifier = userInfo?.email || userInfo?.phone || objectId;
+
     // Only notify admin for future bookings that need deposit confirmation
     if (!isToday) {
       await notificationsCollection.insertOne({
         userId: null, // or 'admin', adjust as needed
         type: "admin",
         orderId: newOrder._id,
-        message: `Có đơn đặt dịch vụ mới từ user ${objectId}`,
+        message: `Có đơn đặt dịch vụ mới từ user ${userIdentifier}`,
         isRead: false,
         created_at: now,
         updated_at: now
@@ -227,7 +231,7 @@ export async function PUT(req) {
         userId: order.userId,
         type: "user",
         orderId: order._id,
-        message: "Admin đã xác nhận cọc, vui lòng xác nhận dịch vụ để hoàn tất đặt lịch.",
+        message: "Admin đã xác nhận cọc, vui lòng kiểm tra lịch sử đặt lịch.",
         isRead: false,
         created_at: new Date(),
         updated_at: new Date()

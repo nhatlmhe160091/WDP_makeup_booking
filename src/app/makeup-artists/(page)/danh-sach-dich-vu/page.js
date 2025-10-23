@@ -20,7 +20,7 @@ import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER } from "@muahub/constants/System";
 import AddServiceModal from "./components/modalThemDichVu";
 import EditServiceModal from "./components/modalSuaDichVu";
-
+import toast from "react-hot-toast";
 const ServiceListPage = () => {
   const { currentUser } = useApp();
   const [services, setServices] = useState([]);
@@ -234,24 +234,37 @@ const ServiceListPage = () => {
                     </Button>
                     <Button
                       variant="outlined"
-                      color="error"
+                      color={service.active ? "error" : "success"}
                       size="small"
                       onClick={async () => {
-                        if (!window.confirm("Bạn chắc chắn muốn xóa dịch vụ này?")) return;
+                        const confirmMsg = service.active
+                          ? "Bạn chắc chắn muốn ẩn dịch vụ này?"
+                          : "Bạn muốn hiện lại dịch vụ này?";
+                        if (!window.confirm(confirmMsg)) return;
                         try {
-                          const res = await SendRequest("DELETE", "/api/services", { id: service._id });
-                          if (res?.success) {
-                            toast.success("Xóa dịch vụ thành công");
-                            fetchData();
-                          } else {
-                            toast.error(res?.error || "Xóa thất bại");
-                          }
+                          const res = await SendRequest("PUT", "/api/services", {
+                            id: service._id,
+                            active: !service.active,
+                            serviceName: service.serviceName,
+                            description: service.description,
+                            location: service.location,
+                            locationDetail: service.locationDetail,
+                            latitude: service.latitude,
+                            longitude: service.longitude,
+                            amenities: service.amenities,
+                            openingTime: service.openingTime,
+                            closingTime: service.closingTime,
+                            images: service.images,
+                            packages: service.packages
+                          });
+                            toast.success(service.active ? "Đã ẩn dịch vụ" : "Đã hiện dịch vụ");
+                            fetchData();              
                         } catch (e) {
-                          toast.error("Có lỗi xảy ra khi xóa");
+                          toast.error("Có lỗi xảy ra khi cập nhật", e);
                         }
                       }}
                     >
-                      Xóa
+                      {service.active ? "Ẩn" : "Hiện"}
                     </Button>
                   </Box>
                 </CardContent>

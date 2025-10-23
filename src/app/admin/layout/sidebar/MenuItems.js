@@ -23,13 +23,13 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: "Tổng quan đặt lịch",
+    title: "Dashboard",
     icon: IconLayoutDashboard,
     href: "/admin"
   },
   {
     id: uniqueId(),
-    title: "Chi tiết doanh thu",
+    title: "Doanh thu",
     icon: IconChartBar,
     href: "/admin/doanh-thu"
   },
@@ -38,13 +38,6 @@ const Menuitems = [
     title: "Lịch sử rút tiền",
     icon: IconHistory,
     href: "/admin/nap-rut"
-  },
-  {
-    id: uniqueId(),
-    title: "Thanh toán cho nền tảng",
-    icon: IconMoneybag,
-    href: "/admin/thanh-toan-nen-tang",
-    onlyUser: true
   },
   {
     id: uniqueId(),

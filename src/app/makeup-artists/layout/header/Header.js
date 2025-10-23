@@ -38,9 +38,10 @@ const Header = ({ toggleMobileSidebar }) => {
         if (typeof window !== 'undefined') {
           userId = localStorage.getItem('userId');
         }
+        // Lấy tất cả thông báo, không lọc isRead
         const url = userId
-          ? `/api/notifications/owner?isRead=false&userId=${userId}`
-          : `/api/notifications/owner?isRead=false`;
+          ? `/api/notifications/owner?userId=${userId}`
+          : `/api/notifications/owner`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.success) setNotifications(data.data);
@@ -52,6 +53,18 @@ const Header = ({ toggleMobileSidebar }) => {
     };
     fetchNotifications();
   }, []);
+  // Hàm đánh dấu đã đọc
+  const markAsRead = async (id) => {
+    try {
+      await fetch('/api/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      // Sau khi đánh dấu, cập nhật trạng thái isRead cho thông báo
+      setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, isRead: true } : n));
+    } catch (e) {}
+  };
 
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -106,13 +119,34 @@ const Header = ({ toggleMobileSidebar }) => {
           {loading ? (
             <MenuItem disabled><Box sx={{ p: 2 }}>Đang tải...</Box></MenuItem>
           ) : notifications.length === 0 ? (
-            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo mới</Box></MenuItem>
+            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box></MenuItem>
           ) : (
             notifications.map((item) => (
-              <MenuItem key={item._id} sx={{ alignItems: 'flex-start', whiteSpace: 'normal', borderBottom: '1px solid #eee' }}>
-                <Box>
-                  <Typography fontWeight={500}>{item.message}</Typography>
-                  <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+              <MenuItem
+                key={item._id}
+                sx={{
+                  alignItems: 'flex-start',
+                  whiteSpace: 'normal',
+                  borderBottom: '1px solid #eee',
+                  cursor: item.isRead ? 'default' : 'pointer',
+                  opacity: item.isRead ? 0.6 : 1,
+                  backgroundColor: item.isRead ? '#f5f5f5' : 'inherit',
+                  '&:hover': { backgroundColor: item.isRead ? '#f5f5f5' : '#f0f7ff' }
+                }}
+                onClick={() => !item.isRead && markAsRead(item._id)}
+                disabled={item.isRead}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box>
+                    <Typography fontWeight={item.isRead ? 400 : 500}>{item.message}</Typography>
+                    <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+                  </Box>
+                  {item.isRead && (
+                    <Box display="flex" alignItems="center" gap={0.5} ml={1}>
+                      <span style={{ color: '#4caf50', fontSize: 16 }}>✔</span>
+                      <Typography fontSize={12} color="#4caf50">Đã đọc</Typography>
+                    </Box>
+                  )}
                 </Box>
               </MenuItem>
             ))

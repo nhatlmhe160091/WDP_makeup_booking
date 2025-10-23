@@ -203,7 +203,7 @@ export async function PUT(req) {
         userId: order.userId,
         type: "user",
         orderId: order._id,
-        message: "Admin đã xác nhận cọc, vui lòng xác nhận dịch vụ để hoàn tất đặt lịch.",
+        message: "Admin đã xác nhận cọc, vui lòng kiểm tra lịch sử đặt lịch.",
         isRead: false,
         created_at: new Date(),
         updated_at: new Date()
