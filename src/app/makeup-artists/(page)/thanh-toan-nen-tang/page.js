@@ -215,7 +215,8 @@ console.log('Current Payment Amount:', currentPaymentAmount);
       if (paymentType === "revenue") {
         toast.success("Đã chọn gói thu theo doanh thu thành công!");
       } else {
-        toast.success("Yêu cầu thanh toán đã được gửi, chờ admin xác nhận!");
+        // toast.success("Yêu cầu thanh toán đã được gửi, chờ admin xác nhận!");
+        toast.success("Thanh toán thành công! Gói của bạn đã được kích hoạt.");
       }
 
       setOpenPaymentModal(false);
