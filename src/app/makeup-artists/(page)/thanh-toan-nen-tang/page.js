@@ -3,23 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   Box,
-  Button,
   Typography,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Modal,
-  Card,
-  CardContent,
   Grid,
-  Chip,
-  Alert
+  Chip
 } from "@mui/material";
+import PlanCard from "./components/PlanCard";
+import CurrentPlanAlert from "./components/CurrentPlanAlert";
+import PlanTable from "./components/PlanTable";
+import PaymentHistoryTable from "./components/PaymentHistoryTable";
+import PaymentModal from "./components/PaymentModal";
 import SendRequest from "@muahub/utils/SendRequest";
 // import PageContainer from "../components/container/PageContainer";
 import { useApp } from "@muahub/app/contexts/AppContext";
@@ -241,13 +233,14 @@ const WebsitePaymentPage = () => {
     }
   };
 
+
+  // Render chip for payment type
   const renderPaymentTypeChip = (type) => {
     const colors = {
       revenue: "primary",
       monthly_6: "info",
       yearly: "success"
     };
-
     if (type === "monthly_3") {
       return (
         <Chip
@@ -257,17 +250,11 @@ const WebsitePaymentPage = () => {
         />
       );
     }
-
     return <Chip label={paymentTypes[type]?.label || "Chưa xác định"} color={colors[type] || "default"} size="large" />;
   };
 
+  // Render chip for status
   const renderStatusChip = (status) => {
-    const statusColors = {
-      "Đang hoạt động": "success",
-      "Chờ xác nhận": "warning",
-      "Đã hủy": "error"
-    };
-
     return <Chip label={status} color={"success"} size="large" variant="outlined" />;
   };
 
@@ -295,14 +282,12 @@ const WebsitePaymentPage = () => {
 
       {/* Hiển thị gói hiện tại và số tiền phải trả */}
       {currentPlan && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <Typography variant="body1">
-            Gói hiện tại: <strong>{paymentTypes[currentPlan]?.label}</strong>
-          </Typography>
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            Số tiền phải trả: <strong>{formatCurrency(currentPaymentAmount)}</strong>
-          </Typography>
-        </Alert>
+        <CurrentPlanAlert
+          currentPlan={currentPlan}
+          paymentTypes={paymentTypes}
+          currentPaymentAmount={currentPaymentAmount}
+          formatCurrency={formatCurrency}
+        />
       )}
 
       {/* Lựa chọn gói thanh toán */}
@@ -313,84 +298,14 @@ const WebsitePaymentPage = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {Object.entries(paymentTypes).map(([key, plan]) => (
           <Grid item xs={12} md={6} lg={3} key={key}>
-            <Card
-              sx={{
-                height: "100%",
-                position: "relative",
-                border: currentPlan === key ? 2 : 1,
-                borderColor: currentPlan === key ? "primary.main" : "grey.300",
-                cursor: currentPlan === key ? "default" : "pointer",
-                borderRadius: 2,
-                transition: "all .2s ease",
-                '&:hover': {
-                  transform: currentPlan === key ? 'none' : 'translateY(-2px)',
-                  boxShadow: 6,
-                  backgroundColor: key === 'revenue' ? '#FFF1EF' : 'inherit'
-                }
-              }}
-              onClick={() => currentPlan !== key && handleSelectPlan(key)}
+            <PlanCard
+              plan={{ ...plan, key }}
+              isCurrent={currentPlan === key}
+              onSelect={() => handleSelectPlan(key)}
+              color={plan.color}
             >
-              {plan.popular && (
-                <Chip label="Phổ biến" color="secondary" size="small" sx={{ position: "absolute", top: 8, right: 8 }} />
-              )}
-
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{
-                    fontWeight: 700,
-                    color:
-                      key === 'revenue'
-                        ? '#ff5c95ff'
-                        : key === 'monthly_3'
-                        ? '#ff5c95ff'
-                        : key === 'monthly_6'
-                        ? 'var(--mui-palette-info-main, #0288d1)'
-                        : 'var(--mui-palette-success-main, #2e7d32)'
-                  }}
-                >
-                  {plan.label}
-                </Typography>
-
-                <Typography variant="h4" color="text.primary" gutterBottom sx={{ fontWeight: 800 }}>
-                  {plan.amount === 0 ? "Miễn phí" : formatCurrency(plan.amount)}
-                </Typography>
-
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  {plan.description}
-                </Typography>
-
-                {/* Hiển thị thông tin số tiền sẽ cập nhật */}
-                <Typography variant="body2" color="info.main" sx={{ mb: 2, fontStyle: "italic" }}>
-                  Số tiền phải trả: {formatCurrency(plan.amount)}
-                </Typography>
-
-                <Button
-                  variant={currentPlan === key ? "outlined" : "contained"}
-                  color={plan.color}
-                  fullWidth
-                  disabled={currentPlan === key}
-                  sx={{
-                    height: 48,
-                    py: 1.25,
-                    borderRadius: 2,
-                    fontWeight: 600,
-                    ...(currentPlan !== key
-                      ? { bgcolor: '#ff5c95ff', '&:hover': { bgcolor: '#d81b60' } }
-                      : {})
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (currentPlan !== key) {
-                      handleSelectPlan(key);
-                    }
-                  }}
-                >
-                  {currentPlan === key ? "Gói hiện tại" : "Chọn gói này"}
-                </Button>
-              </CardContent>
-            </Card>
+              {plan.amount === 0 ? "Miễn phí" : formatCurrency(plan.amount)}
+            </PlanCard>
           </Grid>
         ))}
       </Grid>
@@ -399,160 +314,39 @@ const WebsitePaymentPage = () => {
         Gói đang sử dụng
       </Typography>
 
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" height="30vh">
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table sx={{ '& tbody tr:hover': { backgroundColor: '#FFF1EF' } }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Loại gói</TableCell>
-                <TableCell>Số tiền</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Hạn sử dụng</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentUser?.payment_amount?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    <Typography variant="body2" color="text.secondary">
-                      Chưa chọn gói thanh toán nào
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <TableRow key={1}>
-                  <TableCell>{renderPaymentTypeChip(currentUser.payment_type)}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight="bold">
-                      {formatCurrency(currentUser.payment_amount)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{renderStatusChip("Đang hoạt động")}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {currentUser.payment_expiry
-                        ? new Date(currentUser.payment_expiry).toLocaleDateString("vi-VN")
-                        : "Không xác định"}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+      <PlanTable
+        loading={loading}
+        currentUser={currentUser}
+        renderPaymentTypeChip={renderPaymentTypeChip}
+        renderStatusChip={renderStatusChip}
+        formatCurrency={formatCurrency}
+      />
 
       {/* Lịch sử thanh toán */}
       <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
         Lịch sử thanh toán
       </Typography>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ '& tbody tr:hover': { backgroundColor: '#FFF1EF' } }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Ngày thanh toán</TableCell>
-              <TableCell>Loại gói</TableCell>
-              <TableCell>Số tiền</TableCell>
-              <TableCell>Mô tả</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paymentHistory?.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  <Typography variant="body2" color="text.secondary">
-                    Chưa có lịch sử thanh toán nào
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              paymentHistory
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .map((history, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{convertDateTime(history.date)}</TableCell>
-                    <TableCell>{renderPaymentTypeChip(history.payment_type)}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="bold">
-                        {formatCurrency(history.amount)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{history.description}</Typography>
-                    </TableCell>
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <PaymentHistoryTable
+        paymentHistory={paymentHistory}
+        renderPaymentTypeChip={renderPaymentTypeChip}
+        formatCurrency={formatCurrency}
+        convertDateTime={convertDateTime}
+      />
 
       {/* Modal thanh toán */}
-      <Modal open={openPaymentModal} onClose={() => setOpenPaymentModal(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            p: 4,
-            borderRadius: 2,
-            boxShadow: 24,
-            minWidth: 400,
-            maxWidth: 500
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Thanh toán {paymentTypes[selectedPaymentType]?.label}
-          </Typography>
-
-          <Typography variant="body1" gutterBottom>
-            Số tiền cần thanh toán:{" "}
-            <Typography component="span" variant="h6" color="primary">
-              {formatCurrency(paymentTypes[selectedPaymentType]?.amount)}
-            </Typography>
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Vui lòng quét mã QR bên dưới để thanh toán
-          </Typography>
-
-          <Box display="flex" justifyContent="center" my={3}>
-            {paymentQrCode ? (
-              <img src={paymentQrCode} alt="Payment QR Code" style={{ maxWidth: "300px", width: "100%" }} />
-            ) : (
-              <CircularProgress />
-            )}
-          </Box>
-
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            Sau khi thanh toán, vui lòng nhấn "Xác nhận đã thanh toán" để admin xử lý.
-          </Alert>
-
-          <Box display="flex" justifyContent="space-between" gap={2}>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setOpenPaymentModal(false);
-                setPaymentQrCode("");
-                setSelectedPaymentType("");
-              }}
-              fullWidth
-            >
-              Hủy
-            </Button>
-            {/* <Button variant="contained" color="primary" onClick={() => handleConfirmPayment()} fullWidth>
-              Xác nhận đã thanh toán
-            </Button> */}
-          </Box>
-        </Box>
-      </Modal>
+      <PaymentModal
+        open={openPaymentModal}
+        onClose={() => {
+          setOpenPaymentModal(false);
+          setPaymentQrCode("");
+          setSelectedPaymentType("");
+        }}
+        paymentType={selectedPaymentType}
+        paymentTypes={paymentTypes}
+        paymentQrCode={paymentQrCode}
+        formatCurrency={formatCurrency}
+      />
     </div>
   );
 };
