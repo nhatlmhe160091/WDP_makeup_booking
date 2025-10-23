@@ -1,6 +1,6 @@
 import { Modal, Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 
-const PaymentModal = ({ open, onClose, paymentType, paymentTypes, paymentQrCode, formatCurrency }) => (
+const PaymentModal = ({ open, onClose, onConfirm, paymentType, paymentTypes, paymentQrCode, formatCurrency }) => (
   <Modal open={open} onClose={onClose}>
     <Box
       sx={{
@@ -46,9 +46,9 @@ const PaymentModal = ({ open, onClose, paymentType, paymentTypes, paymentQrCode,
         >
           Hủy
         </Button>
-        {/* <Button variant="contained" color="primary" onClick={onConfirm} fullWidth>
+        <Button variant="contained" color="primary" onClick={onConfirm} fullWidth>
           Xác nhận đã thanh toán
-        </Button> */}
+        </Button>
       </Box>
     </Box>
   </Modal>

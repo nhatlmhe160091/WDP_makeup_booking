@@ -139,6 +139,9 @@ const WebsitePaymentPage = () => {
     }
   };
 
+  // Lưu uuid cho đơn hàng vào state để dùng khi xác nhận
+  const [currentPaymentUUID, setCurrentPaymentUUID] = useState("");
+
   const handleSelectPlan = async (paymentType) => {
     setSelectedPaymentType(paymentType);
 
@@ -150,25 +153,8 @@ const WebsitePaymentPage = () => {
       setOpenPaymentModal(true);
       let uuid = uuidv4(); // Tạo UUID cho đơn hàng
       uuid = uuid.replace(/-/g, ""); // Loại bỏ dấu gạch ngang để sử dụng trong nội dung
+      setCurrentPaymentUUID(uuid);
       generatePaymentQR(paymentTypes[paymentType].amount, uuid);
-
-      setTimeout(() => {
-        const intervalId = setInterval(async () => {
-          const resPayment = await SendRequest("get", `/api/webhooks`);
-          let paymentDone = false;
-          if (resPayment.payload) {
-            resPayment.payload.forEach((item) => {
-              if (item?.content?.includes(`dat coc ${uuid}`)) {
-                paymentDone = true;
-              }
-            });
-          }
-          // if (!paymentDone) return;
-          // Cập nhật state với trạng thái đã xác nhận
-          handleConfirmPayment(paymentType);
-          clearInterval(intervalId); // Stop polling when success
-        }, 1500);
-      }, 5000); // Simulate loading
     }
   };
 
@@ -178,7 +164,7 @@ const WebsitePaymentPage = () => {
         // Tạo bản ghi thanh toán cho các gói trả phí
         await SendRequest("POST", "/api/website-payments", {
           ownerId: currentUser._id,
-          payment_type: paymentType,
+          payment_package: paymentType,
           amount: paymentTypes[paymentType].amount,
           status: "PENDING"
         });
@@ -229,6 +215,7 @@ const WebsitePaymentPage = () => {
       // fetchCurrentUser();
       // fetchPaymentHistory(); // Thêm hàm fetch lịch sử thanh toán
     } catch (error) {
+      console.error("Error confirming payment:", error);
       toast.error("Có lỗi xảy ra khi gửi yêu cầu thanh toán");
     }
   };
@@ -341,11 +328,37 @@ const WebsitePaymentPage = () => {
           setOpenPaymentModal(false);
           setPaymentQrCode("");
           setSelectedPaymentType("");
+          setCurrentPaymentUUID("");
         }}
         paymentType={selectedPaymentType}
         paymentTypes={paymentTypes}
         paymentQrCode={paymentQrCode}
         formatCurrency={formatCurrency}
+        onConfirm={async () => {
+          // Khi ấn xác nhận mới bắt đầu polling kiểm tra thanh toán
+          if (!currentPaymentUUID) return;
+          let pollingCount = 0;
+          const maxPolling = 40; // tối đa 40 lần (60s)
+          const intervalId = setInterval(async () => {
+            pollingCount++;
+            const resPayment = await SendRequest("get", `/api/webhooks`);
+            let paymentDone = false;
+            if (resPayment.payload) {
+              resPayment.payload.forEach((item) => {
+                if (item?.content?.includes(`dat coc ${currentPaymentUUID}`)) {
+                  paymentDone = true;
+                }
+              });
+            }
+            if (paymentDone) {
+              clearInterval(intervalId);
+              handleConfirmPayment(selectedPaymentType);
+            } else if (pollingCount >= maxPolling) {
+              clearInterval(intervalId);
+              toast.error("Không tìm thấy giao dịch thanh toán. Vui lòng thử lại hoặc liên hệ hỗ trợ.");
+            }
+          }, 1500);
+        }}
       />
     </div>
   );
