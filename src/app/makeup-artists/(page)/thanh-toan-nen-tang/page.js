@@ -19,6 +19,7 @@ import { formatCurrency } from "@muahub/utils/Main";
 import toast from "react-hot-toast";
 import { ROLE_MANAGER } from "@muahub/constants/System";
 import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
+
 import { v4 as uuidv4 } from "uuid";
 
 const WebsitePaymentPage = () => {
@@ -27,6 +28,11 @@ const WebsitePaymentPage = () => {
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
   const [selectedPaymentType, setSelectedPaymentType] = useState("");
   const [paymentQrCode, setPaymentQrCode] = useState("");
+  // PayOS integration
+  const [payosInfo, setPayosInfo] = useState(null);
+  const [payosQr, setPayosQr] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [currentOrderCode, setCurrentOrderCode] = useState(null);
   const [websitePayments, setWebsitePayments] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [currentPaymentAmount, setCurrentPaymentAmount] = useState(0);
@@ -110,32 +116,29 @@ const WebsitePaymentPage = () => {
     fetchPaymentHistory();
   }, [currentUser, fetchWebsitePayments, fetchCurrentUser, fetchPaymentHistory]);
 
-  const generatePaymentQR = async (amount, uuid) => {
-    const content = uuid;
-
-    const payload = {
-      accountNo: ACCOUNT_NO,
-      accountName: `${WEB_NAME} Thanh toán`,
-      acqId: ACQ_ID,
-      amount: amount,
-      addInfo: content,
-      format: "text",
-      template: "compact2"
-    };
-
+  // PayOS: generate payment link and QR
+  const generatePayosLink = async (amount, content, orderCode) => {
+    let safeContent = content;
+    if (safeContent.length > 25) safeContent = safeContent.slice(0, 25);
     try {
-      const res = await fetch("https://api.vietqr.io/v2/generate", {
+      const res = await fetch("/api/payos-link", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderCode: orderCode,
+          amount: 2000,
+          description: safeContent,
+          cancelUrl: window.location.origin + "/thanh-toan-that-bai",
+          returnUrl: window.location.origin + "/thanh-toan-thanh-cong"
+        })
       });
-
-      const data = await res.json();
-      setPaymentQrCode(data.data.qrDataURL);
+      const raw = await res.json();
+      const data = raw.data || raw;
+      setPayosInfo(data);
+      setPayosQr(data.qrCode || "");
+      setPaymentQrCode("");
     } catch (error) {
-      toast.error("Không thể tạo mã QR");
+      toast.error("Không thể tạo mã QR PayOS");
     }
   };
 
@@ -144,17 +147,19 @@ const WebsitePaymentPage = () => {
 
   const handleSelectPlan = async (paymentType) => {
     setSelectedPaymentType(paymentType);
-
     if (paymentType === "revenue") {
-      // Chọn gói thu theo doanh thu - không cần thanh toán
+      setPaymentMethod("");
       handleConfirmPayment(paymentType);
     } else {
-      // Mở modal thanh toán cho các gói trả phí
       setOpenPaymentModal(true);
-      let uuid = uuidv4(); // Tạo UUID cho đơn hàng
-      uuid = uuid.replace(/-/g, ""); // Loại bỏ dấu gạch ngang để sử dụng trong nội dung
+      setPaymentMethod("payos");
+      let uuid = uuidv4();
+      uuid = uuid.replace(/-/g, "");
       setCurrentPaymentUUID(uuid);
-      generatePaymentQR(paymentTypes[paymentType].amount, uuid);
+      // Tạo orderCode và lưu lại để dùng khi polling
+      const orderCode = Date.now();
+      setCurrentOrderCode(orderCode);
+      await generatePayosLink(paymentTypes[paymentType].amount, uuid, orderCode);
     }
   };
 
@@ -329,24 +334,48 @@ const WebsitePaymentPage = () => {
           setPaymentQrCode("");
           setSelectedPaymentType("");
           setCurrentPaymentUUID("");
+          setPayosInfo(null);
+          setPayosQr("");
+          setPaymentMethod("");
+          setCurrentOrderCode(null);
         }}
         paymentType={selectedPaymentType}
         paymentTypes={paymentTypes}
         paymentQrCode={paymentQrCode}
+        payosInfo={payosInfo}
+        payosQr={payosQr}
+        paymentMethod={paymentMethod}
         formatCurrency={formatCurrency}
         onConfirm={async () => {
           // Khi ấn xác nhận mới bắt đầu polling kiểm tra thanh toán
           if (!currentPaymentUUID) return;
           let pollingCount = 0;
           const maxPolling = 40; // tối đa 40 lần (60s)
+          const orderCode = paymentMethod === "payos" ? currentOrderCode : null;
+          const uuid = currentPaymentUUID;
           const intervalId = setInterval(async () => {
             pollingCount++;
             const resPayment = await SendRequest("get", `/api/webhooks`);
             let paymentDone = false;
             if (resPayment.payload) {
               resPayment.payload.forEach((item) => {
-                if (item?.content?.includes(`dat coc ${currentPaymentUUID}`)) {
-                  paymentDone = true;
+                if (paymentMethod === "vietqr") {
+                  if (item.content && item.content.includes(`dat coc ${uuid}`)) {
+                    paymentDone = true;
+                  }
+                } else if (paymentMethod === "payos") {
+                  if (item.data) {
+                    // Log để so sánh orderCode
+                    console.log('[PAYOS] So sánh:', {
+                      itemOrderCode: item.data.orderCode,
+                      pollingOrderCode: orderCode,
+                      equal: String(item.data.orderCode) === String(orderCode)
+                    });
+                    if (String(item.data.orderCode) === String(orderCode)) {
+                      console.log('[PAYOS] Payment confirmed for orderCode:', orderCode);
+                      paymentDone = true;
+                    }
+                  }
                 }
               });
             }

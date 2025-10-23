@@ -1,6 +1,32 @@
-import { Modal, Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 
-const PaymentModal = ({ open, onClose, onConfirm, paymentType, paymentTypes, paymentQrCode, formatCurrency }) => (
+import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
+import {
+  Modal,
+  Button,
+  Box,
+  Typography,
+  CircularProgress,
+  Alert
+} from "@mui/material";
+const PaymentModal = ({
+  open,
+  onClose,
+  onConfirm,
+  paymentType,
+  paymentTypes,
+  paymentQrCode,
+  payosInfo,
+  payosQr,
+  paymentMethod,
+  formatCurrency
+}) => {
+  console.log('PaymentModal debug:', {
+    payosInfo,
+    payosQr,
+    paymentMethod,
+    paymentQrCode
+  });
+  return (
   <Modal open={open} onClose={onClose}>
     <Box
       sx={{
@@ -29,7 +55,14 @@ const PaymentModal = ({ open, onClose, onConfirm, paymentType, paymentTypes, pay
         Vui lòng quét mã QR bên dưới để thanh toán
       </Typography>
       <Box display="flex" justifyContent="center" my={3}>
-        {paymentQrCode ? (
+        {paymentMethod === "payos" && payosQr ? (
+          <img
+            src={`https://img.vietqr.io/image/${ACQ_ID}-${payosInfo?.accountNumber || ''}-compact2.png?amount=2000&addInfo=${encodeURIComponent(payosInfo?.description || '')}&accountName=${encodeURIComponent(payosInfo?.accountName || '')}`}
+            alt="Mã QR PayOS"
+            className="img-fluid rounded border"
+            style={{ maxWidth: 250 }}
+          />
+        ) : paymentQrCode ? (
           <img src={paymentQrCode} alt="Payment QR Code" style={{ maxWidth: "300px", width: "100%" }} />
         ) : (
           <CircularProgress />
@@ -52,6 +85,7 @@ const PaymentModal = ({ open, onClose, onConfirm, paymentType, paymentTypes, pay
       </Box>
     </Box>
   </Modal>
-);
+  );
+}
 
 export default PaymentModal;
