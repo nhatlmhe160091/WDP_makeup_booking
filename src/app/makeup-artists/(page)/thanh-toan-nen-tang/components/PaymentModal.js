@@ -20,12 +20,12 @@ const PaymentModal = ({
   paymentMethod,
   formatCurrency
 }) => {
-  console.log('PaymentModal debug:', {
-    payosInfo,
-    payosQr,
-    paymentMethod,
-    paymentQrCode
-  });
+//   console.log('PaymentModal debug:', {
+//     payosInfo,
+//     payosQr,
+//     paymentMethod,
+//     paymentQrCode
+//   });
   return (
   <Modal open={open} onClose={onClose}>
     <Box

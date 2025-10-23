@@ -17,8 +17,8 @@ import SendRequest from "@muahub/utils/SendRequest";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { formatCurrency } from "@muahub/utils/Main";
 import toast from "react-hot-toast";
-import { ROLE_MANAGER } from "@muahub/constants/System";
-import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
+// import { ROLE_MANAGER } from "@muahub/constants/System";
+// import { ACCOUNT_NO, ACQ_ID, WEB_NAME } from "@muahub/constants/MainContent";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -68,7 +68,13 @@ const WebsitePaymentPage = () => {
       popular: false
     }
   };
-
+  // Thứ tự ưu tiên các gói
+  const planPriority = {
+    revenue: 0,
+    monthly_3: 1,
+    monthly_6: 2,
+    yearly: 3
+  };
   const fetchWebsitePayments = useCallback(async () => {
     setLoading(true);
     try {
@@ -88,15 +94,17 @@ const WebsitePaymentPage = () => {
   const fetchCurrentUser = useCallback(async () => {
     try {
       const res = await SendRequest("GET", "/api/users/me");
-      if (res.data) {
-        setCurrentPlan(res.data.payment_type);
+      if (res.payload) {
+        setCurrentPlan(res.payload.payment_type);
+      
         setCurrentPaymentAmount(res.data.payment_amount || 0);
       }
     } catch (error) {
       console.error("Error fetching current user:", error);
     }
   }, []);
-
+console.log('Current Plan:', currentPlan);
+console.log('Current Payment Amount:', currentPaymentAmount);
   // Thêm hàm fetch lịch sử thanh toán
   const fetchPaymentHistory = useCallback(async () => {
     try {
@@ -286,21 +294,29 @@ const WebsitePaymentPage = () => {
       <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
         Chọn gói thanh toán
       </Typography>
-
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {Object.entries(paymentTypes).map(([key, plan]) => (
-          <Grid item xs={12} md={6} lg={3} key={key}>
-            <PlanCard
-              plan={{ ...plan, key }}
-              isCurrent={currentPlan === key}
-              onSelect={() => handleSelectPlan(key)}
-              color={plan.color}
-            >
-              {plan.amount === 0 ? "Miễn phí" : formatCurrency(plan.amount)}
-            </PlanCard>
-          </Grid>
-        ))}
+      <Grid container spacing={3}>
+        {Object.keys(paymentTypes)
+          .sort((a, b) => planPriority[a] - planPriority[b])
+          .map((key) => {
+            const currentLevel = planPriority[currentPlan];
+            const thisLevel = planPriority[key];
+            const isLower = currentLevel !== undefined && thisLevel < currentLevel;
+            return (
+              <Grid item xs={12} sm={6} md={3} key={key}>
+                <PlanCard
+                  paymentType={key}
+                  details={paymentTypes[key]}
+                  isCurrentPlan={currentPlan === key}
+                  onSelect={() => (!isLower && currentPlan !== key) && handleSelectPlan(key)}
+                  disabled={isLower}
+                  sx={isLower ? { opacity: 0.5, pointerEvents: 'none', filter: 'grayscale(1)' } : {}}
+                />
+              </Grid>
+            );
+          })}
       </Grid>
+
+      {/* Bảng gói đang sử dụng */}
 
       <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
         Gói đang sử dụng
