@@ -24,6 +24,16 @@ const defaultProfile = {
 };
 
 const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRequest }) => {
+  // Validate các trường bắt buộc ngân hàng
+  const validateBankInfo = () => {
+    const errors = {};
+    if (!profile.bankInfo.bankName) errors.bankName = "Ngân hàng là bắt buộc.";
+    if (!profile.bankInfo.bankAccount) errors.bankAccount = "Số tài khoản là bắt buộc.";
+    if (!profile.bankInfo.accountHolder) errors.accountHolder = "Chủ tài khoản là bắt buộc.";
+    return errors;
+  };
+
+  const [bankErrors, setBankErrors] = useState({});
   const [profile, setProfile] = useState(defaultProfile);
   const [loading, setLoading] = useState(false);
 
@@ -95,6 +105,12 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
 // Submit cập nhật
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const bankErrs = validateBankInfo();
+    setBankErrors(bankErrs);
+    if (Object.keys(bankErrs).length > 0) {
+      toast.error("Vui lòng điền đầy đủ thông tin ngân hàng.");
+      return;
+    }
     setLoading(true);
     // Đảm bảo workingHours luôn đúng định dạng
     let wh = `${profile.workingHoursStart || "08:00"}-${profile.workingHoursEnd || "18:00"}`;
@@ -108,7 +124,6 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
       
       if (res.success !== false) {
         toast.success(res.message || "Cập nhật hồ sơ thành công!");
-        
         // Nếu là yêu cầu nâng cấp, gọi callback onSubmit
         if (isUpgradeRequest && onSubmit) {
           const profileData = {
@@ -229,8 +244,19 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
           <input className="form-control" name="name" value={profile.name} onChange={handleChange} required maxLength={100} />
         </div>
         <div className="col-md-6 mb-2">
-          <label>Ảnh đại diện (URL)</label>
-          <input className="form-control" name="avatar" value={profile.avatar} onChange={handleChange} />
+          <label>Ảnh đại diện</label>
+          {profile.avatar ? (
+            <img
+              src={profile.avatar}
+              alt="Avatar"
+              className="img-thumbnail"
+              style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'cover' }}
+            />
+          ) : (
+            <div className="border rounded bg-light d-flex align-items-center justify-content-center" style={{ width: '150px', height: '150px' }}>
+              <span className="text-muted">Chưa có ảnh</span>
+            </div>
+          )}
         </div>
         <div className="col-12 mb-2">
           <label>Bio</label>
@@ -270,7 +296,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         </div>
         <div className="col-md-6 mb-2">
           <label>Số điện thoại</label>
-          <input className="form-control" name="phone" value={profile.phone} onChange={handleChange} />
+          <input className="form-control" name="phone" value={profile.phone} onChange={handleChange} readOnly/>
         </div>
         <div className="col-md-6 mb-2">
           <label>Email</label>
@@ -285,16 +311,19 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
           <input className="form-control" name="address" value={profile.address} onChange={handleChange} />
         </div>
         <div className="col-md-4 mb-2">
-          <label>Ngân hàng</label>
-          <input className="form-control" name="bankName" value={profile.bankInfo.bankName} onChange={e => handleNestedChange(e, 'bankInfo')} />
+          <label>Ngân hàng <span className="text-danger">*</span></label>
+          <input className="form-control" name="bankName" value={profile.bankInfo.bankName} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          {bankErrors.bankName && <div className="text-danger small">{bankErrors.bankName}</div>}
         </div>
         <div className="col-md-4 mb-2">
-          <label>Số tài khoản</label>
-          <input className="form-control" name="bankAccount" value={profile.bankInfo.bankAccount} onChange={e => handleNestedChange(e, 'bankInfo')} />
+          <label>Số tài khoản <span className="text-danger">*</span></label>
+          <input className="form-control" name="bankAccount" value={profile.bankInfo.bankAccount} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          {bankErrors.bankAccount && <div className="text-danger small">{bankErrors.bankAccount}</div>}
         </div>
         <div className="col-md-4 mb-2">
-          <label>Chủ tài khoản</label>
-          <input className="form-control" name="accountHolder" value={profile.bankInfo.accountHolder} onChange={e => handleNestedChange(e, 'bankInfo')} />
+          <label>Chủ tài khoản <span className="text-danger">*</span></label>
+          <input className="form-control" name="accountHolder" value={profile.bankInfo.accountHolder} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          {bankErrors.accountHolder && <div className="text-danger small">{bankErrors.accountHolder}</div>}
         </div>
         <div className="col-md-6 mb-2">
           <label>Facebook</label>

@@ -74,3 +74,24 @@ export async function PUT(req) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+// API DELETE - Xóa thông báo quá hạn
+export async function DELETE(req) {
+  try {
+    const client = await clientPromise;
+    const db = client.db(DB_NAME);
+    const notificationsCollection = db.collection(COLLECTION_NAME);
+
+    const url = new URL(req.url);
+    const searchParams = new URLSearchParams(url.search);
+    // Cho phép truyền expiredBefore, nếu không có thì lấy thời điểm hiện tại
+    const expiredBefore = searchParams.get("expiredBefore");
+    const expiredDate = expiredBefore ? new Date(expiredBefore) : new Date();
+
+    const result = await notificationsCollection.deleteMany({
+      created_at: { $lt: expiredDate }
+    });
+    return NextResponse.json({ success: true, deletedCount: result.deletedCount });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

@@ -191,7 +191,7 @@ const UserProfileComponent = () => {
                       <UpgradeIcon fontSize="small" /> Yêu cầu nâng cấp thành Chủ dịch vụ
                     </AlertTitle>
                     <p>Nếu bạn muốn trở thành quản lý/chủ dịch vụ trên hệ thống, vui lòng gửi yêu cầu xác nhận và cập nhật hồ sơ chuyên gia.</p>
-                    <div className="d-flex justify-content-end">
+                    <div className="d-flex justify-content-center">
                       <Button
                         variant="contained"
                         color="primary"
