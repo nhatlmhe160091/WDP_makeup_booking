@@ -211,13 +211,28 @@
               {/* Thêm icon chuông thông báo cho user */}
               <div className="nav-item nav-link position-relative">
                 <Link href="/thong-bao" className="text-decoration-none text-dark">
-                  <i className="fas fa-bell" style={{ fontSize: 18 }}></i>
-                  <span 
-                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                    style={{ fontSize: 10 }}
-                  >
-                    3
-                    <span className="visually-hidden">unread messages</span>
+                  <span style={{ position: 'relative', display: 'inline-block' }}>
+                    <i className="fas fa-bell" style={{ fontSize: 18 }}></i>
+                    <span 
+                      className="badge rounded-pill bg-danger"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        transform: 'translate(50%,-50%)',
+                        fontSize: 10,
+                        padding: '2px 6px',
+                        minWidth: 16,
+                        height: 16,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2
+                      }}
+                    >
+                      3
+                      <span className="visually-hidden">unread messages</span>
+                    </span>
                   </span>
                 </Link>
               </div>
