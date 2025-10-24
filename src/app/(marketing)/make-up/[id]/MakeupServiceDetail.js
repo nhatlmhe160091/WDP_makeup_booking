@@ -500,8 +500,8 @@ const MakeupServiceDetail = () => {
           <Swiper modules={[Navigation, Pagination]} navigation pagination={{ clickable: true }} className="mb-4">
             {serviceData.images.map((image, index) => (
               <SwiperSlide key={index}>
-                {/* <img src={image} className="img-fluid w-100 rounded" alt="Dịch vụ makeup" /> */}
-                 <img src={"/img/ab0.jpg"} className="img-fluid w-100 rounded" alt="Dịch vụ makeup" />
+                <img src={image} className="img-fluid w-100 rounded" alt="Gói dịch vụ" />
+                 {/* <img src={"/img/ab0.jpg"} className="img-fluid w-100 rounded" alt="Gói dịch vụ" /> */}
               </SwiperSlide>
             ))}
           </Swiper>

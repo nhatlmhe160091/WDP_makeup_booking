@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -23,11 +24,12 @@ import { ROLE_MANAGER } from "@muahub/constants/System";
 
 const BookingHistoryPage = () => {
   const { currentUser } = useApp();
+  const searchParams = useSearchParams();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+  const orderId = searchParams.get('orderId');
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -55,8 +57,9 @@ const BookingHistoryPage = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = bookings.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+  const filteredBookings = orderId ? bookings.filter(b => b._id === orderId) : bookings;
+  const currentItems = filteredBookings.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -68,18 +71,16 @@ const BookingHistoryPage = () => {
         id: bookingId,
         status: newStatus
       });
-      if (res.success) {
-        // Tải lại dữ liệu sau khi cập nhật
+      // console.log("Update booking status response:", res);
         fetchData();
-      }
     } catch (error) {
       console.error("Error updating booking status:", error);
     }
   };
 
-   const adjustMongoDBTime = (mongoTime) => {
+  const adjustMongoDBTime = (mongoTime) => {
     return new Date(mongoTime); // MongoDB đã lưu ở UTC, Date() sẽ tự động chuyển sang giờ địa phương
-   };
+  };
 
 
   // Hàm kiểm tra xem đã đủ 1 tiếng từ lúc tạo chưa
@@ -96,9 +97,9 @@ const BookingHistoryPage = () => {
     const currentTime = new Date().getTime();
     const oneHourInMs = 60 * 60 * 1000;
     const remainingMs = oneHourInMs - (currentTime - createdTime);
-    
+
     if (remainingMs <= 0) return null;
-    
+
     const remainingMinutes = Math.ceil(remainingMs / (60 * 1000));
     return remainingMinutes;
   };
@@ -204,9 +205,15 @@ const BookingHistoryPage = () => {
     <PageContainer title="Danh sách đặt dịch vụ makeup" description="Danh sách các dịch vụ makeup bạn đã đặt">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Danh sách đặt dịch vụ makeup</Typography>
-        <Button variant="contained" color="primary" onClick={handleReload}>
-          Tải lại
-        </Button>
+        {orderId ? (
+          <Button variant="contained" color="secondary" onClick={() => router.push('/makeup-artists/danh-sach-dat-lich')}>
+            Quay lại
+          </Button>
+        ) : (
+          <Button variant="contained" color="primary" onClick={handleReload}>
+            Tải lại
+          </Button>
+        )}
       </Box>
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
@@ -217,10 +224,11 @@ const BookingHistoryPage = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Tên dịch vụ makeup</TableCell>
+                <TableCell>Tên dịch vụ</TableCell>
                 <TableCell>Ngày</TableCell>
                 <TableCell>Giờ</TableCell>
-                <TableCell>Dịch vụ makeup</TableCell>
+                <TableCell>Gói dịch vụ</TableCell>
+                <TableCell>Địa điểm</TableCell>
                 <TableCell>Đặt cọc</TableCell>
                 <TableCell>Còn lại</TableCell>
                 <TableCell>Trạng thái</TableCell>
@@ -240,7 +248,56 @@ const BookingHistoryPage = () => {
                   </TableCell>
                   <TableCell>{convertDate(booking.date)}</TableCell>
                   <TableCell>{booking.time}</TableCell>
-                  <TableCell>{booking.field} người</TableCell>
+                  <TableCell>{booking.field}</TableCell>
+                  <TableCell>
+                    {/* Địa điểm dịch vụ */}
+                    {booking.serviceLocationType === 'home' && (
+                      <>
+                        <span style={{ color: '#1976d2' }}>Đến tận nơi</span>
+                        {booking.serviceLocation && (
+                          <>
+                            <br />
+                            {booking.serviceLocation.customerLat && booking.serviceLocation.customerLng && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                sx={{ mt: 1, mb: 1 }}
+                                href={`https://www.google.com/maps/search/?api=1&query=${booking.serviceLocation.customerLat},${booking.serviceLocation.customerLng}`}
+                                target="_blank"
+                              >
+                                Google map
+                              </Button>
+                            )}
+                            <br />
+                            <span>Khoảng cách: {booking.serviceLocation.distanceKm} km</span><br />
+                            <span>Phụ phí: {booking.serviceLocation.extraFee?.toLocaleString()} VND</span>
+                          </>
+                        )}
+                      </>
+                    )}
+                    {booking.serviceLocationType === 'studio' && (
+                      <>
+                        <span style={{ color: '#388e3c' }}>Tại studio</span>
+                        {booking.serviceLocation && (
+                          <>
+                            <br />
+                            {booking.serviceLocation.studioLat && booking.serviceLocation.studioLng && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                sx={{ mt: 1, mb: 1 }}
+                                href={`https://www.google.com/maps/search/?api=1&query=${booking.serviceLocation.studioLat},${booking.serviceLocation.studioLng}`}
+                                target="_blank"
+                              >
+                                Google map
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
+                    {!booking.serviceLocationType && <span>Không rõ</span>}
+                  </TableCell>
                   <TableCell>{booking.deposit.toLocaleString()} VND</TableCell>
                   <TableCell>{booking.remaining.toLocaleString()} VND</TableCell>
                   <TableCell>

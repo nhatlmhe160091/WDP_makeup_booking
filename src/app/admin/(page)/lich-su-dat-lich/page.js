@@ -79,10 +79,10 @@ const BookingHistoryPage = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Tên dịch vụ makeup</TableCell>
+                <TableCell>Tên dịch vụ</TableCell>
                 <TableCell>Ngày</TableCell>
                 <TableCell>Giờ</TableCell>
-                <TableCell>Dịch vụ makeup</TableCell>
+                <TableCell>Gói dịch vụ</TableCell>
                 <TableCell>Đặt cọc</TableCell>
                 <TableCell>Còn lại</TableCell>
                 <TableCell>Trạng thái</TableCell>
@@ -101,7 +101,7 @@ const BookingHistoryPage = () => {
                   </TableCell>
                   <TableCell>{convertDate(booking.date)}</TableCell>
                   <TableCell>{booking.time}</TableCell>
-                  <TableCell>{booking.field} người</TableCell>
+                  <TableCell>{booking.field}</TableCell>
                   <TableCell>{booking.deposit.toLocaleString()} VND</TableCell>
                   <TableCell>{booking.remaining.toLocaleString()} VND</TableCell>
                   <TableCell style={{

@@ -5,7 +5,7 @@ import Link from "next/link";
 // components
 import Profile from "./Profile";
 import { IconBellRinging, IconMenu } from "@tabler/icons-react";
-
+import { useRouter } from "next/navigation";
 const Header = ({ toggleMobileSidebar }) => {
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -53,17 +53,23 @@ const Header = ({ toggleMobileSidebar }) => {
     setAnchorEl(null);
   };
 
-  // Hàm đánh dấu đã đọc
-  const markAsRead = async (id) => {
+ const router = useRouter();
+  // Hàm đánh dấu đã đọc và chuyển trang với orderId
+  const handleReadAndGo = async (item) => {
     try {
       await fetch('/api/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id: item._id })
       });
-      // Sau khi đánh dấu, cập nhật trạng thái isRead cho thông báo
-      setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, isRead: true } : n));
+      setNotifications((prev) => prev.map((n) => n._id === item._id ? { ...n, isRead: true } : n));
     } catch (e) {}
+    if (item.orderId) {
+      router.push(`/admin/danh-sach-dat-lich?orderId=${item.orderId}`);
+    } else {
+      router.push('/admin/danh-sach-dat-lich');
+    }
+    setAnchorEl(null);
   };
 
   // Hàm giải phóng thông báo quá hạn
@@ -144,7 +150,7 @@ const Header = ({ toggleMobileSidebar }) => {
                   backgroundColor: item.isRead ? '#f5f5f5' : 'inherit',
                   '&:hover': { backgroundColor: item.isRead ? '#f5f5f5' : '#f0f7ff' }
                 }}
-                onClick={() => !item.isRead && markAsRead(item._id)}
+               onClick={() => !item.isRead && handleReadAndGo(item)}
                 disabled={item.isRead}
               >
                 <Box display="flex" alignItems="center" gap={1}>

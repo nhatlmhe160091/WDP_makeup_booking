@@ -58,7 +58,9 @@ export async function POST(req) {
       openingTime,
       closingTime,
       images,
-      packages
+      packages,
+      experienceYears,
+      experienceMonths
     } = await req.json();
 
 
@@ -75,6 +77,8 @@ export async function POST(req) {
       closingTime,
       images,
       packages,
+      experienceYears: Number.isFinite(Number(experienceYears)) ? Number(experienceYears) : 0,
+      experienceMonths: Number.isFinite(Number(experienceMonths)) ? Number(experienceMonths) : 0,
       active: typeof req.body?.active !== 'undefined' ? req.body.active : true,
       created_at: new Date(),
       updated_at: new Date()
@@ -108,7 +112,9 @@ export async function PUT(req) {
       closingTime,
       images,
       packages,
-  active = true
+      experienceYears,
+      experienceMonths,
+      active = true
     } = await req.json();
 
     const ObjectId = getObjectId(id);
@@ -116,7 +122,7 @@ export async function PUT(req) {
 
     const service = await servicesCollection.findOne({ _id: ObjectId });
     if (!service) {
-      return NextResponse.json({ success: false, message: "Dịch vụ makeup không tồn tại" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "Gói dịch vụ không tồn tại" }, { status: 404 });
     }
 
     await servicesCollection.updateOne(
@@ -134,6 +140,8 @@ export async function PUT(req) {
           closingTime,
           images,
           packages,
+          experienceYears: Number.isFinite(Number(experienceYears)) ? Number(experienceYears) : 0,
+          experienceMonths: Number.isFinite(Number(experienceMonths)) ? Number(experienceMonths) : 0,
           active: typeof active !== 'undefined' ? active : true,
           updated_at: new Date()
         }

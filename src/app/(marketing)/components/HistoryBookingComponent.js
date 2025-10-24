@@ -274,7 +274,7 @@ const HistoryBookingComponent = ({ currentUser }) => {
                     <Link href={`/make-up/${booking.serviceId}`}>{booking.service?.serviceName}</Link>
                   </td>
                   <td>{convertDate(booking.date)}</td>
-                  <td>Dịch vụ {booking.field} người</td>
+                  <td>Dịch vụ {booking.field}</td>
                   <td>Dịch vụ số {booking.fieldSlot + 1}</td>
                   <td>{booking.time}</td>
                   <td>{formatCurrency(booking.deposit)}</td>

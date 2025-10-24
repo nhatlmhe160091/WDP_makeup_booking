@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button, Menu, MenuItem, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 // components
 import Profile from "./Profile";
 import { IconBellRinging, IconMenu } from "@tabler/icons-react";
@@ -53,17 +54,23 @@ const Header = ({ toggleMobileSidebar }) => {
     };
     fetchNotifications();
   }, []);
-  // Hàm đánh dấu đã đọc
-  const markAsRead = async (id) => {
+  const router = useRouter();
+  // Hàm đánh dấu đã đọc và chuyển trang với orderId
+  const handleReadAndGo = async (item) => {
     try {
       await fetch('/api/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id: item._id })
       });
-      // Sau khi đánh dấu, cập nhật trạng thái isRead cho thông báo
-      setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, isRead: true } : n));
+      setNotifications((prev) => prev.map((n) => n._id === item._id ? { ...n, isRead: true } : n));
     } catch (e) {}
+    if (item.orderId) {
+      router.push(`/makeup-artists/danh-sach-dat-lich?orderId=${item.orderId}`);
+    } else {
+      router.push('/makeup-artists/danh-sach-dat-lich');
+    }
+    setAnchorEl(null);
   };
 
   const handleOpenMenu = (event) => {
@@ -133,7 +140,7 @@ const Header = ({ toggleMobileSidebar }) => {
                   backgroundColor: item.isRead ? '#f5f5f5' : 'inherit',
                   '&:hover': { backgroundColor: item.isRead ? '#f5f5f5' : '#f0f7ff' }
                 }}
-                onClick={() => !item.isRead && markAsRead(item._id)}
+                onClick={() => !item.isRead && handleReadAndGo(item)}
                 disabled={item.isRead}
               >
                 <Box display="flex" alignItems="center" gap={1}>

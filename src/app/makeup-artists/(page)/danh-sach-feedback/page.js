@@ -85,7 +85,7 @@ const FeedbackManagementPage = () => {
                 <TableCell>Ngày gửi</TableCell>
                 <TableCell>Người gửi</TableCell>
                 <TableCell>Thông tin liên hệ</TableCell>
-                <TableCell>Dịch vụ makeup</TableCell>
+                <TableCell>Gói dịch vụ</TableCell>
                 <TableCell>Loại dịch vụ makeup</TableCell>
                 <TableCell>Ngày đặt</TableCell>
                 <TableCell>Tiêu đề</TableCell>
@@ -107,7 +107,7 @@ const FeedbackManagementPage = () => {
                     <Typography>{feedback.service.serviceName}</Typography>
                     {feedback.service.locationDetail}, {feedback.service.location}
                   </TableCell>
-                  <TableCell>{feedback.order.field} người</TableCell>
+                  <TableCell>{feedback.order.field}</TableCell>
                   <TableCell>
                     {feedback.order.date}
                     <br />

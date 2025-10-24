@@ -24,6 +24,8 @@ const defaultProfile = {
 };
 
 const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRequest }) => {
+  // Kiểm tra nếu là trang admin thì chỉ cho view
+  const isAdminView = typeof window !== 'undefined' && window.location.pathname.includes('admin');
   // Validate các trường bắt buộc ngân hàng
   const validateBankInfo = () => {
     const errors = {};
@@ -230,18 +232,24 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
   
 
   return (
-    <form className="p-3" onSubmit={handleSubmit}>
+  <form className="p-3" onSubmit={handleSubmit}>
+    {isAdminView ? (
+      <div className="alert alert-info mb-3">
+        <b>Chế độ xem admin:</b> Bạn không thể chỉnh sửa.
+      </div>
+    ) : (
       <h4 className="mb-3">Cập nhật hồ sơ chuyên gia</h4>
+    )}
       {/* Nếu có request bị từ chối, hiển thị lý do */}
       {requestStatus === "rejected" && (
         <div className="alert alert-danger">
           <b>Yêu cầu nâng cấp bị từ chối.</b> {requestReason && (<span>Lý do: {requestReason}</span>)}
         </div>
       )}
-      <div className="row">
+  <div className="row">
         <div className="col-md-6 mb-2">
           <label>Tên</label>
-          <input className="form-control" name="name" value={profile.name} onChange={handleChange} required maxLength={100} />
+          <input className="form-control" name="name" value={profile.name} onChange={handleChange} required maxLength={100} disabled={isAdminView} />
         </div>
         <div className="col-md-6 mb-2">
           <label>Ảnh đại diện</label>
@@ -260,15 +268,15 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         </div>
         <div className="col-12 mb-2">
           <label>Bio</label>
-          <textarea className="form-control" name="bio" value={profile.bio} onChange={handleChange} maxLength={1000} />
+          <textarea className="form-control" name="bio" value={profile.bio} onChange={handleChange} maxLength={1000} disabled={isAdminView} />
         </div>
         <div className="col-md-4 mb-2">
           <label>Kinh nghiệm (năm)</label>
-          <input type="number" className="form-control" name="experienceYears" value={profile.experienceYears} onChange={handleChange} min={0} />
+          <input type="number" className="form-control" name="experienceYears" value={profile.experienceYears} onChange={handleChange} min={0} disabled={isAdminView} />
         </div>
         <div className="col-md-4 mb-2">
           <label>Kinh nghiệm (tháng)</label>
-          <input type="number" className="form-control" name="experienceMonths" value={profile.experienceMonths} onChange={handleChange} min={0} max={11} />
+          <input type="number" className="form-control" name="experienceMonths" value={profile.experienceMonths} onChange={handleChange} min={0} max={11} disabled={isAdminView} />
         </div>
         <div className="col-md-4 mb-2">
           <label>Giờ làm việc</label>
@@ -281,6 +289,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
               onChange={handleWorkingHoursChange}
               onBlur={handleWorkingHoursBlur}
               style={{ width: "50%" }}
+              disabled={isAdminView}
             />
             <span className="align-self-center">-</span>
             <input
@@ -291,6 +300,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
               onChange={handleWorkingHoursChange}
               onBlur={handleWorkingHoursBlur}
               style={{ width: "50%" }}
+              disabled={isAdminView}
             />
           </div>
         </div>
@@ -308,30 +318,30 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         </div>
         <div className="col-12 mb-2">
           <label>Địa chỉ</label>
-          <input className="form-control" name="address" value={profile.address} onChange={handleChange} />
+          <input className="form-control" name="address" value={profile.address} onChange={handleChange} disabled={isAdminView} />
         </div>
         <div className="col-md-4 mb-2">
           <label>Ngân hàng <span className="text-danger">*</span></label>
-          <input className="form-control" name="bankName" value={profile.bankInfo.bankName} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          <input className="form-control" name="bankName" value={profile.bankInfo.bankName} onChange={e => handleNestedChange(e, 'bankInfo')} required disabled={isAdminView} />
           {bankErrors.bankName && <div className="text-danger small">{bankErrors.bankName}</div>}
         </div>
         <div className="col-md-4 mb-2">
           <label>Số tài khoản <span className="text-danger">*</span></label>
-          <input className="form-control" name="bankAccount" value={profile.bankInfo.bankAccount} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          <input className="form-control" name="bankAccount" value={profile.bankInfo.bankAccount} onChange={e => handleNestedChange(e, 'bankInfo')} required disabled={isAdminView} />
           {bankErrors.bankAccount && <div className="text-danger small">{bankErrors.bankAccount}</div>}
         </div>
         <div className="col-md-4 mb-2">
           <label>Chủ tài khoản <span className="text-danger">*</span></label>
-          <input className="form-control" name="accountHolder" value={profile.bankInfo.accountHolder} onChange={e => handleNestedChange(e, 'bankInfo')} required />
+          <input className="form-control" name="accountHolder" value={profile.bankInfo.accountHolder} onChange={e => handleNestedChange(e, 'bankInfo')} required disabled={isAdminView} />
           {bankErrors.accountHolder && <div className="text-danger small">{bankErrors.accountHolder}</div>}
         </div>
         <div className="col-md-6 mb-2">
           <label>Facebook</label>
-          <input className="form-control" name="facebook" value={profile.socialLinks.facebook} onChange={e => handleNestedChange(e, 'socialLinks')} />
+          <input className="form-control" name="facebook" value={profile.socialLinks.facebook} onChange={e => handleNestedChange(e, 'socialLinks')} disabled={isAdminView} />
         </div>
         <div className="col-md-6 mb-2">
           <label>Instagram</label>
-          <input className="form-control" name="instagram" value={profile.socialLinks.instagram} onChange={e => handleNestedChange(e, 'socialLinks')} />
+          <input className="form-control" name="instagram" value={profile.socialLinks.instagram} onChange={e => handleNestedChange(e, 'socialLinks')} disabled={isAdminView} />
         </div>
       </div>
       <hr />
@@ -339,37 +349,47 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
       {profile.portfolio.map((item, idx) => (
         <div className="row mb-2" key={idx}>
           <div className="col-md-5">
-            <input className="form-control" placeholder="URL ảnh" value={item.image} onChange={e => handlePortfolioChange(idx, 'image', e.target.value)} />
+            <input className="form-control" placeholder="URL ảnh" value={item.image} onChange={e => handlePortfolioChange(idx, 'image', e.target.value)} disabled={isAdminView} />
           </div>
           <div className="col-md-5">
-            <input className="form-control" placeholder="Mô tả" value={item.desc} onChange={e => handlePortfolioChange(idx, 'desc', e.target.value)} />
+            <input className="form-control" placeholder="Mô tả" value={item.desc} onChange={e => handlePortfolioChange(idx, 'desc', e.target.value)} disabled={isAdminView} />
           </div>
           <div className="col-md-2 d-flex align-items-center">
-            <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemovePortfolio(idx)}>Xóa</button>
+            {!isAdminView && (
+              <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemovePortfolio(idx)}>Xóa</button>
+            )}
           </div>
         </div>
       ))}
-      <button type="button" className="btn btn-outline-primary btn-sm mb-3" onClick={handleAddPortfolio}>+ Thêm ảnh</button>
+      {!isAdminView && (
+        <button type="button" className="btn btn-outline-primary btn-sm mb-3" onClick={handleAddPortfolio}>+ Thêm ảnh</button>
+      )}
       <hr />
       <h5>Chứng chỉ</h5>
       {profile.certificates.map((item, idx) => (
         <div className="row mb-2" key={idx}>
           <div className="col-md-6">
-            <input className="form-control" placeholder="Tên chứng chỉ" value={item.name} onChange={e => handleCertificateChange(idx, 'name', e.target.value)} />
+            <input className="form-control" placeholder="Tên chứng chỉ" value={item.name} onChange={e => handleCertificateChange(idx, 'name', e.target.value)} disabled={isAdminView} />
           </div>
           <div className="col-md-4">
-            <input className="form-control" placeholder="URL ảnh/PDF" value={item.image} onChange={e => handleCertificateChange(idx, 'image', e.target.value)} />
+            <input className="form-control" placeholder="URL ảnh/PDF" value={item.image} onChange={e => handleCertificateChange(idx, 'image', e.target.value)} disabled={isAdminView} />
           </div>
           <div className="col-md-2 d-flex align-items-center">
-            <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemoveCertificate(idx)}>Xóa</button>
+            {!isAdminView && (
+              <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemoveCertificate(idx)}>Xóa</button>
+            )}
           </div>
         </div>
       ))}
-      <button type="button" className="btn btn-outline-primary btn-sm mb-3" onClick={handleAddCertificate}>+ Thêm chứng chỉ</button>
+      {!isAdminView && (
+        <button type="button" className="btn btn-outline-primary btn-sm mb-3" onClick={handleAddCertificate}>+ Thêm chứng chỉ</button>
+      )}
       <hr />
-      <button className="btn btn-success" type="submit" disabled={loading}>
-        {loading ? "Đang lưu..." : "Lưu thay đổi"}
-      </button>
+      {!isAdminView && (
+        <button className="btn btn-success" type="submit" disabled={loading}>
+          {loading ? "Đang lưu..." : "Lưu thay đổi"}
+        </button>
+      )}
     </form>
   );
 };

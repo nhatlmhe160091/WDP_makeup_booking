@@ -165,7 +165,7 @@ const TimelineHistoryPage = () => {
               <Typography>Email: {booking.user.email}</Typography>
               <Typography>Phone: {booking.user.phone}</Typography>
               <Typography>Thời gian: {booking.time}</Typography>
-              <Typography>Dịch vụ makeup: {booking.service.serviceName}</Typography>
+              <Typography>Gói dịch vụ: {booking.service.serviceName}</Typography>
               <Typography>Loại dịch vụ makeup: {booking.service.packages[booking.field].name}</Typography>
             </Paper>
           ))}

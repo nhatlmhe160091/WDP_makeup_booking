@@ -36,9 +36,16 @@ export async function POST(req) {
     const profilesCollection = db.collection(COLLECTION_NAME);
     const {
       artistId,
+      name,
+      avatar,
       bio,
       experienceYears,
+      experienceMonths,
       workingHours,
+      phone,
+      email,
+      address,
+      bankInfo, // { bankName, bankAccount, accountHolder }
       socialLinks,
       portfolio,
       certificates
@@ -53,9 +60,16 @@ export async function POST(req) {
     }
     const newProfile = {
       artistId: getObjectId(artistId),
+      name: name || "",
+      avatar: avatar || "",
       bio: bio || "",
       experienceYears: experienceYears || 0,
+      experienceMonths: experienceMonths || 0,
       workingHours: workingHours || "",
+      phone: phone || "",
+      email: email || "",
+      address: address || "",
+      bankInfo: bankInfo || {},
       socialLinks: socialLinks || {},
       portfolio: portfolio || [],
       certificates: certificates || [],

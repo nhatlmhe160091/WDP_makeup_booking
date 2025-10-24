@@ -190,7 +190,7 @@ export async function PUT(req) {
 
     const order = await ordersCollection.findOne({ _id: ObjectId });
     if (!order) {
-      return NextResponse.json({ success: false, message: "Dịch vụ makeup không tồn tại" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "Gói dịch vụ không tồn tại" }, { status: 404 });
     }
 
     // Quy trình xác nhận:

@@ -35,10 +35,10 @@ export async function GET(req) {
     if (userId) searchQuery.userId = getObjectId(userId);
     if (serviceId) searchQuery.serviceId = getObjectId(serviceId);
     if (ownerId) searchQuery.ownerId = getObjectId(ownerId);
-    let projection = { serviceName: 1, location: 1, locationDetail: 1, openingTime: 1, closingTime: 1 };
+    // Luôn lấy cả packages để có thể tra cứu tên gói dịch vụ
+    let projection = { serviceName: 1, location: 1, locationDetail: 1, openingTime: 1, closingTime: 1, packages: 1 };
     if (date) {
       searchQuery.date = date;
-      projection = { ...projection, packages: 1 };
     }
     // packages
 
@@ -60,10 +60,14 @@ export async function GET(req) {
       .find({ _id: { $in: userIds } }, { projection: { name: 1, email: 1, phone: 1 } })
       .toArray();
 
-    // Map the orders to include the service details
+    // Map the orders to include the service details và packageName
     orders = orders.map((order) => {
       const service = services.find((service) => service._id.equals(order.serviceId));
-      return { ...order, service };
+      let packageName = null;
+      if (service && service.packages && order.field && service.packages[order.field]) {
+        packageName = service.packages[order.field].name || null;
+      }
+      return { ...order, service, packageName };
     });
 
     // Map the orders to include the user details
@@ -218,13 +222,14 @@ export async function PUT(req) {
 
     const order = await ordersCollection.findOne({ _id: ObjectId });
     if (!order) {
-      return NextResponse.json({ success: false, message: "Dịch vụ makeup không tồn tại" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "Gói dịch vụ không tồn tại" }, { status: 404 });
     }
 
     // Quy trình xác nhận:
     // pending -> deposit_confirmed (admin xác nhận cọc) -> confirmed (MUA xác nhận dịch vụ)
     let updateOwnerTotal = false;
     let notificationForUser = null;
+    let notificationForOwner = null;
     // Nếu admin xác nhận cọc
     if (order.status === "pending" && status === "deposit_confirmed") {
       notificationForUser = {
@@ -232,6 +237,15 @@ export async function PUT(req) {
         type: "user",
         orderId: order._id,
         message: "Admin đã xác nhận cọc, vui lòng kiểm tra lịch sử đặt lịch.",
+        isRead: false,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+      notificationForOwner = {
+        userId: order.ownerId,
+        type: "owner",
+        orderId: order._id,
+        message: "Admin đã xác nhận cọc cho đơn đặt dịch vụ của bạn.",
         isRead: false,
         created_at: new Date(),
         updated_at: new Date()
@@ -255,9 +269,10 @@ export async function PUT(req) {
       );
     }
 
-    if (notificationForUser) {
+    if (notificationForUser || notificationForOwner) {
       const notificationsCollection = db.collection("notifications");
-      await notificationsCollection.insertOne(notificationForUser);
+      if (notificationForUser) await notificationsCollection.insertOne(notificationForUser);
+      if (notificationForOwner) await notificationsCollection.insertOne(notificationForOwner);
     }
 
     await ordersCollection.updateOne(

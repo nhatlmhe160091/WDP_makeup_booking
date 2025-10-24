@@ -12,7 +12,6 @@ import {
   // thêm icon danh sách chuyên viên align-box-left-bottom
   IconAlignBoxLeftBottom,
   IconMoneybag,
-  IconSettings
 } from "@tabler/icons-react";
 import { uniqueId } from "lodash";
 

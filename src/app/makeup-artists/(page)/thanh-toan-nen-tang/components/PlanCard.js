@@ -1,13 +1,26 @@
-import { Card, CardContent, Typography, Chip, Button } from "@mui/material";
+
+import React, { useState } from "react";
+import { Card, CardContent, Typography, Chip, Button, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info';
 
 const PlanCard = ({
-    details,
-    isCurrentPlan,
-    onSelect,
-    disabled = false,
-    sx = {},
-    paymentType
-  }) => (
+  details,
+  isCurrentPlan,
+  onSelect,
+  disabled = false,
+  sx = {},
+  paymentType
+}) => {
+  const [openBenefit, setOpenBenefit] = useState(false);
+  // Quyền lợi mẫu, thực tế có thể lấy từ details.benefits hoặc API
+  const benefits = details.benefits || [
+    "Ưu tiên hiển thị trên nền tảng",
+    "Tăng giới hạn số lượng dịch vụ",
+    "Hỗ trợ chăm sóc khách hàng 24/7",
+    "Thống kê doanh thu chi tiết",
+    "Được tham gia các chương trình khuyến mãi"
+  ];
+  return (
     <Card
       sx={{
         height: "100%",
@@ -54,6 +67,35 @@ const PlanCard = ({
         <Typography variant="body2" color="text.secondary" paragraph>
           {details.description}
         </Typography>
+        <Button
+          variant="text"
+          color="info"
+          size="small"
+          startIcon={<InfoIcon />}
+          sx={{ mb: 1, textTransform: 'none', fontWeight: 500 }}
+          onClick={e => {
+            e.stopPropagation();
+            setOpenBenefit(true);
+          }}
+        >
+          Xem quyền lợi
+        </Button>
+        <Dialog open={openBenefit} onClose={() => setOpenBenefit(false)} maxWidth="xs" fullWidth>
+          <DialogTitle>Quyền lợi gói {details.label}</DialogTitle>
+          <DialogContent>
+            <List>
+              {benefits.map((b, i) => (
+                <ListItem key={i}>
+                  <ListItemIcon><InfoIcon color="info" /></ListItemIcon>
+                  <ListItemText primary={b} />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenBenefit(false)} color="primary">Đóng</Button>
+          </DialogActions>
+        </Dialog>
         <Typography variant="body2" color="info.main" sx={{ mb: 2, fontStyle: "italic" }}>
           Số tiền phải trả: {details.amount === 0 ? "Miễn phí" : details.amount.toLocaleString('vi-VN') + " ₫"}
         </Typography>
@@ -79,5 +121,6 @@ const PlanCard = ({
       </CardContent>
     </Card>
   );
+};
 
 export default PlanCard;

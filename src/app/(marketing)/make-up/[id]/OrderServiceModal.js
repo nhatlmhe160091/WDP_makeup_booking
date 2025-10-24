@@ -198,7 +198,8 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
         serviceId: serviceData._id,
         ownerId: serviceData.ownerId,
         deposit: serviceData.packages[selectedField].price,
-        field: selectedField,
+        // field: selectedField.name,
+        field: serviceData.packages[selectedField]?.name || '',
         time: slot.time,
         date: selectedDate,
         fieldSlot: slot.fieldIndex,
@@ -280,9 +281,10 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 // console.log('serviceLocation:', serviceLocation);
 // console.log('serviceLocation full detail', extra)
   // Theo dõi thay đổi serviceLocation để debug
-  useEffect(() => {
-    console.log('serviceLocation (debug):', serviceLocation);
-  }, [serviceLocation]);
+  // useEffect(() => {
+  //   console.log('serviceLocation (debug):', serviceLocation);
+  // }, [serviceLocation]);
+  // console.log('selectedField (debug):', serviceData.packages[selectedField]?.name);
   return (
     <Modal show={open} onHide={onClose} centered size="lg" backdrop="static">
       <Modal.Header closeButton>

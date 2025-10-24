@@ -24,7 +24,7 @@ const MakeupServiceNoiBatComponent = () => {
     <div className="container-fluid contact">
       <div className="container pt-5 pb-2">
         <div className="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style={{ maxWidth: "800px" }}>
-          <h1 className="display-5 mb-4">Dịch vụ makeup nổi bật</h1>
+          <h1 className="display-5 mb-4">Gói dịch vụ nổi bật</h1>
           <p className="mb-0">Tổng hợp các dịch vụ được nhiều khách đặt nhất, chất lượng cao và uy tín.</p>
         </div>
         {/* Packages List */}
