@@ -203,7 +203,29 @@
                 Danh sách dịch vụ
               </Link>
               <Link href="/yeu-thich" className={`nav-item nav-link ${pathUrl === "/yeu-thich" ? "active" : ""}`}>
-                Yêu thích
+                <span style={{ position: 'relative', display: 'inline-block' }}>
+                  Yêu thích
+                  <span 
+                    className="badge rounded-pill bg-danger"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      transform: 'translate(50%,-50%)',
+                      fontSize: 10,
+                      padding: '2px 6px',
+                      minWidth: 16,
+                      height: 16,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 2
+                    }}
+                  >
+                    2
+                    <span className="visually-hidden">favorite items</span>
+                  </span>
+                </span>
               </Link>
               <Link href="/lien-he" className={`nav-item nav-link ${pathUrl === "/lien-he" ? "active" : ""}`}>
                 Liên hệ
@@ -212,7 +234,7 @@
               <div className="nav-item nav-link position-relative">
                 <Link href="/thong-bao" className="text-decoration-none text-dark">
                   <span style={{ position: 'relative', display: 'inline-block' }}>
-                    <i className="fas fa-bell" style={{ fontSize: 18 }}></i>
+                    <i className="fas fa-bell" style={{ fontSize: 18, color: '#fff' }}></i>
                     <span 
                       className="badge rounded-pill bg-danger"
                       style={{
