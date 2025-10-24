@@ -61,8 +61,8 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
     if (imageUrl) {
       return (
         <img
-          // src={imageUrl}
-             src={"/img/ab0.jpg"}
+          src={imageUrl}
+            //  src={"/img/ab0.jpg"}
           alt={displayName}
           className="card-img-top img-fluid"
           style={{ height: "250px", objectFit: "cover" }}

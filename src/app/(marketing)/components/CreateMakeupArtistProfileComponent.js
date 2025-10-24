@@ -56,15 +56,16 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
   const fetchBasicInfo = async () => {
     try {
       const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
-      if (res.data) {
+      if (res.payload) {
         // Cập nhật chỉ các thông tin cơ bản
+        console.log("Fetched basic info:", res.data);
         setProfile(prev => ({
           ...prev,
-          email: res.data.email || prev.email,
-          name: res.data.name || prev.name,
-          address: res.data.address || prev.address,
-          phone: res.data.phone || prev.phone,
-          cccd: res.data.cccd || prev.cccd
+          email: res.payload.email || prev.email,
+          name: res.payload.name || prev.name,
+          address: res.payload.address || prev.address,
+          phone: res.payload.phone || prev.phone,
+          cccd: res.payload.cccd || prev.cccd
         }));
       }
     } catch (error) {
@@ -210,7 +211,7 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
     setProfile((prev) => ({ ...prev, certificates: updated }));
   };
 
-  
+  console.log("Current profile state cccd:", profile);
 
   return (
     <form className="p-3" onSubmit={handleSubmit}>
