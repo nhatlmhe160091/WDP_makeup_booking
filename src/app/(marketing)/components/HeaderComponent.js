@@ -37,31 +37,33 @@ const HeaderComponent = () => {
     setTimeout(() => {
       try {
         const backToTopButton = document.querySelector(".back-to-top");
-        backToTopButton.style.display = "none"; // Ẩn button "back to top"
-        window.addEventListener("scroll", function () {
-          var navbar = document.querySelector(".navbar");
-          if (window.scrollY > 45) {
-            navbar.classList.add("sticky-top", "shadow-sm");
-          } else {
-            navbar.classList.remove("sticky-top", "shadow-sm");
-          }
-        });
-
-        // Kiểm tra khi người dùng cuộn trang
-        window.addEventListener("scroll", function () {
-          if (window.scrollY > 300) {
-            backToTopButton.style.display = "flex"; // Hiện button "back to top"
-          } else {
-            backToTopButton.style.display = "none"; // Ẩn button "back to top"
-          }
-        });
-        backToTopButton.addEventListener("click", function (event) {
-          event.preventDefault(); // Ngừng hành động mặc định của nút
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth" // Cuộn lên đầu trang với hiệu ứng mượt mà
+        if (backToTopButton) {
+          backToTopButton.style.display = "none"; // Ẩn button "back to top"
+          window.addEventListener("scroll", function () {
+            var navbar = document.querySelector(".navbar");
+            if (window.scrollY > 45) {
+              navbar.classList.add("sticky-top", "shadow-sm");
+            } else {
+              navbar.classList.remove("sticky-top", "shadow-sm");
+            }
           });
-        });
+
+          // Kiểm tra khi người dùng cuộn trang
+          window.addEventListener("scroll", function () {
+            if (window.scrollY > 300) {
+              backToTopButton.style.display = "flex"; // Hiện button "back to top"
+            } else {
+              backToTopButton.style.display = "none"; // Ẩn button "back to top"
+            }
+          });
+          backToTopButton.addEventListener("click", function (event) {
+            event.preventDefault(); // Ngừng hành động mặc định của nút
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth" // Cuộn lên đầu trang với hiệu ứng mượt mà
+            });
+          });
+        }
       } catch (e) {
         console.log(e);
       }
@@ -138,7 +140,7 @@ const HeaderComponent = () => {
     window.location.href = "/";
   };
   // console.log(11111, currentUser);
-console.log("showResults", showResults);
+// console.log("showResults", showResults);
   return (
     <div className="container-fluid position-relative p-0 header-container">
       <nav className="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">

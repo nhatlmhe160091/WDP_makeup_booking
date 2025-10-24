@@ -143,7 +143,7 @@ const CarouselComponent = ({ pathUrl }) => {
             loading={index === 0 ? "eager" : "lazy"}
             decoding="async"
             sizes="100vw"
-            fetchpriority={index === 0 ? "high" : "low"}
+            fetchPriority={index === 0 ? "high" : "low"}
           />
           <div className="carousel-caption">
             <div className="container-fluid d-flex justify-content-start align-items-center h-100 ps-4 ps-md-5" style={{ height: '100%' }}>

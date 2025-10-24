@@ -177,7 +177,7 @@ export async function POST(req) {
       userId: getObjectId(ownerId),
       type: "owner",
       orderId: newOrder._id,
-      message: `Bạn có đơn đặt dịch vụ mới từ user ${objectId}${isToday ? ' (đã xác nhận cọc tự động)' : ''}`,
+      message: `Bạn có đơn đặt dịch vụ mới từ user ${userIdentifier}${isToday ? ' (đã xác nhận cọc tự động)' : ''}`,
       isRead: false,
       created_at: now,
       updated_at: now

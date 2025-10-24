@@ -201,9 +201,9 @@ const BookingHistoryPage = () => {
   };
 
   return (
-    <PageContainer title="Lịch sử đặt dịch vụ makeup" description="Danh sách các dịch vụ makeup bạn đã đặt">
+    <PageContainer title="Danh sách đặt dịch vụ makeup" description="Danh sách các dịch vụ makeup bạn đã đặt">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Lịch sử đặt dịch vụ makeup</Typography>
+        <Typography variant="h4">Danh sách đặt dịch vụ makeup</Typography>
         <Button variant="contained" color="primary" onClick={handleReload}>
           Tải lại
         </Button>

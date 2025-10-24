@@ -34,7 +34,7 @@ const ServiceListPage = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await SendRequest("GET", "/api/services", {
+      const res = await SendRequest("GET", "/api/services/MUA", {
         ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
       });
       if (res.payload) {

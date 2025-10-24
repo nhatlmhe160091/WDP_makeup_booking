@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Select, MenuItem, CircularProgress, Box } from "@mui/material";
+import { Select, MenuItem, CircularProgress, Box, TextField } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import SendRequest from "@muahub/utils/SendRequest";
 import { ROLE_MANAGER } from "@muahub/constants/System";
@@ -10,13 +10,11 @@ let Chart = null;
 const MUAsOverview = () => {
   const { currentUser } = useApp();
   const now = new Date();
-  const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year, setYear] = useState(now.getFullYear());
+  const [selectedDate, setSelectedDate] = useState(now.toISOString().slice(0, 10)); // yyyy-mm-dd
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [series, setSeries] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [years, setYears] = useState([now.getFullYear()]);
 
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -39,32 +37,24 @@ const MUAsOverview = () => {
     }
   };
 
-  // Lọc và xử lý dữ liệu cho biểu đồ theo tháng/năm
+  // Lọc và xử lý dữ liệu cho biểu đồ theo giờ trong ngày
   const processData = () => {
     if (!data.length) return;
-    // Lọc theo tháng và năm
+    // Lọc theo ngày được chọn
     const filtered = data.filter((item) => {
       const d = new Date(item.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year;
+      // So sánh yyyy-mm-dd
+      return d.toISOString().slice(0, 10) === selectedDate;
     });
-    // Gom nhóm theo tuần
-    const bookingsByWeek = {};
+    // Gom nhóm theo giờ (0-23)
+    const revenueByHour = Array(24).fill(0);
     filtered.forEach((item) => {
-      const date = new Date(item.date);
-      const firstDay = new Date(date.getFullYear(), 0, 1);
-      const dayOfYear = ((date - firstDay + 86400000) / 86400000);
-      const weekNum = Math.ceil(dayOfYear / 7);
-      const key = `Tuần ${weekNum}`;
-      if (!bookingsByWeek[key]) bookingsByWeek[key] = 0;
-      bookingsByWeek[key] += item.deposit;
+      const d = new Date(item.date);
+      const hour = d.getHours();
+      revenueByHour[hour] += item.deposit;
     });
-    const sortedWeeks = Object.keys(bookingsByWeek).sort((a, b) => {
-      const numA = parseInt(a.replace(/\D/g, ""));
-      const numB = parseInt(b.replace(/\D/g, ""));
-      return numA - numB;
-    });
-    setCategories(sortedWeeks);
-    setSeries([{ name: "Đặt cọc", data: sortedWeeks.map((w) => bookingsByWeek[w]) }]);
+    setCategories(Array.from({ length: 24 }, (_, i) => `${i}:00`));
+    setSeries([{ name: "Đặt cọc", data: revenueByHour }]);
   };
 
   useEffect(() => {
@@ -84,13 +74,9 @@ const MUAsOverview = () => {
 
   useEffect(() => {
     if (data.length) {
-      // Lấy danh sách năm có trong dữ liệu
-      const yearSet = new Set(data.map((item) => new Date(item.date).getFullYear()));
-      setYears(Array.from(yearSet).sort((a, b) => a - b));
       processData();
     }
-    // eslint-disable-next-line
-  }, [data, month, year]);
+  }, [data, selectedDate]);
 
   const options = {
     chart: {
@@ -140,27 +126,15 @@ const MUAsOverview = () => {
   return (
     <Box mb={4}>
       <Box mb={2} fontWeight={600} fontSize={20} display="flex" alignItems="center" gap={2}>
-        Tổng quan đặt lịch theo tuần
-        <Select
+        Tổng quan doanh thu theo giờ trong ngày
+        <TextField
+          type="date"
           size="small"
-          value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          sx={{ minWidth: 100 }}
-        >
-          {[...Array(12).keys()].map((m) => (
-            <MenuItem key={m + 1} value={m + 1}>{`Tháng ${m + 1}`}</MenuItem>
-          ))}
-        </Select>
-        <Select
-          size="small"
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          sx={{ minWidth: 100 }}
-        >
-          {years.map((y) => (
-            <MenuItem key={y} value={y}>{y}</MenuItem>
-          ))}
-        </Select>
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          sx={{ minWidth: 160 }}
+          inputProps={{ max: now.toISOString().slice(0, 10) }}
+        />
       </Box>
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="300px">

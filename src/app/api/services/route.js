@@ -22,9 +22,9 @@ export async function GET(req) {
     const findQuery = {
       ownerId: ownerId ? getObjectId(ownerId) : { $exists: true }
     };
-    // if (typeof active !== 'undefined') {
-    //   findQuery.active = active === 'true';
-    // }
+    if (typeof active !== 'undefined') {
+      findQuery.active = active === 'false' ? false : true;
+    }
 
     const services = await servicesCollection
       .find(findQuery)
