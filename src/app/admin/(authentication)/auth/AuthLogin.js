@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Box, Typography, FormGroup, FormControlLabel, Button, Stack, Checkbox, CircularProgress } from "@mui/material";
+import { Box, Typography, FormGroup, FormControlLabel, Stack, Checkbox, CircularProgress } from "@mui/material";
 import Link from "next/link";
 import CustomTextField from "@muahub/app/admin/components/forms/theme-elements/CustomTextField";
 import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
-
+import Button from '@mui/material/Button';
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [account, setAccount] = useState({
     email: "",

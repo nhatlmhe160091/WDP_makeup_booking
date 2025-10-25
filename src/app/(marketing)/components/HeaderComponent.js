@@ -3,11 +3,12 @@
   import { WEB_NAME } from "@muahub/constants/MainContent";
   import CarouselComponent from "./CarouselComponent";
   import Link from "next/link";
-  import { usePathname } from "next/navigation";
-  import { useEffect } from "react";
-  import { useState, useRef } from "react";
+  import { usePathname, useRouter } from "next/navigation";
+  import { useEffect, useState, useRef } from "react";
   import { useApp } from "@muahub/app/contexts/AppContext";
   import { ROLE_MANAGER } from "@muahub/constants/System";
+  import { Badge, IconButton, Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
+  import NotificationsIcon from "@mui/icons-material/Notifications";
 
   const HeaderComponent = () => {
     const pathUrl = usePathname();
@@ -32,6 +33,56 @@
       };
       fetchAllMakeups();
     }, []);
+
+    // Notifications state
+    const [notifications, setNotifications] = useState([]);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [loadingNoti, setLoadingNoti] = useState(false);
+    const router = useRouter();
+
+    // Fetch notifications from API
+    useEffect(() => {
+      const fetchNotifications = async () => {
+        setLoadingNoti(true);
+        try {
+          const res = await fetch(`/api/notifications`);
+          const data = await res.json();
+          if (data.success) setNotifications(data.data);
+        } catch (err) {
+          setNotifications([]);
+        } finally {
+          setLoadingNoti(false);
+        }
+      };
+      fetchNotifications();
+    }, []);
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+
+    const handleOpenMenu = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+    };
+
+    // Mark as read and go to detail
+    const handleReadAndGo = async (item) => {
+      try {
+        await fetch('/api/notifications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: item._id })
+        });
+        setNotifications((prev) => prev.map((n) => n._id === item._id ? { ...n, isRead: true } : n));
+      } catch (e) {}
+      if (item.orderId) {
+        router.push(`/danh-sach-dat-lich?orderId=${item.orderId}`);
+      } else {
+        router.push('/danh-sach-dat-lich');
+      }
+      setAnchorEl(null);
+    };
 
     useEffect(() => {
       setTimeout(() => {
@@ -230,33 +281,73 @@
               <Link href="/lien-he" className={`nav-item nav-link ${pathUrl === "/lien-he" ? "active" : ""}`}>
                 Liên hệ
               </Link>
-              {/* Thêm icon chuông thông báo cho user */}
-              <div className="nav-item nav-link position-relative">
-                <Link href="/thong-bao" className="text-decoration-none text-dark">
-                  <span style={{ position: 'relative', display: 'inline-block' }}>
-                    <i className="fas fa-bell" style={{ fontSize: 18, color: '#fff' }}></i>
-                    <span 
-                      className="badge rounded-pill bg-danger"
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        transform: 'translate(50%,-50%)',
-                        fontSize: 10,
-                        padding: '2px 6px',
-                        minWidth: 16,
-                        height: 16,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 2
+              {/* Thêm icon chuông thông báo cho user với dropdown */}
+              <div className="nav-item nav-link position-relative" style={{ cursor: 'pointer' }} onClick={handleOpenMenu}>
+                <span style={{ position: 'relative', display: 'inline-block' }}>
+                  <i className="fas fa-bell" style={{ fontSize: 18, color: '#fff' }}></i>
+                  <span 
+                    className="badge rounded-pill bg-danger"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      transform: 'translate(50%,-50%)',
+                      fontSize: 10,
+                      padding: '2px 6px',
+                      minWidth: 16,
+                      height: 16,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 2
+                    }}
+                  >
+                    {unreadCount}
+                    <span className="visually-hidden">unread messages</span>
+                  </span>
+                </span>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleCloseMenu}
+                  PaperProps={{ style: { minWidth: 340, maxHeight: 400 } }}
+                >
+                  <Box px={2} py={1} display="flex" alignItems="center" justifyContent="space-between">
+                    <Typography variant="subtitle1">Thông báo</Typography>
+                    {loadingNoti && <CircularProgress size={18} />}
+                  </Box>
+                  {notifications.length === 0 && !loadingNoti && (
+                    <MenuItem disabled>Không có thông báo nào</MenuItem>
+                  )}
+                  {notifications.map((item) => (
+                    <MenuItem
+                      key={item._id}
+                      onClick={() => handleReadAndGo(item)}
+                      sx={{
+                        whiteSpace: 'normal',
+                        alignItems: 'flex-start',
+                        gap: 1,
+                        background: !item.isRead ? 'rgba(255, 243, 224, 0.7)' : 'inherit',
+                        borderLeft: !item.isRead ? '4px solid #ff9800' : '4px solid transparent',
+                        mb: 0.5
                       }}
                     >
-                      3
-                      <span className="visually-hidden">unread messages</span>
-                    </span>
-                  </span>
-                </Link>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        {!item.isRead && <span style={{ width: 8, height: 8, borderRadius: 4, background: '#ff9800', display: 'inline-block' }}></span>}
+                        <Typography
+                          variant="body2"
+                          fontWeight={!item.isRead ? 700 : 400}
+                          color={item.isRead ? 'text.secondary' : 'text.primary'}
+                        >
+                          {item.message}
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.disabled" sx={{ ml: 3 }}>
+                        {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
               </div>
               {/* <div className="nav-item nav-link position-relative">
                 <Link href="/tin-nhan" className="text-decoration-none text-dark">

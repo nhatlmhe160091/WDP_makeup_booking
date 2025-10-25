@@ -6,7 +6,7 @@ import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 import SearchAddressComponent from "../../components/SearchAddressComponent";
 import { ROLE_MANAGER } from "@muahub/constants/System";
-
+import Button from '@mui/material/Button';
 const AuthRegister = ({ title, subtitle, subtext }) => {
   const [account, setAccount] = useState({
     name: "",

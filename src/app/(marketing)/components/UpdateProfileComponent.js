@@ -115,7 +115,7 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
     });
     setFile(null);
   };
-
+if (!currentUser) return <div>Đang tải...</div>;
   return (
     <Form onSubmit={handleUpdate}>
       <Form.Group className="mb-3">

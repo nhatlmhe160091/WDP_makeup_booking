@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Tab, Tabs, Form, Button, Modal } from "react-bootstrap";
+import { Tab, Tabs, Form, Modal } from "react-bootstrap";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
 import UpdateMakeupArtistProfileComponent from "./UpdateMakeupArtistProfileComponent";
@@ -15,7 +15,7 @@ import EmailIcon from "@mui/icons-material/Email";
 //import { ArrowCircleDownOutlined, ExpandCircleDownOutlined, MailOutlined } from "@mui/icons-material";
 import HistoryBankComponent from "./HistoryBankComponent";
 import CreateMakeupArtistProfileComponent from "./CreateMakeupArtistProfileComponent";
-
+import Button from '@mui/material/Button';
 const UserProfileComponent = () => {
   const { currentUser, updateUser } = useApp();
   const [key, setKey] = useState("account");
