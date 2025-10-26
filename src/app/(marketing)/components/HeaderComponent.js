@@ -45,7 +45,7 @@
       const fetchNotifications = async () => {
         setLoadingNoti(true);
         try {
-          const res = await fetch(`/api/notifications`);
+          const res = await fetch(`/api/notifications/user`);
           const data = await res.json();
           if (data.success) setNotifications(data.data);
         } catch (err) {
@@ -310,7 +310,7 @@
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
-                  PaperProps={{ style: { minWidth: 340, maxHeight: 400 } }}
+                  PaperProps={{ style: { minWidth: 320, maxHeight: 400 } }}
                 >
                   <Box px={2} py={1} display="flex" alignItems="center" justifyContent="space-between">
                     <Typography variant="subtitle1">Thông báo</Typography>
@@ -323,28 +323,17 @@
                     <MenuItem
                       key={item._id}
                       onClick={() => handleReadAndGo(item)}
-                      sx={{
-                        whiteSpace: 'normal',
-                        alignItems: 'flex-start',
-                        gap: 1,
-                        background: !item.isRead ? 'rgba(255, 243, 224, 0.7)' : 'inherit',
-                        borderLeft: !item.isRead ? '4px solid #ff9800' : '4px solid transparent',
-                        mb: 0.5
-                      }}
+                      selected={!item.isRead}
+                      sx={{ whiteSpace: 'normal', alignItems: 'flex-start', gap: 1 }}
                     >
-                      <Box display="flex" alignItems="center" gap={1}>
-                        {!item.isRead && <span style={{ width: 8, height: 8, borderRadius: 4, background: '#ff9800', display: 'inline-block' }}></span>}
-                        <Typography
-                          variant="body2"
-                          fontWeight={!item.isRead ? 700 : 400}
-                          color={item.isRead ? 'text.secondary' : 'text.primary'}
-                        >
-                          {item.message}
+                      <Box>
+                        <Typography variant="body2" color={item.isRead ? 'text.secondary' : 'text.primary'}>
+                          {item.message || 'Thông báo mới'}
+                        </Typography>
+                        <Typography variant="caption" color="text.disabled">
+                          {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
                         </Typography>
                       </Box>
-                      <Typography variant="caption" color="text.disabled" sx={{ ml: 3 }}>
-                        {item.created_at ? new Date(item.created_at).toLocaleString() : ''}
-                      </Typography>
                     </MenuItem>
                   ))}
                 </Menu>

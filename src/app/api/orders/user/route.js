@@ -161,7 +161,7 @@ export async function POST(req) {
         userId: objectId,
         type: "user",
         orderId: newOrder._id,
-        message: "Đặt lịch trong ngày đã được tự động xác nhận cọc, vui lòng xác nhận dịch vụ để hoàn tất đặt lịch.",
+        message: "Đặt lịch trong ngày đã được tự động xác nhận cọc",
         isRead: false,
         created_at: now,
         updated_at: now
