@@ -18,11 +18,11 @@ export default function RootLayout({ children }) {
             {children}
             <Toaster />
             {/* loading full screen */}
-            <div className="loading position-fixed" id="loading-full-screen">
+            {/* <div className="loading position-fixed" id="loading-full-screen">
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
-            </div>
+            </div> */}
           </AppProvider>
         </Providers>
       </body>

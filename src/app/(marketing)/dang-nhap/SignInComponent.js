@@ -5,12 +5,14 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
+import { useApp } from "@muahub/app/contexts/AppContext";
 const SignInComponent = () => {
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { refreshUserData } = useApp();
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -56,6 +58,8 @@ const SignInComponent = () => {
         }
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
+        // Refresh user data before navigation
+        await refreshUserData();
         if (res.payload.role === "admin") {
           router.push("/admin");
         } else if (res.payload.role === "makeup_artist") {
@@ -80,9 +84,16 @@ const SignInComponent = () => {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/" });
+      const result = await signIn("google", { redirect: false });
+      if (result?.error) {
+        toast.error("Đăng nhập bằng Google thất bại");
+      } else {
+        await refreshUserData();
+        router.push("/");
+      }
     } catch (error) {
       toast.error("Đăng nhập bằng Google thất bại");
+    } finally {
       setLoading(false);
     }
   };

@@ -136,14 +136,14 @@ export async function PUT(req) {
     }
     // Nếu artistId là user thường thì kiểm tra MUA_requests
     const user = await usersCollection.findOne({ _id: getObjectId(artistId) });
-    console.log("[DEBUG] PUT profile - artistId:", artistId, "user:", user);
+    //console.log("[DEBUG] PUT profile - artistId:", artistId, "user:", user);
     if (user && user.role === "user") {
       // Nếu có request bị từ chối thì update lại thành pending
       const updateResult = await MUARequestsCollection.updateMany(
         { userId: artistId, status: { $in: ["rejected", "reject"] } },
         { $set: { status: "pending", reason: "" } }
       );
-      console.log("[DEBUG] Update MUA_requests result:", updateResult);
+     // console.log("[DEBUG] Update MUA_requests result:", updateResult);
     }
     // Chuẩn bị dữ liệu cập nhật
     const updateFields = {};

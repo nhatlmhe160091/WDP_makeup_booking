@@ -9,6 +9,14 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const loadingState = useRef(false);
   const router = useRouter();
+  // Add authTrigger state to force re-fetch
+  const [authTrigger, setAuthTrigger] = useState(0);
+
+  // Function to force refresh user data
+  const refreshUserData = () => {
+    setAuthTrigger(prev => prev + 1);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       loadingState.current = true;
@@ -20,10 +28,7 @@ export function AppProvider({ children }) {
         setUser({});
         // save current url
         localStorage.setItem("redirectUrl", window.location.pathname);
-
-        // redirect to login page
         setLoading(false);
-        // router.push("/login");
       } else {
         try {
           const res = await SendRequest("GET", "/api/users/me");
@@ -33,8 +38,6 @@ export function AppProvider({ children }) {
           } else {
             // save current url
             localStorage.setItem("redirectUrl", window.location.pathname);
-
-            // redirect to/login page
             setLoading(false);
             // remove token
             localStorage.removeItem("token");
@@ -51,10 +54,10 @@ export function AppProvider({ children }) {
     if (!loadingState.current) {
       fetchData();
     }
-  }, []);
+  }, [authTrigger]); // Add authTrigger to dependencies
 
   return (
-    <AppContext.Provider value={{ currentUser: user, updateUser: setUser, loading }}>{children}</AppContext.Provider>
+    <AppContext.Provider value={{ currentUser: user, updateUser: setUser, loading, refreshUserData }}>{children}</AppContext.Provider>
   );
 }
 

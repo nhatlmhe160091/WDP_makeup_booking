@@ -56,7 +56,7 @@ export async function POST(request) {
     const commentsCollection = db.collection("comments");
 
     const body = await request.json();
-    console.log("Request body:", body); // Debug
+   // console.log("Request body:", body); // Debug
 
     // Kiểm tra dữ liệu đầu vào
     if (!body.serviceId || !body.content || !body.userId) {
@@ -77,7 +77,7 @@ export async function POST(request) {
     };
 
     const result = await commentsCollection.insertOne(newComment);
-    console.log("Inserted comment ID:", result.insertedId); // Debug
+    //console.log("Inserted comment ID:", result.insertedId); // Debug
 
     return NextResponse.json({
       success: true,
@@ -97,7 +97,7 @@ export async function PUT(request) {
     const commentsCollection = db.collection("comments");
 
     const body = await request.json();
-    console.log("Request body for update:", body); // Debug
+   // console.log("Request body for update:", body); // Debug
 
     // Kiểm tra dữ liệu đầu vào
     if (!body._id || !body.content) {
@@ -109,7 +109,7 @@ export async function PUT(request) {
       { _id: getObjectId(body._id) },
       { $set: { content: body.content, updated_at: new Date() } }
     );
-    console.log("Update result:", result); // Debug
+   // console.log("Update result:", result); // Debug
     if (result.matchedCount === 0) {
       return NextResponse.json({ success: false, error: "Comment not found" }, { status: 404 });
     }
@@ -132,7 +132,7 @@ export async function DELETE(request) {
     const commentsCollection = db.collection("comments");
 
     const body = await request.json();
-    console.log("Request body for delete:", body); // Debug
+  //  console.log("Request body for delete:", body); // Debug
 
     // Kiểm tra dữ liệu đầu vào
     if (!body._id) {
@@ -141,7 +141,7 @@ export async function DELETE(request) {
 
     // Xóa comment
     const result = await commentsCollection.deleteOne({ _id: getObjectId(body._id) });
-    console.log("Delete result:", result); // Debug
+    //console.log("Delete result:", result); // Debug
     if (result.deletedCount === 0) {
       return NextResponse.json({ success: false, error: "Comment not found" }, { status: 404 });
     }

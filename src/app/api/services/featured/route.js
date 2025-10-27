@@ -26,7 +26,7 @@ export async function GET(req) {
       })
       .toArray();
 
-    console.log("Artists before filter:", artists);
+    // console.log("Artists before filter:", artists);
     
     // Lọc và sắp xếp artists theo độ ưu tiên của gói
     const filteredArtists = artists
@@ -98,19 +98,19 @@ export async function GET(req) {
         }
       })
       .toArray();
-    
-    console.log("Query for profiles:", {
-      artistIds: filteredArtists.map(artist => artist._id.toString()),
-      foundProfiles: artistProfiles
-    });
 
-    console.log("Artist IDs being searched:", filteredArtists.map(artist => artist._id));
-    console.log("Found Artist Profiles:", artistProfiles);
-    console.log("Collection Name being used:", COLLECTION_NAME);
+    // console.log("Query for profiles:", {
+    //   artistIds: filteredArtists.map(artist => artist._id.toString()),
+    //   foundProfiles: artistProfiles
+    // });
+
+    // console.log("Artist IDs being searched:", filteredArtists.map(artist => artist._id));
+    // console.log("Found Artist Profiles:", artistProfiles);
+    // console.log("Collection Name being used:", COLLECTION_NAME);
 
     // Tạo map cho profiles để dễ truy cập
     const profilesMap = new Map(artistProfiles.map(profile => [profile.artistId.toString(), profile]));
-    console.log("Profiles Map:", Object.fromEntries(profilesMap));
+    // console.log("Profiles Map:", Object.fromEntries(profilesMap));
 
     // Tạo map các artist theo ID để dễ dàng truy cập thông tin
     const artistsMap = new Map(filteredArtists.map(artist => [artist._id.toString(), artist]));
@@ -118,18 +118,18 @@ export async function GET(req) {
     // Thêm thông tin của makeup artist vào mỗi dịch vụ
     const servicesWithArtists = sortedServices.map(service => {
       const artist = artistsMap.get(service.ownerId.toString());
-      console.log("Processing service for artist:", {
-        serviceOwnerId: service.ownerId,
-        artistFound: !!artist,
-        artistId: artist?._id
-      });
+      // console.log("Processing service for artist:", {
+      //   serviceOwnerId: service.ownerId,
+      //   artistFound: !!artist,
+      //   artistId: artist?._id
+      // });
       
       const profile = artist ? profilesMap.get(artist._id.toString()) : null;
-      console.log("Found profile:", {
-        artistId: artist?._id,
-        profileFound: !!profile,
-        profileData: profile
-      });
+      // console.log("Found profile:", {
+      //   artistId: artist?._id,
+      //   profileFound: !!profile,
+      //   profileData: profile
+      // });
       
       return {
         ...service,

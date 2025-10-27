@@ -1,6 +1,4 @@
 "use client";
-
-
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@muahub/utils/Main";
 import Link from "next/link";

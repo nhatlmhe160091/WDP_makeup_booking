@@ -107,8 +107,8 @@ const WebsitePaymentPage = () => {
       console.error("Error fetching current user:", error);
     }
   }, []);
-console.log('Current Plan:', currentPlan);
-console.log('Current Payment Amount:', currentPaymentAmount);
+// console.log('Current Plan:', currentPlan);
+// console.log('Current Payment Amount:', currentPaymentAmount);
   // Thêm hàm fetch lịch sử thanh toán
   const fetchPaymentHistory = useCallback(async () => {
     try {
@@ -390,11 +390,11 @@ console.log('Current Payment Amount:', currentPaymentAmount);
                 } else if (paymentMethod === "payos") {
                   if (item.data) {
                     // Log để so sánh orderCode
-                    console.log('[PAYOS] So sánh:', {
-                      itemOrderCode: item.data.orderCode,
-                      pollingOrderCode: orderCode,
-                      equal: String(item.data.orderCode) === String(orderCode)
-                    });
+                    // console.log('[PAYOS] So sánh:', {
+                    //   itemOrderCode: item.data.orderCode,
+                    //   pollingOrderCode: orderCode,
+                    //   equal: String(item.data.orderCode) === String(orderCode)
+                    // });
                     if (String(item.data.orderCode) === String(orderCode)) {
                       console.log('[PAYOS] Payment confirmed for orderCode:', orderCode);
                       paymentDone = true;

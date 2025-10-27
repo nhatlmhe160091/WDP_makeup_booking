@@ -12,7 +12,7 @@
   
   const HeaderComponent = () => {
     const pathUrl = usePathname();
-    const { currentUser } = useApp();
+    const { currentUser, refreshUserData } = useApp();
     const { data: session } = useSession();
     const isLoggedIn = currentUser && Object.keys(currentUser).length > 0 || session?.user;
     const [allMakeups, setAllMakeups] = useState([]);
@@ -218,12 +218,29 @@
     };
 
     const logout = async () => {
-      // Logout from both traditional and Google auth
-      localStorage.removeItem("token");
-      if (session) {
-        await signOut({ redirect: false });
+      try {
+        // Xóa token trước
+       localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("redirectUrl");
+      localStorage.removeItem("nextauth.message");
+        
+        // Đăng xuất Google nếu đang dùng session
+        if (session) {
+          await signOut({ redirect: false });
+        }
+
+        // Đợi refresh user data hoàn tất
+        await refreshUserData();
+
+        // Sau khi mọi thứ hoàn tất mới chuyển trang
+        router.push("/");
+      } catch (error) {
+        console.error("Logout error:", error);
+        // Vẫn refresh user data và chuyển trang ngay cả khi có lỗi
+        await refreshUserData();
+        router.push("/");
       }
-      router.push("/");
     };
     // console.log(11111, currentUser);
   // console.log("showResults", showResults);

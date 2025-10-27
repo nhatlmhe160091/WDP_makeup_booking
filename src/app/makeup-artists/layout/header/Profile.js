@@ -8,8 +8,10 @@ import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER_TEXT } from "@muahub/constants/System";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 const Profile = () => {
-  const { currentUser } = useApp();
+  const { currentUser, refreshUserData } = useApp();
+  const { data: session } = useSession();
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [currentUserMe, setCurrentUserMe] = useState(null);
   const [remainingDays, setRemainingDays] = useState(0);
@@ -21,10 +23,30 @@ const Profile = () => {
     setAnchorEl2(null);
   };
 
-  const logout = () => {
-    // Logout
-    localStorage.removeItem("token");
-    router.push("/dang-nhap");
+  const logout = async () => {
+    try {
+      // Xóa token trước
+     localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("redirectUrl");
+      localStorage.removeItem("nextauth.message");
+      
+      // Đăng xuất Google nếu đang dùng session
+      if (session) {
+        await signOut({ redirect: false });
+      }
+
+      // Đợi refresh user data hoàn tất
+      await refreshUserData();
+
+      // Sau khi mọi thứ hoàn tất mới chuyển trang
+        window.location.href = "/";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Vẫn refresh user data và chuyển trang ngay cả khi có lỗi
+      await refreshUserData();
+      window.location.href = "/";
+    }
   };
   // call api me
   const fetchMe = useCallback(async () => {

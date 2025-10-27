@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const ImagePreviewModal = ({ show, image, onClose, total, index }) => {
    // State for preview image modal
   const [previewImage, setPreviewImage] = useState({ show: false, image: '', index: 0, total: 0 });
-  if (!show) return null;
+  if (!previewImage.show) return null;
   return (
     <div
       style={{

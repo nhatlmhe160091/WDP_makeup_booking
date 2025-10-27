@@ -21,12 +21,12 @@ const AdminLayout = ({ children }) => {
     return;
   }
 
-  const url = ["/makeup-artists/dang-nhap", "/makeup-artists/dang-ky"];
+  // const url = ["/dang-nhap", "/dang-ky"];
 
-  if (!loading && Object.keys(currentUser).length === 0 && !url.includes(pathUrl)) {
-    router.push("/makeup-artists/dang-nhap");
-    return;
-  }
+  // if (!loading && !currentUser?.role && !url.includes(pathUrl)) {
+  //   router.push("/dang-nhap");
+  //   return;
+  // }
 
   return (
     <ThemeProvider theme={baselightTheme}>
