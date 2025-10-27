@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@muahub/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+// import { writeFile, mkdir } from "fs/promises";
+// import path from "path";
 
 // GET - Lấy danh sách banners
 export async function GET(req) {

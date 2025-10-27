@@ -1,4 +1,4 @@
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+// import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { Toaster } from "react-hot-toast";
 import { AppProvider } from "./contexts/AppContext";
 

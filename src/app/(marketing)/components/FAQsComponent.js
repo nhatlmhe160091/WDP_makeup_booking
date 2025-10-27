@@ -1,6 +1,6 @@
 "use client";
 import { Accordion, Card, Button } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 const FAQsComponent = () => {
   const faqs = [

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import "@muahub/styles/style.css";
-import Script from "next/script";
+// import Script from "next/script";
 import META_DATA from "./metaData";
 import { ADDRESS, EMAIL, MAIN_URL_APP, PHONE_NUMBER } from "@muahub/constants/MainContent";
 import ContactFormComponent from "../components/ContactFormComponent";

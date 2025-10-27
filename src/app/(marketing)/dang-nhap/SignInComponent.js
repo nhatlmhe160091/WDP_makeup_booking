@@ -3,11 +3,12 @@ import SendRequest from "@muahub/utils/SendRequest";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
+import { useRouter } from "next/navigation";
 const SignInComponent = () => {
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const validateForm = () => {
     let validationErrors = {};
@@ -40,11 +41,11 @@ const SignInComponent = () => {
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
         if (res.payload.role === "admin") {
-          window.location.href = "/admin";
+          router.push("/admin");
         } else if (res.payload.role === "makeup_artist") {
-          window.location.href = "/makeup-artists";
+          router.push("/makeup-artists");
         } else {
-          window.location.href = "/";
+          router.push("/");
         }
       } else {
         toast.error("Đăng nhập thất bại, vui lòng kiểm tra thông tin của bạn.");

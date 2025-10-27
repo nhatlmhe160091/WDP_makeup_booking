@@ -1,12 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import "@muahub/styles/style.css";
-import Script from "next/script";
+//import Script from "next/script";
 import AboutUsComponent from "../components/AboutUsComponent";
 import OurFeaturesComponent from "../components/OurFeaturesComponent";
 import OurOfferComponent from "../components/OurOfferComponent";
-import FAQsComponent from "../components/FAQsComponent";
+//import FAQsComponent from "../components/FAQsComponent";
 import OurTeamComponent from "../components/OurTeamComponent";
-import TestimonialComponent from "../components/TestimonialComponent";
+//import TestimonialComponent from "../components/TestimonialComponent";
 import META_DATA from "./metaData";
 
 export const metadata = {

@@ -8,16 +8,16 @@
   import { useApp } from "@muahub/app/contexts/AppContext";
   import { ROLE_MANAGER } from "@muahub/constants/System";
   import { Badge, IconButton, Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
-  import NotificationsIcon from "@mui/icons-material/Notifications";
-
+  
   const HeaderComponent = () => {
     const pathUrl = usePathname();
     const { currentUser } = useApp();
+    const isLoggedIn = currentUser && Object.keys(currentUser).length > 0;
     const [allMakeups, setAllMakeups] = useState([]);
     const [searchValue, setSearchValue] = useState("");
     const [showResults, setShowResults] = useState(false);
     const [focusedIndex, setFocusedIndex] = useState(-1);
-
+    
     // Load all makeups once when component mounts
     useEffect(() => {
       const fetchAllMakeups = async () => {
@@ -40,12 +40,20 @@
     const [loadingNoti, setLoadingNoti] = useState(false);
     const router = useRouter();
 
-    // Fetch notifications from API
+    // Fetch notifications from API when user is logged in
     useEffect(() => {
       const fetchNotifications = async () => {
+        if (!isLoggedIn) return; // don't fetch for anonymous users
         setLoadingNoti(true);
         try {
-          const res = await fetch(`/api/notifications/user`);
+          const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+          const userIdParam = currentUser?._id || currentUser?.id || currentUser?.userId;
+          let url = '/api/notifications/user';
+          if (userIdParam) url += `?userId=${encodeURIComponent(userIdParam)}`;
+
+          const res = await fetch(url, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          });
           const data = await res.json();
           if (data.success) setNotifications(data.data);
         } catch (err) {
@@ -55,12 +63,13 @@
         }
       };
       fetchNotifications();
-    }, []);
+    }, [isLoggedIn, currentUser]);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const handleOpenMenu = (event) => {
-      setAnchorEl(event.currentTarget);
+      // toggle: if already open, close it; otherwise open with the clicked element
+      setAnchorEl((prev) => (prev ? null : event.currentTarget));
     };
     const handleCloseMenu = () => {
       setAnchorEl(null);
@@ -177,7 +186,7 @@
         e.preventDefault();
         const selected = filtered[focusedIndex];
         if (selected) {
-          window.location.href = `/dich-vu/${selected._id}`;
+          router.push(`/dich-vu/${selected._id}`);
         }
       } else if (e.key === "Escape") {
         setShowResults(false);
@@ -188,7 +197,7 @@
     const logout = () => {
       // Logout
       localStorage.removeItem("token");
-      window.location.href = "/";
+      router.push("/");
     };
     // console.log(11111, currentUser);
   // console.log("showResults", showResults);
@@ -253,36 +262,39 @@
               <Link href="/dich-vu" className={`nav-item nav-link ${pathUrl === "/dich-vu" ? "active" : ""}`}>
                 Danh sách dịch vụ
               </Link>
-              <Link href="/yeu-thich" className={`nav-item nav-link ${pathUrl === "/yeu-thich" ? "active" : ""}`}>
-                <span style={{ position: 'relative', display: 'inline-block' }}>
-                  Yêu thích
-                  <span 
-                    className="badge rounded-pill bg-danger"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      transform: 'translate(50%,-50%)',
-                      fontSize: 10,
-                      padding: '2px 6px',
-                      minWidth: 16,
-                      height: 16,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      zIndex: 2
-                    }}
-                  >
-                    2
-                    <span className="visually-hidden">favorite items</span>
+              {isLoggedIn && (
+                <Link href="/yeu-thich" className={`nav-item nav-link ${pathUrl === "/yeu-thich" ? "active" : ""}`}>
+                  <span style={{ position: 'relative', display: 'inline-block' }}>
+                    Yêu thích
+                    <span 
+                      className="badge rounded-pill bg-danger"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        transform: 'translate(50%,-50%)',
+                        fontSize: 10,
+                        padding: '2px 6px',
+                        minWidth: 16,
+                        height: 16,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2
+                      }}
+                    >
+                      2
+                      <span className="visually-hidden">favorite items</span>
+                    </span>
                   </span>
-                </span>
-              </Link>
+                </Link>
+              )}
               <Link href="/lien-he" className={`nav-item nav-link ${pathUrl === "/lien-he" ? "active" : ""}`}>
                 Liên hệ
               </Link>
               {/* Thêm icon chuông thông báo cho user với dropdown */}
-              <div className="nav-item nav-link position-relative" style={{ cursor: 'pointer' }} onClick={handleOpenMenu}>
+              {isLoggedIn && (
+                <div className="nav-item nav-link position-relative" style={{ cursor: 'pointer' }} onClick={handleOpenMenu}>
                 <span style={{ position: 'relative', display: 'inline-block' }}>
                   <i className="fas fa-bell" style={{ fontSize: 18, color: '#fff' }}></i>
                   <span 
@@ -337,7 +349,8 @@
                     </MenuItem>
                   ))}
                 </Menu>
-              </div>
+                </div>
+              )}
               {/* <div className="nav-item nav-link position-relative">
                 <Link href="/tin-nhan" className="text-decoration-none text-dark">
                   <i className="fas fa-comment" style={{ fontSize: 18 }}></i>

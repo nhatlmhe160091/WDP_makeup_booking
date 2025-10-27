@@ -10,20 +10,21 @@ import LoadingFullScreen from "./components/Loading/LoadingFullScreen";
 import "./baseCss.css";
 import { useApp } from "../contexts/AppContext";
 import { ROLE_MANAGER } from "@muahub/constants/System";
-
+import { useRouter } from "next/navigation";
 const AdminLayout = ({ children }) => {
   const { currentUser, loading } = useApp();
   const pathUrl = usePathname();
+  const router = useRouter();
 
   if (currentUser.role === ROLE_MANAGER.USER) {
-    window.location.href = "/";
+    router.push("/");
     return;
   }
 
   const url = ["/makeup-artists/dang-nhap", "/makeup-artists/dang-ky"];
 
   if (!loading && Object.keys(currentUser).length === 0 && !url.includes(pathUrl)) {
-    window.location.href = "/makeup-artists/dang-nhap";
+    router.push("/makeup-artists/dang-nhap");
     return;
   }
 

@@ -120,19 +120,7 @@ const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTim
               />
             </Grid>
 
-            <Grid item xs={4}>
-              <TextField
-                label="Số lượng"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={packages[fieldIndex].count}
-                onChange={(e) => {
-                  handleFieldChange(fieldIndex, "count", e.target.value);
-                }}
-                disabled={!packages[fieldIndex].isAvailable}
-              />
-            </Grid>
+
 
             <Grid item xs={4}>
               <TextField

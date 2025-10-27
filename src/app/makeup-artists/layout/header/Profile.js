@@ -7,13 +7,13 @@ import { IconKey, IconUser, IconUserEdit } from "@tabler/icons-react";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER_TEXT } from "@muahub/constants/System";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 const Profile = () => {
   const { currentUser } = useApp();
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [currentUserMe, setCurrentUserMe] = useState(null);
   const [remainingDays, setRemainingDays] = useState(0);
-
+  const router = useRouter();
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);
   };
@@ -24,7 +24,7 @@ const Profile = () => {
   const logout = () => {
     // Logout
     localStorage.removeItem("token");
-    window.location.href = "/dang-nhap";
+    router.push("/dang-nhap");
   };
   // call api me
   const fetchMe = useCallback(async () => {

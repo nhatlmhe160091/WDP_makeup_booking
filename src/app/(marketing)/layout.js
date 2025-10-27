@@ -4,21 +4,22 @@ import FooterComponent from "./components/FooterComponent";
 import HeaderComponent from "./components/HeaderComponent";
 import { useApp } from "../contexts/AppContext";
 import { usePathname } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 const UserAppLayout = ({ children }) => {
   const { currentUser, loading } = useApp();
   const pathUrl = usePathname();
+  const router = useRouter();
 
   const linkNeedAuth = ["/trang-ca-nhan"];
   const linkNeedNotAuth = ["/quen-mat-khau", "/dang-nhap", "/dang-ky"];
 
   if (!loading && Object.keys(currentUser).length === 0 && linkNeedAuth.includes(pathUrl)) {
-    window.location.href = "/dang-nhap";
+    router.push("/dang-nhap");
     return null; // Prevent rendering while redirecting
   }
 
   if (!loading && Object.keys(currentUser).length > 0 && linkNeedNotAuth.includes(pathUrl)) {
-    window.location.href = "/trang-ca-nhan";
+    router.push("/trang-ca-nhan");
     return null; // Prevent rendering while redirecting
   }
 

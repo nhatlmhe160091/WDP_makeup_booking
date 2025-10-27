@@ -18,7 +18,11 @@ export async function GET(req) {
     const isRead = searchParams.get("isRead");
 
     const query = { type: "user" };
-    if (userId) query.userId = getObjectId(userId);
+    // If no userId provided, return empty list (don't expose notifications)
+    if (!userId) {
+      return NextResponse.json({ success: true, data: [] });
+    }
+    query.userId = getObjectId(userId);
     if (isRead !== null && isRead !== undefined) query.isRead = isRead === "true";
 
     const notifications = await notificationsCollection

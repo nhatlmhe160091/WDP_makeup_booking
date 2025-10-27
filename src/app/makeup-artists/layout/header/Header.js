@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button, Menu, MenuItem, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-import Link from "next/link";
+// import Link from "next/link";
 import { useRouter } from "next/navigation";
 // components
 import Profile from "./Profile";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Menuitems from "./MenuItems";
 import { usePathname } from "next/navigation";
 import { Box, List } from "@mui/material";
@@ -6,19 +6,27 @@ import NavItem from "./NavItem";
 import NavGroup from "./NavGroup/NavGroup";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import { ROLE_MANAGER } from "@muahub/constants/System";
-
+  import { useRouter } from "next/navigation";
 const SidebarItems = ({ toggleMobileSidebar }) => {
   const { currentUser } = useApp();
   const pathname = usePathname();
   const pathDirect = pathname;
-
-  if (currentUser.role === ROLE_MANAGER.MUA && !currentUser.payment_type) {
-    if (pathname !== "/admin/thanh-toan-nen-tang") {
-      if (typeof window !== "undefined") {
-        window.location.href = "/admin/thanh-toan-nen-tang";
-      }
-      return null;
+  const router = useRouter();
+  useEffect(() => {
+    if (
+      currentUser.role === ROLE_MANAGER.MUA &&
+      !currentUser.payment_type &&
+      pathname !== "/admin/thanh-toan-nen-tang"
+    ) {
+      router.push("/admin/thanh-toan-nen-tang");
     }
+  }, [currentUser, pathname, router]);
+
+  if (
+    currentUser.role === ROLE_MANAGER.MUA &&
+    !currentUser.payment_type &&
+    pathname === "/admin/thanh-toan-nen-tang"
+  ) {
     return (
       <Box sx={{ px: 3 }}>
         <div style={{ padding: "16px", textAlign: "center", color: "#888" }}>

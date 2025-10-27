@@ -123,7 +123,7 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
           </div>
         </div>
         <div className="card-body d-flex flex-column">
-          <Link href={`/makeup-artists/${field.ownerId}`} className="text-decoration-none">
+          <Link href={`/make-up/${field._id}`} className="text-decoration-none">
             <h5 className="card-title" style={{ color: "#ff5c95ff", fontWeight: "600" }}>
               {displayName}
             </h5>

@@ -1,6 +1,90 @@
 "use client";
 
 import { useEffect, useState } from "react";
+// Simple modal for image preview
+const ImagePreviewModal = ({ show, image, onClose, total, index }) => {
+   // State for preview image modal
+  const [previewImage, setPreviewImage] = useState({ show: false, image: '', index: 0, total: 0 });
+  if (!show) return null;
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0,0,0,0.7)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'background 0.2s',
+        cursor: 'zoom-out',
+      }}
+      onClick={onClose}
+    >
+      <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+        <img
+          src={image}
+          alt="Xem ảnh lớn"
+          style={{
+            maxWidth: '90vw',
+            maxHeight: '80vh',
+            borderRadius: 18,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+            background: '#fff',
+            display: 'block',
+            margin: '0 auto',
+            objectFit: 'contain',
+          }}
+          onClick={e => e.stopPropagation()}
+        />
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            right: 24,
+            background: '#ff5c95',
+            color: '#fff',
+            borderRadius: 12,
+            fontSize: 15,
+            padding: '4px 16px',
+            opacity: 0.95,
+            fontWeight: 500,
+            letterSpacing: 0.5,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.10)'
+          }}
+        >
+          Ảnh {index + 1}/{total}
+        </span>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            background: 'rgba(0,0,0,0.5)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '50%',
+            width: 36,
+            height: 36,
+            fontSize: 22,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2
+          }}
+          aria-label="Đóng"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+};
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -21,6 +105,9 @@ const MakeupServiceDetail = () => {
   const { currentUser } = useApp();
   const pathUrl = usePathname();
   const id = pathUrl.split("/").pop();
+
+  // State for preview image modal
+  const [previewImage, setPreviewImage] = useState({ show: false, image: '', index: 0, total: 0 });
 
   const [serviceData, setServiceData] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -305,7 +392,7 @@ const MakeupServiceDetail = () => {
   };
    
   const isServiceOwner = (userId) => {
-    return serviceData && serviceData.owner && serviceData.owner._id === userId;
+    return serviceData && serviceData?.owner && serviceData?.owner._id === userId;
   };
 
   if (!serviceData) return <p className="text-center">Đang tải dữ liệu...</p>;
@@ -318,11 +405,11 @@ const MakeupServiceDetail = () => {
             <div className="card-body">
               <div className="d-flex align-items-center mb-4">
                 <div className="flex-shrink-0">
-                  <Link href={`/makeup-artists/${serviceData.owner._id}`} className="text-decoration-none">
+                  <Link href={`/makeup-artists/${serviceData?.owner._id}`} className="text-decoration-none">
                     <div className="position-relative">
                       <Avatar
-                        alt={serviceData.owner.name}
-                        src={serviceData.owner.avatar}
+                        alt={serviceData?.owner.name}
+                        src={serviceData?.owner.avatar}
                         sx={{ width: 80, height: 80, cursor: 'pointer' }}
                       />
                       <div 
@@ -342,17 +429,17 @@ const MakeupServiceDetail = () => {
                   </Link>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{serviceData.serviceName}</h2>
+                  <h2 className="mb-1" style={{ color: '#ff5c95ff' }}>{serviceData?.serviceName}</h2>
                   <p className="text-muted mb-0">
                     <i className="fas fa-user-circle me-2"></i>
                     Chuyên viên: {' '}
-                    <Link href={`/makeup-artists/${serviceData.owner._id}`} className="text-decoration-none">
-                      <strong className="text-primary" style={{ cursor: 'pointer' }}>{serviceData.owner.name}</strong>
+                    <Link href={`/makeup-artists/${serviceData?.owner._id}`} className="text-decoration-none">
+                      <strong className="text-primary" style={{ cursor: 'pointer' }}>{serviceData?.owner.name}</strong>
                     </Link>
-                    {serviceData.owner.phone && (
-                      <a href={`tel:${serviceData.owner.phone}`} className="ms-2 text-decoration-none">
+                    {serviceData?.owner.phone && (
+                      <a href={`tel:${serviceData?.owner.phone}`} className="ms-2 text-decoration-none">
                         <i className="fas fa-phone-alt me-1"></i>
-                        {serviceData.owner.phone}
+                        {serviceData?.owner.phone}
                       </a>
                     )}
                   </p>
@@ -365,7 +452,7 @@ const MakeupServiceDetail = () => {
                     <i className="fas fa-map-marker-alt text-primary me-2"></i>
                     <div>
                       <small className="text-muted d-block">Địa điểm</small>
-                      <strong>{serviceData.locationDetail}, {serviceData.location}</strong>
+                      <strong>{serviceData?.locationDetail}, {serviceData?.location}</strong>
                     </div>
                   </div>
                 </div>
@@ -374,18 +461,18 @@ const MakeupServiceDetail = () => {
                     <i className="fas fa-clock text-primary me-2"></i>
                     <div>
                       <small className="text-muted d-block">Giờ làm việc</small>
-                      <strong>{serviceData.openingTime} - {serviceData.closingTime}</strong>
+                      <strong>{serviceData?.openingTime} - {serviceData?.closingTime}</strong>
                     </div>
                   </div>
                 </div>
-                {(serviceData.experienceYears || serviceData.experienceMonths) && (
+                {(serviceData?.experienceYears || serviceData?.experienceMonths) && (
                   <div className="col-md-6">
                     <div className="d-flex align-items-center">
                       <i className="fas fa-medal text-primary me-2"></i>
                       <div>
                         <small className="text-muted d-block">Kinh nghiệm</small>
                         <strong>
-                          {serviceData.experienceYears || 0} năm {serviceData.experienceMonths || 0} tháng
+                          {serviceData?.experienceYears || 0} năm {serviceData?.experienceMonths || 0} tháng
                         </strong>
                       </div>
                     </div>
@@ -399,7 +486,7 @@ const MakeupServiceDetail = () => {
                   Bảng giá dịch vụ
                 </h5>
                 <div className="row g-3">
-                  {Object.values(serviceData.packages)
+                  {Object.values(serviceData?.packages)
                     .filter((f) => f.isAvailable)
                     .map((service, index) => (
                       <div key={index} className="col-md-6">
@@ -495,23 +582,112 @@ const MakeupServiceDetail = () => {
           />
         )}
         <div className="col-md-12 mt-4">
-          <h4>Mô tả dịch vụ</h4>
-          <p>{serviceData.description}</p>
-          <Swiper modules={[Navigation, Pagination]} navigation pagination={{ clickable: true }} className="mb-4">
-            {serviceData.images.map((image, index) => (
-              <SwiperSlide key={index}>
-                <img src={image} className="img-fluid w-100 rounded" alt="Gói dịch vụ" />
-                 {/* <img src={"/img/ab0.jpg"} className="img-fluid w-100 rounded" alt="Gói dịch vụ" /> */}
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          <h4 className="mb-3" style={{ color: '#ff5c95', fontWeight: 600, letterSpacing: 1 }}>Mô tả dịch vụ</h4>
+          <p style={{ fontSize: 17, color: '#444', marginBottom: 24 }}>{serviceData?.description}</p>
+          <div className="mb-4">
+            {Array.isArray(serviceData?.images) && serviceData.images.length > 0 ? (
+              <>
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  navigation
+                  pagination={{ clickable: true }}
+                  className="service-image-swiper"
+                  style={{ maxWidth: 650, margin: '0 auto', padding: '0 8px' }}
+                >
+                  {serviceData.images.map((image, index) => (
+                    <SwiperSlide key={index}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: 340,
+                          background: 'linear-gradient(135deg, #fff6fa 60%, #ffe3ed 100%)',
+                          borderRadius: 22,
+                          border: '2px solid #ff5c95',
+                          boxShadow: '0 4px 16px rgba(255,92,149,0.08)',
+                          position: 'relative',
+                          transition: 'box-shadow 0.2s',
+                          overflow: 'hidden',
+                          margin: '0 auto',
+                          maxWidth: 600
+                        }}
+                        className="service-image-slide"
+                      >
+                        <img
+                          src={image}
+                          className="img-fluid rounded-4"
+                          alt={`Ảnh dịch vụ ${index + 1}`}
+                          style={{
+                            maxHeight: 300,
+                            maxWidth: '100%',
+                            objectFit: 'cover',
+                            margin: '0 auto',
+                            display: 'block',
+                            background: '#fff',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            borderRadius: 18,
+                            transition: 'transform 0.2s',
+                            cursor: 'zoom-in',
+                          }}
+                          onError={e => { e.target.onerror = null; e.target.src = '/img/ab0.jpg'; }}
+                          onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+                          onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+                          onClick={() => {
+                            setPreviewImage({
+                              show: true,
+                              image,
+                              index,
+                              total: serviceData.images.length
+                            });
+                          }}
+                        />
+                        <span
+                          style={{
+                            position: 'absolute',
+                            bottom: 10,
+                            right: 18,
+                            background: '#ff5c95',
+                            color: '#fff',
+                            borderRadius: 12,
+                            fontSize: 13,
+                            padding: '2px 12px',
+                            opacity: 0.92,
+                            fontWeight: 500,
+                            letterSpacing: 0.5
+                          }}
+                        >
+                          Ảnh {index + 1}/{serviceData.images.length}
+                        </span>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <ImagePreviewModal
+                  show={!!previewImage?.show}
+                  image={previewImage?.image}
+                  index={previewImage?.index || 0}
+                  total={previewImage?.total || 0}
+                  onClose={() => setPreviewImage({ show: false })}
+                />
+              </>
+            ) : (
+              <div className="text-center text-muted" style={{ minHeight: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #fff6fa 60%, #ffe3ed 100%)', borderRadius: 22, border: '2px dashed #ffb6d5', boxShadow: '0 2px 8px rgba(255,92,149,0.06)' }}>
+                <div>
+                  <img src="/img/ab0.jpg" alt="No image" style={{ width: 110, opacity: 0.45, marginBottom: 8, borderRadius: 12, border: '1.5px solid #ffb6d5' }} />
+                  <div style={{ fontWeight: 500, color: '#ff5c95', fontSize: 16 }}>Không có ảnh dịch vụ</div>
+                </div>
+              </div>
+            )}
+          </div>
+ 
         </div>
         <div className="col-md-12 mt-4">
           <h4>Vị trí trên bản đồ</h4>
           {serviceData && (
             <iframe
               src={`https://maps.google.com/maps?width=600&height=400&hl=en&q=${encodeURIComponent(
-                serviceData.locationDetail + ", " + serviceData.location
+                serviceData?.locationDetail + ", " + serviceData?.location
               )}&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
               width="100%"
               height="300"

@@ -5,13 +5,14 @@ import CustomTextField from "@muahub/app/makeup-artists/components/forms/theme-e
 import SendRequest from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
 import Button from '@mui/material/Button';
+import { useRouter } from "next/navigation";
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [account, setAccount] = useState({
     email: "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const validate = () => {
     if (!account.email) {
       toast.error("Vui lòng nhập email.");
@@ -40,7 +41,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       if (res.payload) {
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
-        window.location.href = "/makeup-artists";
+        router.push("/makeup-artists");
       } else {
         toast.error("Đăng nhập thất bại, vui lòng kiểm tra thông tin của bạn.");
       }
