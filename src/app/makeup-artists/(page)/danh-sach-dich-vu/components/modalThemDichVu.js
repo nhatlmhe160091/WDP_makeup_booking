@@ -19,7 +19,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import SearchAddressComponent from "../../../components/SearchAddressComponent";
 import SelectServiceComponent from "../../../components/SelectServiceComponent";
-import ImagePreview from "@muahub/app/makeup-artists/components/ImagePreview";
+import ImagePreview from "@muahub/app/admin/components/ImagePreview";
 import toast from "react-hot-toast";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
 import { useApp } from "@muahub/app/contexts/AppContext";
@@ -29,7 +29,7 @@ const fieldSizes = {
     isAvailable: false,
     name: "Makeup cô dâu",
     price: 0,
-    count: 0,
+    count: 1, // Mặc định là 1 và ẩn đi
     timeMatch: 0,
     timeDetail: []
   },
@@ -37,7 +37,7 @@ const fieldSizes = {
     isAvailable: false,
     name: "Makeup dự tiệc / Sự kiện / Đi chơi",
     price: 0,
-    count: 0,
+    count: 1,
     timeMatch: 0,
     timeDetail: []
   },
@@ -45,7 +45,7 @@ const fieldSizes = {
     isAvailable: false,
     name: "Makeup cá nhân (Kỷ yếu / Tốt nghiệp / Lookbook)",
     price: 0,
-    count: 0,
+    count: 1,
     timeMatch: 0,
     timeDetail: []
   }

@@ -63,12 +63,6 @@ const Menuitems = [
     href: "/admin/lich-su-dat-lich"
   },
   {
-    id: uniqueId(),
-    title: "Trạng thái đặt lịch",
-    icon: IconCalendarEvent,
-    href: "/admin/timeline-dich-vu"
-  },
-  {
     navlabel: true,
     subheader: "Quản lý người dùng",
     onlyAdmin: true
@@ -101,25 +95,7 @@ const Menuitems = [
     href: "/admin/danh-sach-duyet-makeup-artists",
     onlyAdmin: true
   },
-  {
-    navlabel: true,
-    subheader: "Quản lý dịch vụ makeup",
-    onlyUser: true
-  },
-  {
-    id: uniqueId(),
-    title: "Danh sách dịch vụ",
-    icon: IconSoccerField,
-    href: "/admin/danh-sach-dich-vu",
-    onlyUser: true
-  },
-  {
-    id: uniqueId(),
-    title: "Thêm dịch vụ",
-    icon: IconPlus,
-    href: "/admin/them-dich-vu",
-    onlyUser: true
-  },
+
   {
     navlabel: true,
     subheader: "Quản trị website"

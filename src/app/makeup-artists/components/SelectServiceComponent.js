@@ -1,5 +1,6 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Settings } from "@mui/icons-material";
 
 const types = [5, 7, 11];
 
@@ -9,6 +10,8 @@ const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTim
     7: false,
     11: false
   });
+  const [breakTime, setBreakTime] = useState(60);
+  const [openBreakTimeModal, setOpenBreakTimeModal] = useState(false);
 
   // update if openingTime or closingTime change
   useEffect(() => {
@@ -60,7 +63,6 @@ const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTim
 
     const startMinutes = timeToMinutes(openTime);
     const endMinutes = timeToMinutes(closeTime);
-    const breakTime = 10; // 10 phút nghỉ
     const result = [];
 
     let currentStart = startMinutes;
@@ -113,39 +115,39 @@ const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTim
                 fullWidth
                 variant="outlined"
                 value={packages[fieldIndex].price}
+                inputProps={{ min: 0 }}
                 onChange={(e) => {
-                  handleFieldChange(fieldIndex, "price", e.target.value);
+                  handleFieldChange(fieldIndex, "price", Math.max(0, e.target.value));
                 }}
                 disabled={!packages[fieldIndex].isAvailable}
               />
             </Grid>
 
-            <Grid item xs={4}>
-              <TextField
-                label="Số lượng"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={packages[fieldIndex].count}
-                onChange={(e) => {
-                  handleFieldChange(fieldIndex, "count", e.target.value);
-                }}
-                disabled={!packages[fieldIndex].isAvailable}
-              />
-            </Grid>
 
-            <Grid item xs={4}>
-              <TextField
-                label="Thời lượng (phút)"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={packages[fieldIndex].timeMatch}
-                onChange={(e) => {
-                  handleFieldChange(fieldIndex, "timeMatch", e.target.value);
-                }}
-                disabled={!packages[fieldIndex].isAvailable}
-              />
+
+            <Grid item xs={6}>
+              <Box display="flex" gap={1}>
+                <TextField
+                  label="Thời lượng (phút)"
+                  type="number"
+                  fullWidth
+                  variant="outlined"
+                  value={packages[fieldIndex].timeMatch}
+                  inputProps={{ min: 0 }}
+                  onChange={(e) => {
+                    handleFieldChange(fieldIndex, "timeMatch", Math.max(0, e.target.value));
+                  }}
+                  disabled={!packages[fieldIndex].isAvailable}
+                />
+                <Button
+                  variant="outlined"
+                  onClick={() => setOpenBreakTimeModal(true)}
+                  disabled={!packages[fieldIndex].isAvailable}
+                  sx={{ minWidth: 'auto', width: '56px' }}
+                >
+                  <Settings />
+                </Button>
+              </Box>
             </Grid>
 
             <Grid item xs={12} sx={{ borderBottom: "1px solid #e0e0e0", paddingBottom: 2 }}>
@@ -175,6 +177,48 @@ const SelectServiceComponent = ({ packages, setPackages, openingTime, closingTim
           </Grid>
         </Grid>
       ))}
+      {/* Modal điều chỉnh thời gian nghỉ */}
+      <Dialog open={openBreakTimeModal} onClose={() => setOpenBreakTimeModal(false)}>
+        <DialogTitle>Điều chỉnh thời gian nghỉ giữa các ca</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Thời gian nghỉ (phút)"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={breakTime}
+            inputProps={{ min: 0 }}
+            onChange={(e) => setBreakTime(Math.max(0, e.target.value))}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenBreakTimeModal(false)}>Hủy</Button>
+          <Button 
+            variant="contained" 
+            onClick={() => {
+              setOpenBreakTimeModal(false);
+              // Cập nhật lại tất cả các timeDetail
+              setPackages(prevPackages => {
+                const newPackages = { ...prevPackages };
+                types.forEach((fieldIndex) => {
+                  if (newPackages[fieldIndex].isAvailable) {
+                    const data = generateTimeSlots(
+                      openingTime.format("HH:mm"),
+                      closingTime.format("HH:mm"),
+                      newPackages[fieldIndex].timeMatch
+                    );
+                    newPackages[fieldIndex].timeDetail = data;
+                  }
+                });
+                return newPackages;
+              });
+            }}
+          >
+            Lưu
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
