@@ -8,7 +8,7 @@ import FAQsComponent from "./components/FAQsComponent";
 import OurTeamComponent from "./components/OurTeamComponent";
 import TestimonialComponent from "./components/TestimonialComponent";
 import META_DATA from "./metaData";
-import BoxFieldComponent from "./components/BoxFieldComponent";
+// import BoxFieldComponent from "./components/BoxFieldComponent";
 import PopularServicesComponent from "./components/PopularServicesComponent";
 import MakeupServiceNoiBatComponent from "./components/MakeupServiceNoiBatComponent";
 
