@@ -126,23 +126,21 @@ const Menuitems = [
     href: "/makeup-artists/them-dich-vu",
     onlyUser: true
   },
-  // {
-  //   navlabel: true,
-  //   subheader: "Quản trị website"
-  // },
+  {
+    navlabel: true,
+    subheader: "Quản lý Blog"
+  },
+  {
+    id: uniqueId(),
+    title: "Danh sách bài viết",
+    icon: IconListCheck,
+    href: "/makeup-artists/danh-sach-blog"
+  },
   // {
   //   id: uniqueId(),
-  //   title: "Quản lý banner",
-  //   icon: IconSettings,
-  //   href: "/makeup-artists/quan-ly-banner",
-  //   onlyAdmin: true
-  // },
-  // {
-  //   id: uniqueId(),
-  //   title: "Quản trị website",
-  //   icon: IconSettings,
-  //   href: "/makeup-artists/quan-tri-website",
-  //   onlyAdmin: true
+  //   title: "Thêm bài viết",
+  //   icon: IconPlus,
+  //   href: "/makeup-artists/them-blog"
   // }
 ];
 

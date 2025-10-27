@@ -40,6 +40,7 @@ const WebsitePaymentPage = () => {
 
   const paymentTypes = {
     revenue: {
+      key: 'revenue',
       label: "Thu theo doanh thu",
       amount: 0,
       description: "Không có phí cố định - Thu % theo doanh thu",
@@ -47,6 +48,7 @@ const WebsitePaymentPage = () => {
       popular: false
     },
     monthly_3: {
+      key: 'monthly_3',
       label: "Gói 3 tháng",
       amount: 3000000,
       description: "3,000,000 VNĐ cho 3 tháng sử dụng",
@@ -54,6 +56,7 @@ const WebsitePaymentPage = () => {
       popular: false
     },
     monthly_6: {
+      key: 'monthly_6',
       label: "Gói 6 tháng",
       amount: 5500000,
       description: "5,500,000 VNĐ cho 6 tháng sử dụng",
@@ -61,6 +64,7 @@ const WebsitePaymentPage = () => {
       popular: true
     },
     yearly: {
+      key: 'yearly',
       label: "Gói 1 năm",
       amount: 10000000,
       description: "10,000,000 VNĐ cho 1 năm sử dụng - Tiết kiệm nhất",
@@ -306,7 +310,10 @@ console.log('Current Payment Amount:', currentPaymentAmount);
               <Grid item xs={12} sm={6} md={3} key={key}>
                 <PlanCard
                   paymentType={key}
-                  details={paymentTypes[key]}
+                  details={{
+                    ...paymentTypes[key],
+                    key: key // Đảm bảo key được truyền vào
+                  }}
                   isCurrentPlan={currentPlan === key}
                   onSelect={() => (!isLower && currentPlan !== key) && handleSelectPlan(key)}
                   disabled={isLower}

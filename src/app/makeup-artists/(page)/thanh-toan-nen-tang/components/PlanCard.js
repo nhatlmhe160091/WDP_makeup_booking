@@ -12,14 +12,41 @@ const PlanCard = ({
   paymentType
 }) => {
   const [openBenefit, setOpenBenefit] = useState(false);
-  // Quyền lợi mẫu, thực tế có thể lấy từ details.benefits hoặc API
-  const benefits = details.benefits || [
-    "Ưu tiên hiển thị trên nền tảng",
-    "Tăng giới hạn số lượng dịch vụ",
-    "Hỗ trợ chăm sóc khách hàng 24/7",
-    "Thống kê doanh thu chi tiết",
-    "Được tham gia các chương trình khuyến mãi"
-  ];
+  const getBenefits = () => {
+    switch (details.key) {
+      case 'revenue':
+        return [
+          "Phí đặt cọc 10% trên mỗi lần yêu cầu",
+          "Đăng tải dịch vụ cơ bản",
+          "Thống kê doanh thu cơ bản",
+          "Hỗ trợ khách hàng trong giờ hành chính"
+        ];
+      case 'monthly_3':
+        return [
+          "Miễn phí đặt cọc (0%)",
+          "Đăng tải không giới hạn dịch vụ",
+          "Thống kê doanh thu chi tiết",
+          "Hỗ trợ khách hàng 24/7"
+        ];
+      case 'monthly_6':
+        return [
+          "Tất cả quyền lợi của gói 3 tháng",
+          "Đăng tải blog làm đẹp",
+          "Ưu tiên hiển thị trên trang tìm kiếm",
+          "Tham gia các chương trình khuyến mãi đặc biệt"
+        ];
+      case 'yearly':
+        return [
+          "Tất cả quyền lợi của gói 6 tháng",
+          "Hiển thị trong danh sách MUA nổi bật tại trang chủ",
+          "Được giới thiệu trong các chiến dịch marketing",
+          "Hỗ trợ tư vấn phát triển thương hiệu cá nhân"
+        ];
+      default:
+        return [];
+    }
+  };
+  const benefits = getBenefits();
   return (
     <Card
       sx={{
