@@ -27,7 +27,7 @@ const SendRequest = async (method, url, data = {}) => {
       }
     });
     return {
-      payload: response.data.data
+      payload: response.data?.data || response.data || response
     };
   } catch (error) {
     console.error(error);

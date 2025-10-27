@@ -101,7 +101,7 @@ const WebsitePaymentPage = () => {
       if (res.payload) {
         setCurrentPlan(res.payload.payment_type);
       
-        setCurrentPaymentAmount(res.data.payment_amount || 0);
+        setCurrentPaymentAmount(res.payload.payment_amount || 0);
       }
     } catch (error) {
       console.error("Error fetching current user:", error);
@@ -177,6 +177,7 @@ const WebsitePaymentPage = () => {
 
   const handleConfirmPayment = async (paymentType = selectedPaymentType) => {
     try {
+      let paymentId = null;
       if (paymentType !== "revenue") {
         // Tạo bản ghi thanh toán cho các gói trả phí
         await SendRequest("POST", "/api/website-payments", {
@@ -185,6 +186,17 @@ const WebsitePaymentPage = () => {
           amount: paymentTypes[paymentType].amount,
           status: "PENDING"
         });
+        // Lấy payment vừa tạo (có thể lấy theo ownerId, payment_package, status: "PENDING")
+        const res = await SendRequest("GET", "/api/website-payments", {
+          ownerId: currentUser._id,
+          payment_package: paymentType,
+          status: "PENDING"
+        });
+        // console.log('Payment fetch response:', res);
+        if (res.payload.payload && res.payload.payload.length > 0) {
+          // console.log('paymentId found:', res.payload.payload[0]._id);
+          paymentId = res.payload.payload[0]._id;
+        }
       }
 
       // Tạo object lịch sử thanh toán
@@ -215,11 +227,18 @@ const WebsitePaymentPage = () => {
         payment_history: paymentHistoryRecord,
         payment_expiry: paymentType === "revenue" ? null : expiryDate
       });
+     console.log('paymentId:', paymentId);
+      // Cập nhật trạng thái payment sang CONFIRM
+      if (paymentId) {
+        await SendRequest("PUT", "/api/website-payments", {
+          id: paymentId,
+          status: "CONFIRM"
+        });
+      }
 
       if (paymentType === "revenue") {
         toast.success("Đã chọn gói thu theo doanh thu thành công!");
       } else {
-        // toast.success("Yêu cầu thanh toán đã được gửi, chờ admin xác nhận!");
         toast.success("Thanh toán thành công! Gói của bạn đã được kích hoạt.");
       }
 
@@ -228,10 +247,7 @@ const WebsitePaymentPage = () => {
       setSelectedPaymentType("");
       setTimeout(() => {
         window.location.reload(); // Tải lại trang để cập nhật giao diện
-      }, 3000); // Đợi 3 giây để cập nhật giao diện
-      // fetchWebsitePayments();
-      // fetchCurrentUser();
-      // fetchPaymentHistory(); // Thêm hàm fetch lịch sử thanh toán
+      }, 3000);
     } catch (error) {
       console.error("Error confirming payment:", error);
       toast.error("Có lỗi xảy ra khi gửi yêu cầu thanh toán");
