@@ -1,14 +1,30 @@
 "use client";
 import SendRequest from "@muahub/utils/SendRequest";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 const SignInComponent = () => {
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      // Người dùng đã đăng nhập, chuyển hướng dựa vào role
+      const userRole = session?.user?.role;
+      if (userRole === "admin") {
+        router.push("/admin");
+      } else if (userRole === "makeup_artist") {
+        router.push("/makeup-artists");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [status, session, router]);
 
   const validateForm = () => {
     let validationErrors = {};
@@ -59,6 +75,16 @@ const SignInComponent = () => {
       ...formData,
       [id]: type === "checkbox" ? checked : value
     });
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (error) {
+      toast.error("Đăng nhập bằng Google thất bại");
+      setLoading(false);
+    }
   };
 
   return (
@@ -124,6 +150,28 @@ const SignInComponent = () => {
 
                   <button type="submit" className="btn btn-primary w-100 mt-3" disabled={loading}>
                     Đăng nhập
+                  </button>
+
+                  <div className="text-center my-3">
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <hr className="flex-grow-1" />
+                      <span className="text-muted">hoặc</span>
+                      <hr className="flex-grow-1" />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-dark w-100"
+                    onClick={handleGoogleSignIn}
+                    disabled={loading}
+                  >
+                    <img
+                      src="https://www.google.com/favicon.ico"
+                      alt="Google"
+                      style={{ width: "20px", marginRight: "10px" }}
+                    />
+                    Đăng nhập bằng Google
                   </button>
 
                   <p className="text-center mt-3">

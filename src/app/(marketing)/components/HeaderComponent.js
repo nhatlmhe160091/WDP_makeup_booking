@@ -7,12 +7,14 @@
   import { useEffect, useState, useRef } from "react";
   import { useApp } from "@muahub/app/contexts/AppContext";
   import { ROLE_MANAGER } from "@muahub/constants/System";
+  import { useSession, signOut } from "next-auth/react";
   import { Badge, IconButton, Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
   
   const HeaderComponent = () => {
     const pathUrl = usePathname();
     const { currentUser } = useApp();
-    const isLoggedIn = currentUser && Object.keys(currentUser).length > 0;
+    const { data: session } = useSession();
+    const isLoggedIn = currentUser && Object.keys(currentUser).length > 0 || session?.user;
     const [allMakeups, setAllMakeups] = useState([]);
     const [searchValue, setSearchValue] = useState("");
     const [showResults, setShowResults] = useState(false);
@@ -94,40 +96,61 @@
     };
 
     useEffect(() => {
-      setTimeout(() => {
+      let timeoutId;
+      let scrollHandler;
+      let backToTopClickHandler;
+
+      timeoutId = setTimeout(() => {
         try {
           const backToTopButton = document.querySelector(".back-to-top");
-          if (backToTopButton) {
-            backToTopButton.style.display = "none"; // Ẩn button "back to top"
-            window.addEventListener("scroll", function () {
-              var navbar = document.querySelector(".navbar");
-              if (window.scrollY > 45) {
-                navbar.classList.add("sticky-top", "shadow-sm");
-              } else {
-                navbar.classList.remove("sticky-top", "shadow-sm");
-              }
-            });
+          const navbar = document.querySelector(".navbar");
 
-            // Kiểm tra khi người dùng cuộn trang
-            window.addEventListener("scroll", function () {
-              if (window.scrollY > 300) {
-                backToTopButton.style.display = "flex"; // Hiện button "back to top"
-              } else {
-                backToTopButton.style.display = "none"; // Ẩn button "back to top"
+          if (backToTopButton) {
+            backToTopButton.style.display = "none";
+
+            // Xử lý scroll cho navbar và back-to-top button
+            scrollHandler = function() {
+              if (navbar) {
+                if (window.scrollY > 45) {
+                  navbar.classList.add("sticky-top", "shadow-sm");
+                } else {
+                  navbar.classList.remove("sticky-top", "shadow-sm");
+                }
               }
-            });
-            backToTopButton.addEventListener("click", function (event) {
-              event.preventDefault(); // Ngừng hành động mặc định của nút
+
+              if (backToTopButton) {
+                backToTopButton.style.display = window.scrollY > 300 ? "flex" : "none";
+              }
+            };
+
+            // Xử lý click cho back-to-top button
+            backToTopClickHandler = function(event) {
+              event.preventDefault();
               window.scrollTo({
                 top: 0,
-                behavior: "smooth" // Cuộn lên đầu trang với hiệu ứng mượt mà
+                behavior: "smooth"
               });
-            });
+            };
+
+            window.addEventListener("scroll", scrollHandler);
+            backToTopButton.addEventListener("click", backToTopClickHandler);
           }
         } catch (e) {
           console.log(e);
         }
       }, 10);
+
+      // Cleanup function
+      return () => {
+        clearTimeout(timeoutId);
+        if (scrollHandler) {
+          window.removeEventListener("scroll", scrollHandler);
+        }
+        const backToTopButton = document.querySelector(".back-to-top");
+        if (backToTopButton && backToTopClickHandler) {
+          backToTopButton.removeEventListener("click", backToTopClickHandler);
+        }
+      };
     }, []);
 
     useEffect(() => {
@@ -194,9 +217,12 @@
       }
     };
 
-    const logout = () => {
-      // Logout
+    const logout = async () => {
+      // Logout from both traditional and Google auth
       localStorage.removeItem("token");
+      if (session) {
+        await signOut({ redirect: false });
+      }
       router.push("/");
     };
     // console.log(11111, currentUser);
@@ -364,7 +390,7 @@
                 </Link>
               </div> */}
             </div>
-            {Object.keys(currentUser).length > 0 ? (
+            {isLoggedIn ? (
               <div className="dropdown">
                 <div
                   className="dropdown-toggle"
@@ -373,14 +399,15 @@
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  {currentUser.name}
+                  {session?.user?.name || currentUser.name}
                   {/* avatar */}
-                  {currentUser.avatar ? (
+                  {session?.user?.image || currentUser.avatar ? (
                     <img
-                      src={currentUser.avatar}
+                      src={session?.user?.image || currentUser.avatar}
                       alt="avatar"
                       className="rounded-circle ms-2"
                       style={{ width: "30px", height: "30px" }}
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     <img
@@ -392,14 +419,14 @@
                   )}
                 </div>
                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  {currentUser.role === ROLE_MANAGER.ADMIN && (
+                  {(session?.user?.role === ROLE_MANAGER.ADMIN || currentUser.role === ROLE_MANAGER.ADMIN) && (
                     <li>
                       <a href="/admin" className="dropdown-item">
                         Trang quản trị
                       </a>
                     </li>
                   )}
-                  {currentUser.role === ROLE_MANAGER.MUA && (
+                  {(session?.user?.role === ROLE_MANAGER.MUA || currentUser.role === ROLE_MANAGER.MUA) && (
                     <li>
                       <a href="/makeup-artists" className="dropdown-item">
                         Trang quản lý dịch vụ

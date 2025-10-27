@@ -26,6 +26,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
   const [bookedSlots, setBookedSlots] = useState([]); // [{time, fieldSlot}]
+  const [lockedSlots, setLockedSlots] = useState([]); // [{time, fieldSlot}] - slots đang bị lock bởi người khác
   const [makeupLocation, setMakeupLocation] = useState(""); // 'at-home' | 'at-studio'
   const [serviceLocation, setServiceLocation] = useState({
     extraFee: 0,
@@ -60,19 +61,38 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     }
   }, [open]);
 
-  // Thêm hàm handleClose để reset tất cả state
-  const handleClose = () => {
-    // Reset tất cả state về trạng thái ban đầu
-    setOrderDone(false);
-    setQrCode("");
-    setErrorMessage("");
-    setSelectedDate("");
-    setSelectedField("");
-    setSelectedFieldSlot([]);
-    setMakeupLocation("");
+  // Thêm hàm handleClose để reset tất cả state và giải phóng lock
+  const handleClose = async () => {
+    try {
+      // Giải phóng tất cả các lock của user hiện tại
+      if (selectedFieldSlot.length > 0) {
+        await fetch("/api/slots/unlock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serviceId: serviceData._id,
+            date: selectedDate,
+            slots: selectedFieldSlot
+          })
+        });
+      }
 
-    // Gọi hàm onClose từ parent component
-    onClose();
+      // Reset tất cả state về trạng thái ban đầu
+      setOrderDone(false);
+      setQrCode("");
+      setErrorMessage("");
+      setSelectedDate("");
+      setSelectedField("");
+      setSelectedFieldSlot([]);
+      setMakeupLocation("");
+
+      // Gọi hàm onClose từ parent component
+      onClose();
+    } catch (error) {
+      console.error('Error closing modal:', error);
+      // Vẫn đóng modal ngay cả khi có lỗi giải phóng lock
+      onClose();
+    }
   };
 
   // Nhận thêm orderCode nếu là PayOS
@@ -150,23 +170,48 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
   // Thêm state để lưu dịch vụ makeup đã chọn cụ thể
 
 
-  // Lấy danh sách slot đã đặt khi thay đổi ngày hoặc dịch vụ
+  // Lấy danh sách slot đã đặt và đang bị lock khi thay đổi ngày hoặc dịch vụ
   useEffect(() => {
     setSelectedFieldSlot([]);
     setBookedSlots([]);
+    setLockedSlots([]);
     if (!selectedDate || !serviceData?._id) return;
-    const fetchBookedSlots = async () => {
+    
+    const fetchSlotStatus = async () => {
       try {
+        // Lấy slots đã được đặt
         const res = await fetch(`/api/orders/booked-slots?serviceId=${serviceData._id}&date=${selectedDate}`);
         const data = await res.json();
         if (data.success && Array.isArray(data.slots)) {
           setBookedSlots(data.slots);
         }
+
+        // Lấy slots đang bị lock
+        const lockRes = await fetch(`/api/slots/check-locks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            serviceId: serviceData._id,
+            date: selectedDate
+          })
+        });
+        const lockData = await lockRes.json();
+        if (lockData.success && Array.isArray(lockData.lockedSlots)) {
+          setLockedSlots(lockData.lockedSlots);
+        }
       } catch (err) {
-        // silent
+        console.error('Error fetching slot status:', err);
       }
     };
-    fetchBookedSlots();
+
+    // Gọi lần đầu
+    fetchSlotStatus();
+
+    // Polling để cập nhật trạng thái lock mỗi 10 giây
+    const intervalId = setInterval(fetchSlotStatus, 10000);
+
+    // Cleanup interval khi component unmount hoặc selectedDate/serviceId thay đổi
+    return () => clearInterval(intervalId);
   }, [selectedDate, serviceData?._id]);
 
 
@@ -174,109 +219,219 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
     setErrorMessage("");
     const payloadArr = [];
     let orderCost = 0;
-    // Kiểm tra trùng slot trước khi đặt
-    for (let slot of selectedFieldSlot) {
+
+    // Function để giải phóng lock
+    const cleanupLocks = async () => {
+      try {
+        await fetch("/api/slots/unlock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serviceId: serviceData._id,
+            date: selectedDate,
+            slots: selectedFieldSlot
+          })
+        });
+      } catch (error) {
+        console.error('Error cleaning up locks:', error);
+      }
+    };
+
+    try {
+      // 1. Khóa tất cả các slot được chọn
+      for (const slot of selectedFieldSlot) {
+        const lockRes = await fetch("/api/slots/lock", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serviceId: serviceData._id,
+            date: selectedDate,
+            time: slot.time,
+            fieldSlot: slot.fieldIndex
+          })
+        });
+        const lockData = await lockRes.json();
+        
+        if (!lockData.success) {
+          setErrorMessage(`Khung giờ ${slot.time} - Slot ${slot.fieldIndex + 1} vừa được người khác chọn. Vui lòng chọn slot khác.`);
+          return;
+        }
+      }
+
+      // 2. Double-check xem slot có bị người khác đặt không
+      for (const slot of selectedFieldSlot) {
+        const checkRes = await fetch("/api/orders/check-slot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            serviceId: serviceData._id,
+            date: selectedDate,
+            time: slot.time,
+            fieldSlot: slot.fieldIndex
+          })
+        });
+        const checkData = await checkRes.json();
+        
+        if (checkData.exists) {
+          await cleanupLocks();
+          setErrorMessage(`Khung giờ ${slot.time} - Slot ${slot.fieldIndex + 1} đã được đặt. Vui lòng chọn slot khác.`);
+          return;
+        }
+      }
+
+      // 3. Tạo payload cho các đơn hàng
+        selectedFieldSlot.forEach((slot) => {
+        const payload = {
+          serviceId: serviceData._id,
+          ownerId: serviceData.ownerId,
+          deposit: serviceData.packages[selectedField].price,
+          field: serviceData.packages[selectedField]?.name || '',
+          time: slot.time,
+          date: selectedDate,
+          fieldSlot: slot.fieldIndex,
+          location: makeupLocation,
+          status: "pending",
+          serviceLocationType: makeupLocation === 'at-home' ? 'home' : (makeupLocation === 'at-studio' ? 'studio' : null),
+          serviceLocation: {
+            extraFee: serviceLocation.extraFee,
+            distanceKm: serviceLocation.distanceKm,
+            customerLat: serviceLocation.customerLat,
+            customerLng: serviceLocation.customerLng,
+            studioLat: serviceLocation.studioLat,
+            studioLng: serviceLocation.studioLng
+          },
+        };
+        orderCost += payload.deposit * 0.3;
+        payloadArr.push(payload);
+      });
+
+      // 4. Xử lý thanh toán
+      let uuid = uuidv4();
+      uuid = uuid.replace(/-/g, "");
+
+      let orderCode = null;
+      if (paymentMethod === "payos") {
+        orderCode = Math.floor(Math.random() * 1000000);
+        await handleGetQr(uuid, orderCost, orderCode);
+      } else {
+        await handleGetQr(uuid, orderCost);
+      }
+
+      // 5. Chờ xác nhận thanh toán và tạo đơn hàng
+      setTimeout(() => {
+        const intervalId = setInterval(async () => {
+          const resPayment = await SendRequest("get", `/api/webhooks`);
+          let paymentDone = false;
+
+          if (resPayment.payload) {
+            resPayment.payload.forEach((item) => {
+              if (paymentMethod === "vietqr" && item.content && item.content.includes(`dat coc ${uuid}`)) {
+                paymentDone = true;
+              } else if (paymentMethod === "payos" && item.data && item.data.orderCode === orderCode) {
+                paymentDone = true;
+              }
+            });
+          }
+
+          if (!paymentDone) return;
+
+          try {
+            // Tạo tất cả orders
+            for (const payload of payloadArr) {
+              await SendRequest("post", "/api/orders", payload);
+            }
+            await cleanupLocks();
+            setOrderDone(true);
+          } catch (error) {
+            console.error('Error creating orders:', error);
+            setErrorMessage('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng liên hệ hỗ trợ.');
+            await cleanupLocks();
+          }
+          
+          clearInterval(intervalId);
+        }, 5000);
+      }, 5000);
+
+    } catch (error) {
+      console.error('Error in order process:', error);
+      setErrorMessage('Có lỗi xảy ra. Vui lòng thử lại.');
+      await cleanupLocks();
+    }
+  };
+
+  const toggleSelectedFieldSlot = async ({ time, fieldIndex }) => {
+    // Nếu slot đang được chọn, bỏ chọn và unlock
+    for (let i = 0; i < selectedFieldSlot.length; i++) {
+      if (selectedFieldSlot[i].time === time && selectedFieldSlot[i].fieldIndex === fieldIndex) {
+        try {
+          // Giải phóng lock cho slot này
+          await fetch("/api/slots/unlock", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              serviceId: serviceData._id,
+              date: selectedDate,
+              slots: [{ time, fieldIndex }]
+            })
+          });
+          
+          // Cập nhật state
+          setSelectedFieldSlot(
+            selectedFieldSlot.filter((slot) => !(slot.time === time && slot.fieldIndex === fieldIndex))
+          );
+        } catch (error) {
+          console.error('Error unlocking slot:', error);
+          setErrorMessage('Có lỗi xảy ra khi bỏ chọn slot. Vui lòng thử lại.');
+        }
+        return;
+      }
+    }
+
+    // Nếu chưa chọn, kiểm tra và lock slot
+    try {
+      // Kiểm tra slot có available không
       const checkRes = await fetch("/api/orders/check-slot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId: serviceData._id,
           date: selectedDate,
-          time: slot.time,
-          fieldSlot: slot.fieldIndex
+          time,
+          fieldSlot: fieldIndex
         })
       });
       const checkData = await checkRes.json();
+
       if (checkData.exists) {
-        setErrorMessage(`Khung giờ ${slot.time} - Slot ${slot.fieldIndex + 1} đã được đặt. Vui lòng chọn slot khác.`);
+        setErrorMessage(`Slot này vừa được người khác chọn.`);
         return;
       }
-    }
 
-    selectedFieldSlot.forEach((slot) => {
-      const payload = {
-        serviceId: serviceData._id,
-        ownerId: serviceData.ownerId,
-        deposit: serviceData.packages[selectedField].price,
-        // field: selectedField.name,
-        field: serviceData.packages[selectedField]?.name || '',
-        time: slot.time,
-        date: selectedDate,
-        fieldSlot: slot.fieldIndex,
-        location: makeupLocation,
-        status: "pending",
-        serviceLocationType: makeupLocation === 'at-home' ? 'home' : (makeupLocation === 'at-studio' ? 'studio' : null),
-        serviceLocation: {
-          extraFee: serviceLocation.extraFee,
-          distanceKm: serviceLocation.distanceKm,
-          customerLat: serviceLocation.customerLat,
-          customerLng: serviceLocation.customerLng,
-          studioLat: serviceLocation.studioLat,
-          studioLng: serviceLocation.studioLng
-        },
-      };
-      orderCost += payload.deposit * 0.3;
-      payloadArr.push(payload);
-    });
+      // Lock slot
+      const lockRes = await fetch("/api/slots/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serviceId: serviceData._id,
+          date: selectedDate,
+          time,
+          fieldSlot: fieldIndex
+        })
+      });
+      const lockData = await lockRes.json();
 
-    let uuid = uuidv4();
-    uuid = uuid.replace(/-/g, "");
-
-    let orderCode = null;
-    if (paymentMethod === "payos") {
-      orderCode = Math.floor(Math.random() * 1000000);
-      await handleGetQr(uuid, orderCost, orderCode);
-    } else {
-      await handleGetQr(uuid, orderCost);
-    }
-
-    setTimeout(() => {
-      const intervalId = setInterval(async () => {
-        const resPayment = await SendRequest("get", `/api/webhooks`);
-        let paymentDone = false;
-        if (resPayment.payload) {
-          // console.log('resPayment.payload:', resPayment.payload);
-          resPayment.payload.forEach((item) => {
-            // console.log("paymentMethod:", paymentMethod);
-            if (paymentMethod === "vietqr") {
-              // console.log('item.content vietqr:', item.content, 'looking for:', `dat coc ${uuid}`);
-              if (item.content && item.content.includes(`dat coc ${uuid}`)) {
-                paymentDone = true;
-              }
-            } else if (paymentMethod === "payos") {
-              // console.log('item.data payos:', item.data, 'looking for:', `orderCode ${orderCode}`);
-              if (item.data) {
-                console.log('item.data.orderCode:', item.data.orderCode, 'orderCode:', orderCode, 'equal:', item.data.orderCode === orderCode);
-                if (item.data.orderCode === orderCode) {
-                  console.log('Payment confirmed for orderCode:', orderCode);
-                  paymentDone = true;
-                }
-              }
-            }
-          });
-        }
-        if (!paymentDone) return;
-        payloadArr.forEach(async (payload) => {
-          await SendRequest("post", "/api/orders", payload);
-        });
-        setOrderDone(true);
-        clearInterval(intervalId);
-      }, 5000);
-    }, 5000);
-  };
-
-  const toggleSelectedFieldSlot = ({ time, fieldIndex }) => {
-    for (let i = 0; i < selectedFieldSlot.length; i++) {
-      if (selectedFieldSlot[i].time === time && selectedFieldSlot[i].fieldIndex === fieldIndex) {
-        // Nếu đã chọn, bỏ chọn
-        setSelectedFieldSlot(
-          selectedFieldSlot.filter((slot) => !(slot.time === time && slot.fieldIndex === fieldIndex))
-        );
+      if (!lockData.success) {
+        setErrorMessage('Không thể chọn slot này. Vui lòng thử lại.');
         return;
       }
+
+      // Thêm vào danh sách đã chọn
+      setSelectedFieldSlot([...selectedFieldSlot, { time, fieldIndex }]);
+      setErrorMessage('');
+    } catch (error) {
+      console.error('Error toggling slot:', error);
+      setErrorMessage('Có lỗi xảy ra. Vui lòng thử lại.');
     }
-    // Nếu chưa chọn, thêm vào
-    setSelectedFieldSlot([...selectedFieldSlot, { time, fieldIndex }]);
   };
 // console.log('serviceLocation:', serviceLocation);
 // console.log('serviceLocation full detail', extra)

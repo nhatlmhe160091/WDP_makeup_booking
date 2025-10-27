@@ -5,22 +5,30 @@ import HeaderComponent from "./components/HeaderComponent";
 import { useApp } from "../contexts/AppContext";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 const UserAppLayout = ({ children }) => {
   const { currentUser, loading } = useApp();
+  const { data: session, status } = useSession();
   const pathUrl = usePathname();
   const router = useRouter();
 
   const linkNeedAuth = ["/trang-ca-nhan"];
   const linkNeedNotAuth = ["/quen-mat-khau", "/dang-nhap", "/dang-ky"];
 
-  if (!loading && Object.keys(currentUser).length === 0 && linkNeedAuth.includes(pathUrl)) {
+  // Kiểm tra xác thực từ cả hai nguồn (NextAuth và hệ thống hiện tại)
+  const isAuthenticated = (!loading && Object.keys(currentUser).length > 0) || (status === "authenticated" && session);
+  const isLoading = loading || status === "loading";
+
+  // Chuyển hướng nếu chưa đăng nhập và cố truy cập trang cần xác thực
+  if (!isLoading && !isAuthenticated && linkNeedAuth.includes(pathUrl)) {
     router.push("/dang-nhap");
-    return null; // Prevent rendering while redirecting
+    return null;
   }
 
-  if (!loading && Object.keys(currentUser).length > 0 && linkNeedNotAuth.includes(pathUrl)) {
+  // Chuyển hướng nếu đã đăng nhập và cố truy cập trang đăng nhập/đăng ký
+  if (!isLoading && isAuthenticated && linkNeedNotAuth.includes(pathUrl)) {
     router.push("/trang-ca-nhan");
-    return null; // Prevent rendering while redirecting
+    return null;
   }
 
   return (

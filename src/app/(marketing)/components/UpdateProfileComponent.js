@@ -6,8 +6,11 @@ import { Form, Button } from "react-bootstrap";
 import SearchAddressComponent from "./SearchAddressComponent";
 import SendRequest, { loadingUi } from "@muahub/utils/SendRequest";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 const UpdateProfileComponent = ({ currentUser, updateUser }) => {
+  const { data: session } = useSession();
+  const isGoogleUser = !!session?.user;
   const [formData, setFormData] = useState({
     name: currentUser.name || "",
     phone: currentUser.phone || "",
@@ -68,7 +71,7 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
     e.preventDefault();
     if (!validateForm()) return;
     let fileUrl = currentUser.avatar || "";
-    if (file) {
+    if (file && !isGoogleUser) {
       loadingUi(true);
       try {
         const formData = new FormData();
@@ -86,6 +89,8 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
       } catch (error) {
         toast.error("Lỗi khi tải ảnh lên");
       }
+    } else if (isGoogleUser) {
+      fileUrl = session.user.image;
     }
     const payload = {
       ...formData,
@@ -118,10 +123,29 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
 if (!currentUser) return <div>Đang tải...</div>;
   return (
     <Form onSubmit={handleUpdate}>
-      <Form.Group className="mb-3">
-        <Form.Label>Ảnh đại diện</Form.Label>
-        <Form.Control type="file" name="avatar" onChange={(e) => setFile(e.target.files[0])} />
-      </Form.Group>
+      {!isGoogleUser && (
+        <Form.Group className="mb-3">
+          <Form.Label>Ảnh đại diện</Form.Label>
+          <Form.Control type="file" name="avatar" onChange={(e) => setFile(e.target.files[0])} />
+        </Form.Group>
+      )}
+      {isGoogleUser && (
+        <Form.Group className="mb-3">
+          <Form.Label>Ảnh đại diện</Form.Label>
+          <div>
+            <img 
+              src={session.user.image} 
+              alt="Google Avatar" 
+              className="rounded-circle"
+              style={{ width: "100px", height: "100px" }}
+              referrerPolicy="no-referrer"
+            />
+            <p className="text-muted mt-2">
+              <small>Ảnh đại diện được đồng bộ từ tài khoản Google của bạn</small>
+            </p>
+          </div>
+        </Form.Group>
+      )}
       <Form.Group className="mb-3">
         <Form.Label>Họ và tên</Form.Label>
         <Form.Control type="text" name="name" value={formData.name} onChange={handleChange} />

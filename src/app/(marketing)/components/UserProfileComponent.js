@@ -5,6 +5,7 @@ import { Tab, Tabs, Form, Modal } from "react-bootstrap";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
 import UpdateMakeupArtistProfileComponent from "./UpdateMakeupArtistProfileComponent";
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import SendRequest from "@muahub/utils/SendRequest";
 import { ROLE_MANAGER } from "@muahub/constants/System";
@@ -18,15 +19,19 @@ import CreateMakeupArtistProfileComponent from "./CreateMakeupArtistProfileCompo
 import Button from '@mui/material/Button';
 const UserProfileComponent = () => {
   const { currentUser, updateUser } = useApp();
+  const { data: session } = useSession();
   const [key, setKey] = useState("account");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  
+  // Sử dụng thông tin từ cả currentUser và session
+  const user = session?.user || currentUser;
   const [upgradeProfileData, setUpgradeProfileData] = useState(null);
   const [isPending, setIsPending] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   // Kiểm tra trạng thái pending khi vào tab "Yêu cầu nâng cấp"
   useEffect(() => {
-    if (key === "upgrade" && currentUser && currentUser._id) {
-      fetch(`/api/request-add-MUA/check-pending/${currentUser._id}`)
+    if (key === "upgrade" && user && user._id) {
+      fetch(`/api/request-add-MUA/check-pending/${user._id}`)
         .then((res) => res.json())
         .then((data) => {
           setIsPending(!!data.isPending);
@@ -35,7 +40,7 @@ const UserProfileComponent = () => {
           setIsPending(false);
         });
     }
-  }, [key, currentUser]);
+  }, [key, user]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -55,7 +60,7 @@ const UserProfileComponent = () => {
       return;
     }
     const res = await SendRequest("PUT", "/api/users", {
-      id: currentUser._id,
+      id: user._id,
       password: passwordData.newPassword,
       currentPassword: passwordData.currentPassword
     });
@@ -75,7 +80,7 @@ const UserProfileComponent = () => {
   // Khi nhấn nút gửi yêu cầu nâng cấp, mở modal và kiểm tra profile
   const handleUpgradeRequest = async () => {
     try {
-      const response = await fetch(`/api/makeup-artist-profiles/check/${currentUser._id}`);
+      const response = await fetch(`/api/makeup-artist-profiles/check/${user._id}`);
       const data = await response.json();
       setHasProfile(data.exists);
       setShowUpgradeModal(true);
@@ -89,9 +94,9 @@ const UserProfileComponent = () => {
   const handleUpgradeProfileSubmit = async (profileData) => {
     try {
       // Kiểm tra xem đã có yêu cầu pending chưa
-      const checkRes = await fetch(`/api/request-add-MUA?email=${currentUser.email}`);
+      const checkRes = await fetch(`/api/request-add-MUA?email=${user.email}`);
       const checkData = await checkRes.json();
-      const isPending = checkData.data?.some((item) => item.email === currentUser.email && item.status === "pending");
+      const isPending = checkData.data?.some((item) => item.email === user.email && item.status === "pending");
       if (isPending) {
         toast("Bạn đã gửi yêu cầu nâng cấp trước đó. Vui lòng chờ xác nhận từ quản trị viên.");
         setShowUpgradeModal(false);
@@ -103,8 +108,8 @@ const UserProfileComponent = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: currentUser._id,
-          email: currentUser.email,
+          userId: user._id,
+          email: user.email,
           profile: profileData // gửi kèm thông tin hồ sơ
         })
       });
@@ -128,13 +133,13 @@ const UserProfileComponent = () => {
     <div className="container my-4">
       <Tabs id="profile-tabs" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
         <Tab eventKey="account" title="Cập nhật tài khoản">
-          <UpdateProfileComponent currentUser={currentUser} updateUser={updateUser} />
+          <UpdateProfileComponent currentUser={user} updateUser={updateUser} />
         </Tab>
               
         {/* Tab cập nhật hồ sơ chuyên gia cho MUA */}
-        {currentUser.role === "makeup_artist" && (
+        {user.role === "makeup_artist" && (
           <Tab eventKey="mua-profile" title="Cập nhật hồ sơ chuyên gia">
-            <UpdateMakeupArtistProfileComponent currentUser={currentUser} />
+            <UpdateMakeupArtistProfileComponent currentUser={user} />
           </Tab>
         )}
 
@@ -164,20 +169,20 @@ const UserProfileComponent = () => {
           </Form>
         </Tab>
 
-        {currentUser.role === ROLE_MANAGER.USER && (
+        {user.role === ROLE_MANAGER.USER && (
           <Tab eventKey="empty" title="Lịch sử đặt dịch vụ">
-            <HistoryBookingComponent currentUser={currentUser} />
+            <HistoryBookingComponent currentUser={user} />
           </Tab>
         )}
 
         <Tab eventKey="backs" title="Lịch sử trả tiền">
-          <HistoryBankComponent currentUser={currentUser} />
+          <HistoryBankComponent currentUser={user} />
         </Tab>
 
-        {currentUser.role === ROLE_MANAGER.USER && (
+        {user.role === ROLE_MANAGER.USER && (
           <Tab eventKey="upgrade" title="Yêu cầu nâng cấp">
             <div className="mt-3">
-              {currentUser.active ? (
+              {user.active ? (
                 isPending ? (
                   <Alert severity="info" className="mb-3">
                     <AlertTitle>
@@ -221,13 +226,13 @@ const UserProfileComponent = () => {
                 <Modal.Body>
                   {!hasProfile ? (
                     <CreateMakeupArtistProfileComponent
-                      currentUser={currentUser}
+                      currentUser={user}
                       onSubmit={handleUpgradeProfileSubmit}
                       isUpgradeRequest={true}
                     />
                   ) : (
                     <UpdateMakeupArtistProfileComponent
-                      currentUser={currentUser}
+                      currentUser={user}
                       onSubmit={handleUpgradeProfileSubmit}
                       isUpgradeRequest={true}
                     />
