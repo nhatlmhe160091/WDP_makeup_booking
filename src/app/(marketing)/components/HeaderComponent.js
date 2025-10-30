@@ -371,6 +371,10 @@
                   </span>
                 </Link>
               )}
+              {/* Blog bài viết */}
+              <Link href="/blog" className={`nav-item nav-link ${pathUrl === "/blog" ? "active" : ""}`}>
+                Bài viết
+              </Link>
               <Link href="/lien-he" className={`nav-item nav-link ${pathUrl === "/lien-he" ? "active" : ""}`}>
                 Liên hệ
               </Link>

@@ -18,7 +18,10 @@ const LinkName = [
   { name: "Đăng ký", path: "/dang-ky" },
   { name: "Trang cá nhân", path: "/trang-ca-nhan" },
   { name: "Xác thực tài khoản", path: "/xac-thuc-tai-khoan" },
-  { name: "Quên mật khẩu", path: "/quen-mat-khau" }
+  { name: "Quên mật khẩu", path: "/quen-mat-khau" },
+  { name: "Đặt lại mật khẩu", path: "/dat-lai-mat-khau" },
+  { name: "Bài viết", path: "/blog" },
+  { name: "Yêu thích", path: "/yeu-thich" }
 ];
 
 const CarouselComponent = ({ pathUrl }) => {
