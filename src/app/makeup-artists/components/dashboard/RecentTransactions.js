@@ -25,7 +25,7 @@ const RecentNotifies = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/orders", {
-        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser.id : ""
       });
       if (res.payload) {
         // Lấy ngày hôm nay

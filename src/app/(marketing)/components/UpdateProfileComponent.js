@@ -96,7 +96,7 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
       ...formData,
       address,
       avatar: fileUrl,
-      id: currentUser._id
+      id: currentUser.id
     };
 
     const response = await SendRequest("PUT", "/api/users", payload);
@@ -121,6 +121,7 @@ const UpdateProfileComponent = ({ currentUser, updateUser }) => {
     setFile(null);
   };
 if (!currentUser) return <div>Đang tải...</div>;
+console.log("Current User in UpdateProfileComponent:", currentUser);
   return (
     <Form onSubmit={handleUpdate}>
       {!isGoogleUser && (

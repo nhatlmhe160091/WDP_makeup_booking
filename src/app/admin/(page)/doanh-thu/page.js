@@ -30,7 +30,7 @@ const RevenueDetailPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/orders/revenue", {
-        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser.id : ""
       });
       if (res.payload) {
         setRevenue(res.payload);

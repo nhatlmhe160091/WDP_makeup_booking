@@ -14,7 +14,18 @@
     const pathUrl = usePathname();
     const { currentUser, refreshUserData } = useApp();
     const { data: session } = useSession();
-    const isLoggedIn = currentUser && Object.keys(currentUser).length > 0 || session?.user;
+    const isLoggedIn = (currentUser && Object.keys(currentUser).length > 0) || session?.user;
+
+    // Log user session info when logged in (Google hoặc thường)
+    useEffect(() => {
+      if (isLoggedIn) {
+        if (session?.user) {
+          console.log('[Header] User session (Google/next-auth):', session.user);
+        } else if (currentUser && Object.keys(currentUser).length > 0) {
+          console.log('[Header] User session (local):', currentUser);
+        }
+      }
+    }, [isLoggedIn, session, currentUser]);
     const [allMakeups, setAllMakeups] = useState([]);
     const [searchValue, setSearchValue] = useState("");
     const [showResults, setShowResults] = useState(false);
@@ -65,6 +76,34 @@
         }
       };
       fetchNotifications();
+    }, [isLoggedIn, currentUser]);
+
+    // Refetch notifications when user just logged in (isLoggedIn chuyển từ false sang true)
+    const prevIsLoggedIn = useRef(isLoggedIn);
+    useEffect(() => {
+      if (!prevIsLoggedIn.current && isLoggedIn) {
+        // User vừa đăng nhập, fetch lại notifications
+        const fetchNotifications = async () => {
+          setLoadingNoti(true);
+          try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+            const userIdParam = currentUser?._id || currentUser?.id || currentUser?.userId;
+            let url = '/api/notifications/user';
+            if (userIdParam) url += `?userId=${encodeURIComponent(userIdParam)}`;
+            const res = await fetch(url, {
+              headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+            const data = await res.json();
+            if (data.success) setNotifications(data.data);
+          } catch (err) {
+            setNotifications([]);
+          } finally {
+            setLoadingNoti(false);
+          }
+        };
+        fetchNotifications();
+      }
+      prevIsLoggedIn.current = isLoggedIn;
     }, [isLoggedIn, currentUser]);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;

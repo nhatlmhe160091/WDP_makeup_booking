@@ -48,14 +48,14 @@ const HistoryBankComponent = () => {
 
   const fetchRefunds = useCallback(async () => {
     setLoading(true);
-    let id_user = currentUser._id;
+    let id_user = currentUser.id;
     if (currentUser.role === "admin") {
       id_user = "";
     }
     const res = await SendRequest("GET", "/api/refund", { userId: id_user });
     if (res.payload) setRefunds(res.payload);
     setLoading(false);
-  }, [currentUser._id, currentUser.role]);
+  }, [currentUser.id, currentUser.role]);
 
   useEffect(() => {
     fetchRefunds();
@@ -97,14 +97,14 @@ const HistoryBankComponent = () => {
 
     try {
       await SendRequest("PUT", "/api/users", {
-        id: currentUser._id,
+        id: currentUser.id,
         withdrawn: (currentUser.withdrawn || 0) + amount
       });
       await SendRequest("POST", "/api/refund", {
         totalAmount: amount,
         discount: currentUser.payment_type ? 0 : 10, // Giả sử chiết khấu là 10% nếu không có gói thanh toán
         type: "get_money",
-        userId: currentUser._id,
+        userId: currentUser.id,
         bank_info_number: currentUser.bank_info_number,
         bank_info: currentUser.bank_info,
         name: currentUser.name,

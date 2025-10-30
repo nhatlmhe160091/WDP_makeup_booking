@@ -34,7 +34,7 @@ const UserAppLayout = ({ children }) => {
       } else if (userRole === "makeup_artist") {
         router.push("/makeup-artists");
       } else {
-        router.push("/trang-ca-nhan");
+        window.location.href = "/";
       }
     }
   }, [isLoading, isAuthenticated, pathUrl, userRole, router]);

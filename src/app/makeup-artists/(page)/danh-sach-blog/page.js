@@ -74,15 +74,15 @@ const BlogManagementPage = () => {
         "GET",
         "/api/blogs?" +
           new URLSearchParams({
-            ownerId: currentUser._id,
+            ownerId: currentUser.id,
             ...(filter !== "all" && { status: filter }),
           })
       );
-      console.log("response", response.payload);
-      console.log("response success", response);
+      // console.log("response", response.payload);
+      // console.log("response success", response);
       if (response.payload) {
         setBlogs(response.payload);
-        console.log("blogs", response.payload);
+        // console.log("blogs", response.payload);
       }
     } catch (error) {
       toast.error("Lỗi khi tải danh sách blog");

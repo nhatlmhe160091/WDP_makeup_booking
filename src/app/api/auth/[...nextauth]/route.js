@@ -55,17 +55,21 @@ export const authOptions = {
       return true;
     },
     async session({ session, token }) {
-      // Thêm thông tin user từ database vào session
+      // Lấy toàn bộ thông tin user từ database vào session.user
       if (session.user) {
         const client = await clientPromise;
         const db = client.db("accounts");
         const accountsCollection = db.collection("users");
-        
         const dbUser = await accountsCollection.findOne({ email: session.user.email });
         if (dbUser) {
-          session.user.id = dbUser._id.toString();
-          session.user.role = dbUser.role;
-          session.user.active = dbUser.active;
+          // Merge toàn bộ thông tin user từ DB vào session.user
+          session.user = {
+            ...session.user,
+            ...dbUser,
+            id: dbUser._id?.toString() || dbUser.id,
+            _id: dbUser._id?.toString() || dbUser.id,
+            avatar: dbUser.avatar || session.user.image || "",
+          };
         }
       }
       return session;

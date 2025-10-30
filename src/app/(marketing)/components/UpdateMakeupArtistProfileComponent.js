@@ -47,7 +47,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser._id}`);
+        const res = await SendRequest("get", `/api/makeup-artists/request-profile/${currentUser.id}`);
         // console.log("fetchProfile res", res);
         if (res.payload) {
           // console.log("res.payload", res.payload);
@@ -119,7 +119,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
     try {
       // Cập nhật profile
       const res = await SendRequest("put", "/api/makeup-artist-profiles", {
-        artistId: currentUser._id,
+        artistId: currentUser.id,
         ...profile,
         workingHours: wh
       });
@@ -131,7 +131,7 @@ const UpdateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
           const profileData = {
             ...profile,
             workingHours: wh,
-            artistId: currentUser._id
+            artistId: currentUser.id
           };
           await onSubmit(profileData);
         }

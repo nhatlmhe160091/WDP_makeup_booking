@@ -9,7 +9,7 @@ import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 import FormMakeupLocation from "./FormMakeupLocation";
 
-const OrderServiceModal = ({ open, onClose, serviceData }) => {
+const OrderServiceModal = ({ open, onClose, serviceData, currentUser }) => {
 
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedField, setSelectedField] = useState("");
@@ -47,7 +47,7 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
   //     fetchOrderData();
   //   }
   // }, [serviceData]);
-
+console.log('serviceData in OrderServiceModal:', currentUser);
   useEffect(() => {
     if (open) {
       // reset all
@@ -72,7 +72,8 @@ const OrderServiceModal = ({ open, onClose, serviceData }) => {
           body: JSON.stringify({
             serviceId: serviceData._id,
             date: selectedDate,
-            slots: selectedFieldSlot
+            slots: selectedFieldSlot,
+            
           })
         });
       }

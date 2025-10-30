@@ -29,12 +29,12 @@ const HistoryBankComponent = ({ currentUser }) => {
 
   const fetchRefunds = useCallback(async () => {
     setLoading(true);
-    const res = await SendRequest("GET", "/api/refund", { userId: currentUser._id });
+    const res = await SendRequest("GET", "/api/refund", { userId: currentUser.id });
     if (res.payload) {
       setRefunds(res.payload);
     }
     setLoading(false);
-  }, [currentUser._id]);
+  }, [currentUser.id]);
 
   useEffect(() => {
     fetchRefunds();

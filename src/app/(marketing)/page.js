@@ -26,6 +26,7 @@ export const metadata = {
     url: META_DATA.URL
   }
 };
+
 export default function Home() {
 
   return (

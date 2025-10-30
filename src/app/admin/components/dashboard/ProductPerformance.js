@@ -27,7 +27,7 @@ const ProductPerformance = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/orders", {
-        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser.id : ""
       });
       if (res.payload) {
         // Tính số lần đặt của từng dịch vụ makeup

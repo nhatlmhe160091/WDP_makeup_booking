@@ -35,7 +35,7 @@ const ServiceListPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/services/MUA", {
-        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser.id : ""
       });
       if (res.payload) {
         setServices(res.payload);

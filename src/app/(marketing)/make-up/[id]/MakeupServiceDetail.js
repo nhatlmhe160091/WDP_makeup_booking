@@ -227,7 +227,7 @@ const MakeupServiceDetail = () => {
 
     const payload = {
       feedbackId: selectedFeedback._id,
-      userId: currentUser._id,
+      userId: currentUser.id,
       content: replyContent
     };
 
@@ -308,7 +308,7 @@ const MakeupServiceDetail = () => {
 
       const payload = {
         serviceId: id,
-        userId: currentUser._id,
+        userId: currentUser.id,
         content: newComment.trim(),
         images: imageUrls
       };
@@ -996,7 +996,7 @@ const MakeupServiceDetail = () => {
                                     if (!currentUser || !content) return;
                                     const res = await SendRequest("POST", "/api/comment-replies", {
                                       commentId: comment._id,
-                                      userId: currentUser._id,
+                                      userId: currentUser.id,
                                       content
                                     });
                                     if (res?.success) {
@@ -1074,7 +1074,7 @@ const MakeupServiceDetail = () => {
       </div>
 
       {/* Modal đặt lịch */}
-      <OrderServiceModal open={showModal} onClose={() => setShowModal(false)} serviceData={serviceData} />
+      <OrderServiceModal open={showModal} onClose={() => setShowModal(false)} serviceData={serviceData} currentUser={currentUser} />
 
       {/* Modal phản hồi */}
       <Modal show={showReplyModal} onHide={() => setShowReplyModal(false)} centered>

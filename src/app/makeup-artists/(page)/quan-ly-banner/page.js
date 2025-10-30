@@ -49,7 +49,7 @@ const BannerManagementPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/banners", {
-        ownerId: currentUser._id
+        ownerId: currentUser.id
       });
       if (res) {
         setBanners(res.payload || []);
@@ -60,13 +60,13 @@ const BannerManagementPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentUser._id]);
+  }, [currentUser.id]);
 
   useEffect(() => {
-    if (currentUser._id) {
+    if (currentUser.id) {
       fetchBanners();
     }
-  }, [currentUser._id, fetchBanners]);
+  }, [currentUser.id, fetchBanners]);
 
   // Handle file upload
   const handleFileChange = (event) => {
@@ -115,7 +115,7 @@ const BannerManagementPage = () => {
       submitData.append("description", formData.description);
       submitData.append("active", formData.active);
       submitData.append("order", formData.order);
-      submitData.append("ownerId", currentUser._id);
+      submitData.append("ownerId", currentUser.id);
       let fileUrl = "";
 
       if (formData.image) {

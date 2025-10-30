@@ -146,9 +146,11 @@ export async function PUT(req) {
     const ObjectId = getObjectId(id);
 
     // Kiểm tra xem user có tồn tại không
-    const user = await accountsCollection.findOne({
-      _id: ObjectId
-    });
+    let user = await accountsCollection.findOne({ _id: ObjectId });
+    // Nếu không tìm thấy theo _id (ObjectId), thử tìm theo id dạng string (session lưu id dạng string)
+    if (!user && id) {
+      user = await accountsCollection.findOne({ id: id });
+    }
 
     if (!user) {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });

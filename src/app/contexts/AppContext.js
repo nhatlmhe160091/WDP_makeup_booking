@@ -2,6 +2,7 @@
 import SendRequest from "@muahub/utils/SendRequest";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
@@ -9,15 +10,46 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const loadingState = useRef(false);
   const router = useRouter();
-  // Add authTrigger state to force re-fetch
   const [authTrigger, setAuthTrigger] = useState(0);
+  const { data: session, status } = useSession();
 
   // Function to force refresh user data
   const refreshUserData = () => {
     setAuthTrigger(prev => prev + 1);
   };
 
+
   useEffect(() => {
+    // Hàm chuẩn hóa user cho mọi trường hợp
+    const normalizeUser = (user1, user2) => {
+      // user1: từ backend (local), user2: từ session Google
+      return {
+        _id: user1?._id || user2?.id || user2?._id || "",
+        id: user1?._id || user2?.id || user2?._id || "",
+        email: user1?.email || user2?.email || "",
+        name: user1?.name || user2?.name || "",
+        avatar: user1?.avatar || user2?.image || "",
+        role: user1?.role || user2?.role || "user",
+        active: user1?.active ?? user2?.active ?? true,
+        phone: user1?.phone || "",
+        address: user1?.address || "",
+        bank_info: user1?.bank_info || "",
+        bank_info_number: user1?.bank_info_number || "",
+        bio: user1?.bio || "",
+        payment_package: user1?.payment_package || null,
+        withdrawn: user1?.withdrawn || 0,
+        created_at: user1?.created_at || user2?.created_at || "",
+        updated_at: user1?.updated_at || user2?.updated_at || ""
+      };
+    };
+
+    if (status === "authenticated" && session?.user) {
+      // Nếu đã đăng nhập Google, đồng bộ với user local nếu có
+      setUser(prev => normalizeUser(prev, session.user));
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       loadingState.current = true;
       setLoading(true);
@@ -48,13 +80,14 @@ export function AppProvider({ children }) {
           setLoading(false);
         }
       }
-      setUser(userPayload);
+      // Nếu có session Google thì merge luôn
+      setUser(normalizeUser(userPayload, session?.user));
       loadingState.current = false;
     };
     if (!loadingState.current) {
       fetchData();
     }
-  }, [authTrigger]); // Add authTrigger to dependencies
+  }, [authTrigger, session, status]);
 
   return (
     <AppContext.Provider value={{ currentUser: user, updateUser: setUser, loading, refreshUserData }}>{children}</AppContext.Provider>

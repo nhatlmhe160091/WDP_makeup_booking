@@ -36,7 +36,7 @@ const BookingHistoryPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/orders/makeup-artists", {
-        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser._id : ""
+        ownerId: currentUser.role === ROLE_MANAGER.MUA ? currentUser.id : ""
       });
       if (res.payload) {
         setBookings(res.payload);

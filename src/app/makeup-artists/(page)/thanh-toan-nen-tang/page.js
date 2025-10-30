@@ -83,7 +83,7 @@ const WebsitePaymentPage = () => {
     setLoading(true);
     try {
       const res = await SendRequest("GET", "/api/website-payments", {
-        ownerId: currentUser._id
+        ownerId: currentUser.id
       });
       if (res.payload) {
         setWebsitePayments(res.payload);
@@ -181,14 +181,14 @@ const WebsitePaymentPage = () => {
       if (paymentType !== "revenue") {
         // Tạo bản ghi thanh toán cho các gói trả phí
         await SendRequest("POST", "/api/website-payments", {
-          ownerId: currentUser._id,
+          ownerId: currentUser.id,
           payment_package: paymentType,
           amount: paymentTypes[paymentType].amount,
           status: "PENDING"
         });
         // Lấy payment vừa tạo (có thể lấy theo ownerId, payment_package, status: "PENDING")
         const res = await SendRequest("GET", "/api/website-payments", {
-          ownerId: currentUser._id,
+          ownerId: currentUser.id,
           payment_package: paymentType,
           status: "PENDING"
         });
@@ -206,7 +206,7 @@ const WebsitePaymentPage = () => {
         amount: paymentTypes[paymentType].amount,
         description: `Thanh toán ${paymentTypes[paymentType].label}`,
         status: paymentType === "revenue" ? "Đang hoạt động" : "Chờ xác nhận",
-        transaction_id: `PAY_${Date.now()}_${currentUser._id.slice(-6)}` // Tạo mã giao dịch unique
+        transaction_id: `PAY_${Date.now()}_${currentUser.id.slice(-6)}` // Tạo mã giao dịch unique
       };
 
       // Cập nhật payment_type, payment_amount và thêm lịch sử thanh toán cho user
@@ -221,7 +221,7 @@ const WebsitePaymentPage = () => {
       }
 
       await SendRequest("PUT", "/api/users", {
-        id: currentUser._id,
+        id: currentUser.id,
         payment_type: paymentType,
         payment_amount: paymentTypes[paymentType].amount,
         payment_history: paymentHistoryRecord,
