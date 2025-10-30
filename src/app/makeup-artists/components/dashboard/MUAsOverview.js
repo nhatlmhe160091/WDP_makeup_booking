@@ -132,7 +132,7 @@ const MUAsOverview = () => {
 
   return (
     <DashboardCard
-      title="Tổng quan đặt lịch makeup"
+      title="Tổng quan đặt lịch makeup makeup artist"
       action={
         <Select labelId="month-dd" id="month-dd" value={month} size="small" onChange={(e) => setMonth(e.target.value)}>
           {[...Array(12).keys()].map((m) => (

@@ -15,8 +15,8 @@ const AdminLayout = ({ children }) => {
   const { currentUser, loading } = useApp();
   const pathUrl = usePathname();
   const router = useRouter();
-
-  if (currentUser.role === ROLE_MANAGER.USER) {
+console.log("Current User in Makeup Artists Layout:", currentUser);
+  if (currentUser?.role === ROLE_MANAGER.USER) {
     router.push("/");
     return;
   }

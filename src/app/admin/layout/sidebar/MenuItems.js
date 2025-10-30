@@ -33,6 +33,12 @@ const Menuitems = [
     icon: IconChartBar,
     href: "/admin/doanh-thu"
   },
+    {
+    id: uniqueId(),
+    title: "Gói dịch vụ",
+    icon: IconChartBar,
+    href: "/admin/thong-ke-goi-dich-vu"
+  },
   {
     id: uniqueId(),
     title: "Lịch sử rút tiền",

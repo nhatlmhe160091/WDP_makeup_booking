@@ -17,7 +17,8 @@ const UserAppLayout = ({ children }) => {
   const linkNeedNotAuth = ["/quen-mat-khau", "/dang-nhap", "/dang-ky"];
 
   // Kiểm tra xác thực từ cả hai nguồn (NextAuth và hệ thống hiện tại)
-  const isAuthenticated = (!loading && Object.keys(currentUser).length > 0) || (status === "authenticated" && session);
+  const isLocalUserValid = currentUser && (currentUser.id || currentUser._id || currentUser.email);
+  const isAuthenticated = (!loading && (session?.user || isLocalUserValid)) || (status === "authenticated" && session?.user);
   const isLoading = loading || status === "loading";
 
   // Lấy role từ currentUser hoặc session

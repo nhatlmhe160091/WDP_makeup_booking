@@ -10,12 +10,17 @@ export async function GET(req) {
     const db = client.db("accounts");
     const paymentsCollection = db.collection("website_payments");
 
+
     const url = new URL(req.url);
     const ownerId = url.searchParams.get("ownerId");
+    const status = url.searchParams.get("status");
 
     let query = {};
     if (ownerId) {
       query.ownerId = new ObjectId(ownerId);
+    }
+    if (status) {
+      query.status = status;
     }
 
     const payments = await paymentsCollection

@@ -37,9 +37,16 @@ export function AppProvider({ children }) {
         bank_info_number: user1?.bank_info_number || "",
         bio: user1?.bio || "",
         payment_package: user1?.payment_package || null,
+        payment_type: user1?.payment_type || null,
         withdrawn: user1?.withdrawn || 0,
         created_at: user1?.created_at || user2?.created_at || "",
-        updated_at: user1?.updated_at || user2?.updated_at || ""
+        updated_at: user1?.updated_at || user2?.updated_at || "",
+        // Bổ sung các trường cần thiết
+        cccd: user1?.cccd || "",
+        totalPrice: user1?.totalPrice || 0,
+        payment_amount: user1?.payment_amount || 0,
+        payment_expiry: user1?.payment_expiry || "",
+        payment_history: user1?.payment_history || [],
       };
     };
 

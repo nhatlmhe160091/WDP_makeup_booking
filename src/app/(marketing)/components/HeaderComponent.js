@@ -14,8 +14,11 @@
     const pathUrl = usePathname();
     const { currentUser, refreshUserData } = useApp();
     const { data: session } = useSession();
-    const isLoggedIn = (currentUser && Object.keys(currentUser).length > 0) || session?.user;
-
+    // Consider user logged in only if session.user exists OR currentUser has a valid id or email
+    const isLocalUserValid = currentUser && (currentUser.id || currentUser._id || currentUser.email);
+    const isLoggedIn = !!(session?.user || isLocalUserValid);
+    // Debug log
+    console.log("HeaderComponent - isLoggedIn:", isLoggedIn, "session:", session, "currentUser:", currentUser);
     // Log user session info when logged in (Google hoặc thường)
     useEffect(() => {
       if (isLoggedIn) {

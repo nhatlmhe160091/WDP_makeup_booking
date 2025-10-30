@@ -14,7 +14,7 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
   const router = useRouter();
   useEffect(() => {
     if (
-      currentUser.role === ROLE_MANAGER.MUA &&
+      currentUser?.role === ROLE_MANAGER.MUA &&
       !currentUser.payment_type &&
       pathname !== "/makeup-artists/thanh-toan-nen-tang"
     ) {
@@ -23,10 +23,15 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
   }, [currentUser, pathname, router]);
 
   if (
-    currentUser.role === ROLE_MANAGER.MUA &&
-    !currentUser.payment_type &&
+    currentUser?.role === ROLE_MANAGER.MUA &&
+    !currentUser?.payment_type &&
     pathname === "/makeup-artists/thanh-toan-nen-tang"
   ) {
+     console.log("[SidebarItems] Blocked: currentUser=", currentUser, "pathname=", pathname, "ROLE_MANAGER=", ROLE_MANAGER, "condition:", {
+          isMua: currentUser.role === ROLE_MANAGER.MUA,
+          noPayment: !currentUser.payment_type,
+          isPaymentPage: pathname === "/admin/thanh-toan-nen-tang"
+        });
     return (
       <Box sx={{ px: 3 }}>
         <div style={{ padding: "16px", textAlign: "center", color: "#888" }}>
@@ -41,10 +46,10 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
       <List sx={{ pt: 0 }} className="sidebarNav" component="div">
         {Menuitems.map((item) => {
           // {/********SubHeader**********/}
-          if (item.onlyUser && currentUser.role === ROLE_MANAGER.ADMIN) {
+          if (item.onlyUser && currentUser?.role === ROLE_MANAGER.ADMIN) {
             return null;
           }
-          if (item.onlyAdmin && currentUser.role === ROLE_MANAGER.MUA) {
+          if (item.onlyAdmin && currentUser?.role === ROLE_MANAGER.MUA) {
             return null;
           }
           if (item.subheader) {

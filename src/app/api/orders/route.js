@@ -250,6 +250,23 @@ export async function PUT(req) {
         created_at: new Date(),
         updated_at: new Date()
       };
+
+      // Cộng tiền cọc cho admin
+      // Tìm admin theo email
+      const adminEmail = 'admin@gmail.com';
+      const adminData = await accountsCollection.findOne({ email: adminEmail });
+      const adminOldTotal = adminData?.totalPrice || 0;
+      const adminNewTotal = adminOldTotal + order.deposit;
+      console.log('Cộng tiền cọc cho admin:', { adminEmail, adminOldTotal, deposit: order.deposit, adminNewTotal });
+      await accountsCollection.updateOne(
+        { email: adminEmail },
+        {
+          $set: {
+            totalPrice: adminNewTotal
+          }
+        },
+        { upsert: true }
+      );
     }
     // Nếu MUA xác nhận dịch vụ
     if (order.status === "deposit_confirmed" && status === "confirmed") {
@@ -259,11 +276,14 @@ export async function PUT(req) {
     if (updateOwnerTotal) {
       const ownerId = order.ownerId;
       const ownerData = await accountsCollection.findOne({ _id: ownerId });
+      const oldTotal = ownerData.totalPrice || 0;
+      const newTotal = oldTotal + order.deposit;
+      console.log('Cộng tiền cho owner:', { ownerId: ownerId.toString ? ownerId.toString() : ownerId, oldTotal, deposit: order.deposit, newTotal });
       await accountsCollection.updateOne(
         { _id: ownerId },
         {
           $set: {
-            totalPrice: (ownerData.totalPrice || 0) + order.deposit
+            totalPrice: newTotal
           }
         }
       );

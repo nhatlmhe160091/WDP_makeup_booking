@@ -33,7 +33,7 @@ const WebsitePaymentPage = () => {
   const [payosQr, setPayosQr] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [currentOrderCode, setCurrentOrderCode] = useState(null);
-  const [websitePayments, setWebsitePayments] = useState([]);
+  // const [websitePayments, setWebsitePayments] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
   const [currentPaymentAmount, setCurrentPaymentAmount] = useState(0);
   const [paymentHistory, setPaymentHistory] = useState([]);
@@ -79,21 +79,21 @@ const WebsitePaymentPage = () => {
     monthly_6: 2,
     yearly: 3
   };
-  const fetchWebsitePayments = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await SendRequest("GET", "/api/website-payments", {
-        ownerId: currentUser.id
-      });
-      if (res.payload) {
-        setWebsitePayments(res.payload);
-      }
-    } catch (error) {
-      console.error("Error fetching website payments:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser]);
+  // const fetchWebsitePayments = useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await SendRequest("GET", "/api/website-payments", {
+  //       ownerId: currentUser.id
+  //     });
+  //     if (res.payload) {
+  //       setWebsitePayments(res.payload);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching website payments:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [currentUser]);
 
   const fetchCurrentUser = useCallback(async () => {
     try {
@@ -123,10 +123,10 @@ const WebsitePaymentPage = () => {
 
   useEffect(() => {
     if (Object.keys(currentUser).length === 0) return;
-    fetchWebsitePayments();
+    // fetchWebsitePayments();
     fetchCurrentUser();
     fetchPaymentHistory();
-  }, [currentUser, fetchWebsitePayments, fetchCurrentUser, fetchPaymentHistory]);
+  }, [currentUser, fetchCurrentUser, fetchPaymentHistory]);
 
   // PayOS: generate payment link and QR
   const generatePayosLink = async (amount, content, orderCode) => {
