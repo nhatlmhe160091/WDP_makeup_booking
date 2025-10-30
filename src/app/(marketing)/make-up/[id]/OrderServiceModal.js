@@ -73,7 +73,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             serviceId: serviceData._id,
             date: selectedDate,
             slots: selectedFieldSlot,
-            
+            userId: currentUser?.id || currentUser?._id
           })
         });
       }
@@ -193,7 +193,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             serviceId: serviceData._id,
-            date: selectedDate
+            date: selectedDate,
+            userId: currentUser?.id || currentUser?._id
           })
         });
         const lockData = await lockRes.json();
@@ -230,7 +231,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
           body: JSON.stringify({
             serviceId: serviceData._id,
             date: selectedDate,
-            slots: selectedFieldSlot
+            slots: selectedFieldSlot,
+            userId: currentUser?.id || currentUser?._id
           })
         });
       } catch (error) {
@@ -248,7 +250,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             serviceId: serviceData._id,
             date: selectedDate,
             time: slot.time,
-            fieldSlot: slot.fieldIndex
+            fieldSlot: slot.fieldIndex,
+            userId: currentUser?.id || currentUser?._id
           })
         });
         const lockData = await lockRes.json();
@@ -268,7 +271,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             serviceId: serviceData._id,
             date: selectedDate,
             time: slot.time,
-            fieldSlot: slot.fieldIndex
+            fieldSlot: slot.fieldIndex,
+            userId: currentUser?.id || currentUser?._id
           })
         });
         const checkData = await checkRes.json();
@@ -372,7 +376,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             body: JSON.stringify({
               serviceId: serviceData._id,
               date: selectedDate,
-              slots: [{ time, fieldIndex }]
+              slots: [{ time, fieldIndex }],
+              userId: currentUser?.id || currentUser?._id
             })
           });
           
@@ -398,7 +403,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
           serviceId: serviceData._id,
           date: selectedDate,
           time,
-          fieldSlot: fieldIndex
+          fieldSlot: fieldIndex,
+          userId: currentUser?.id || currentUser?._id
         })
       });
       const checkData = await checkRes.json();
@@ -416,7 +422,8 @@ console.log('serviceData in OrderServiceModal:', currentUser);
           serviceId: serviceData._id,
           date: selectedDate,
           time,
-          fieldSlot: fieldIndex
+          fieldSlot: fieldIndex,
+          userId: currentUser?.id || currentUser?._id
         })
       });
       const lockData = await lockRes.json();

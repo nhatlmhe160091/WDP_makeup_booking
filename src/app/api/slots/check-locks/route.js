@@ -7,8 +7,8 @@ const SLOT_LOCKS_COLLECTION = "slot_locks";
 
 export async function POST(request) {
   try {
-    const { serviceId, date } = await request.json();
-    if (!serviceId || !date) {
+    const { serviceId, date, userId } = await request.json();
+    if (!serviceId || !date || !userId) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 });
     }
 
@@ -23,12 +23,13 @@ export async function POST(request) {
       expiresAt: { $gt: new Date() }
     }).toArray();
 
-    // Trả về mảng các slot đang bị lock
+    // Trả về mảng các slot đang bị lock, đồng thời đánh dấu slot nào là của user hiện tại
     return NextResponse.json({
       success: true,
       lockedSlots: lockedSlots.map(lock => ({
         time: lock.time,
-        fieldSlot: lock.fieldSlot
+        fieldSlot: lock.fieldSlot,
+        isLockedByCurrentUser: lock.lockedBy?.toString() === userId
       }))
     });
   } catch (error) {

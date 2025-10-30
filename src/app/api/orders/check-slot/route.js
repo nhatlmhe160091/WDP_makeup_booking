@@ -15,7 +15,7 @@ export async function POST(req) {
         const ordersCollection = db.collection(ORDERS_COLLECTION);
         const slotLocksCollection = db.collection(SLOT_LOCKS_COLLECTION);
 
-        const { serviceId, date, time, fieldSlot } = await req.json();
+        const { serviceId, date, time, fieldSlot, userId } = await req.json();
         if (!serviceId || !date || !time || typeof fieldSlot === 'undefined') {
             return NextResponse.json({ success: false, error: "Missing required parameters" }, { status: 400 });
         }
@@ -40,14 +40,29 @@ export async function POST(req) {
         };
         const existingLock = await slotLocksCollection.findOne(lockQuery);
 
+        let isLocked = false;
+        let isLockedByCurrentUser = false;
+        let message = "Slot còn trống";
+        if (existingOrder) {
+            message = "Slot đã được đặt";
+        } else if (existingLock) {
+            if (userId && existingLock.lockedBy?.toString() === userId) {
+                isLockedByCurrentUser = true;
+                isLocked = false;
+                message = "Slot đang được bạn chọn";
+            } else {
+                isLocked = true;
+                message = "Slot đang được người khác chọn";
+            }
+        }
+
         return NextResponse.json({
             success: true,
-            exists: !!existingOrder || !!existingLock,
-            isLocked: !!existingLock,
+            exists: !!existingOrder || (!!existingLock && !isLockedByCurrentUser),
+            isLocked,
+            isLockedByCurrentUser,
             isBooked: !!existingOrder,
-            message: existingOrder ? "Slot đã được đặt" : 
-                    existingLock ? "Slot đang được người khác chọn" : 
-                    "Slot còn trống"
+            message
         });
     } catch (error) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
