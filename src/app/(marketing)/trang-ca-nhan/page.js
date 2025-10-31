@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+export const dynamic = "force-dynamic";
 import "@muahub/styles/style.css";
 // import Script from "next/script";
 // import AboutUsComponent from "../components/AboutUsComponent";
