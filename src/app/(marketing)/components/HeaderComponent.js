@@ -11,6 +11,25 @@
   import { Badge, IconButton, Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
   
   const HeaderComponent = () => {
+  // Favorite count from localStorage
+  const [favoriteCount, setFavoriteCount] = useState(0);
+
+  // Update favorite count from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const favs = JSON.parse(localStorage.getItem("favoriteServices") || "[]");
+      setFavoriteCount(favs.length);
+    }
+    // Listen to storage event for cross-tab sync
+    const handleStorage = (e) => {
+      if (e.key === "favoriteServices") {
+        const favs = JSON.parse(e.newValue || "[]");
+        setFavoriteCount(favs.length);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
     const pathUrl = usePathname();
     const { currentUser, refreshUserData } = useApp();
     const { data: session } = useSession();
@@ -130,9 +149,9 @@
         setNotifications((prev) => prev.map((n) => n._id === item._id ? { ...n, isRead: true } : n));
       } catch (e) {}
       if (item.orderId) {
-        router.push(`/danh-sach-dat-lich?orderId=${item.orderId}`);
+        router.push(`/trang-ca-nhan?orderId=${item.orderId}`);
       } else {
-        router.push('/danh-sach-dat-lich');
+        router.push('/');
       }
       setAnchorEl(null);
     };
@@ -368,7 +387,7 @@
                         zIndex: 2
                       }}
                     >
-                      2
+                      {favoriteCount}
                       <span className="visually-hidden">favorite items</span>
                     </span>
                   </span>
@@ -411,7 +430,9 @@
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
-                  PaperProps={{ style: { minWidth: 320, maxHeight: 400 } }}
+                  PaperProps={{
+                    sx: { width: 350, maxHeight: 400, p: 0, mt: 1.5, overflowY: "auto" },
+                  }}
                 >
                   <Box px={2} py={1} display="flex" alignItems="center" justifyContent="space-between">
                     <Typography variant="subtitle1">Thông báo</Typography>

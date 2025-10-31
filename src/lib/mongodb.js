@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 
 const uri = MONGODB_CONNECT;
 const options = {
-  useNewUrlParser: true // Loại bỏ useUnifiedTopology
+  // useNewUrlParser: true // Loại bỏ useUnifiedTopology
 };
 
 let client;

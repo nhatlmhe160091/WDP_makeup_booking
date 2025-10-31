@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Tab, Tabs, Form, Modal } from "react-bootstrap";
 import { useApp } from "@muahub/app/contexts/AppContext";
 import UpdateProfileComponent from "./UpdateProfileComponent";
@@ -20,7 +21,9 @@ import Button from '@mui/material/Button';
 const UserProfileComponent = () => {
   const { currentUser, updateUser } = useApp();
   const { data: session } = useSession();
-  const [key, setKey] = useState("account");
+  const searchParams = useSearchParams();
+  const orderIdParam = searchParams.get("orderId");
+  const [key, setKey] = useState(orderIdParam ? "empty" : "account");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   // Sử dụng thông tin từ cả currentUser và session
@@ -171,7 +174,7 @@ const UserProfileComponent = () => {
 
         {user.role === ROLE_MANAGER.USER && (
           <Tab eventKey="empty" title="Lịch sử đặt dịch vụ">
-            <HistoryBookingComponent currentUser={user} />
+            <HistoryBookingComponent currentUser={user} highlightOrderId={orderIdParam} />
           </Tab>
         )}
 

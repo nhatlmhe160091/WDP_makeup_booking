@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import toast from "react-hot-toast";
 
-const HistoryBookingComponent = ({ currentUser }) => {
+const HistoryBookingComponent = ({ currentUser, highlightOrderId }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -267,9 +267,9 @@ const HistoryBookingComponent = ({ currentUser }) => {
             )}
             {bookings.map((booking) => {
               const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking);
-
+              const isHighlighted = highlightOrderId && booking._id === highlightOrderId;
               return (
-                <tr key={booking._id}>
+                <tr key={booking._id} style={isHighlighted ? { backgroundColor: '#ffe082', fontWeight: 'bold' } : {}}>
                   <td>
                     <Link href={`/make-up/${booking.serviceId}`}>{booking.service?.serviceName}</Link>
                   </td>
@@ -341,8 +341,10 @@ const HistoryBookingComponent = ({ currentUser }) => {
           </div>
         )}
         {bookings.map((booking) => {
-          const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking); return (
-            <div key={booking._id} className="card mb-3 shadow-sm">
+          const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking);
+          const isHighlighted = highlightOrderId && booking._id === highlightOrderId;
+          return (
+            <div key={booking._id} className={`card mb-3 shadow-sm${isHighlighted ? ' border-warning bg-warning-subtle' : ''}`}> 
               <div className="card-body">
                 <h6 className="card-title mb-1">
                   <Link href={`/make-up/${booking.serviceId}`} className="text-decoration-none">

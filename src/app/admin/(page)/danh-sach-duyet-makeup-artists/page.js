@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
- import { Box,
+import {
+  Box,
   Button,
   Typography,
   CircularProgress,
@@ -47,7 +48,7 @@ const UserListUpgradeToOwnerPage = () => {
           MUAReqRes.data.some((req) => req.email === user.email && req.status === "pending")
         );
 
-        setUsers(usersWithRequests);
+        setUsers(usersWithRequests.map(user => ({ ...user, id: user._id })));
       }
       if (MUAReqRes.success) setMUARequests(MUAReqRes.data || []);
     } catch (error) {
@@ -141,6 +142,9 @@ const UserListUpgradeToOwnerPage = () => {
     );
   };
 
+// Console ra người dùng
+// console.log("Danh sách người dùng yêu cầu nâng cấp lên chủ dịch vụ makeup:", users);
+// console.log("selectedUser yêu cầu nâng cấp lên chủ dịch vụ makeup:", selectedUser); 
   return (
     <PageContainer
       title="Danh sách duyệt chủ dịch vụ makeup"
@@ -201,54 +205,54 @@ const UserListUpgradeToOwnerPage = () => {
                       <span style={{ color: "#aaa" }}>-</span>
                     )}
                   </TableCell>
-      {/* Modal duyệt đơn và xem profile */}
-      <Modal open={showApproveModal} onClose={() => { setShowApproveModal(false); setShowCancelReason(false); }} maxWidth="md">
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, minWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}>
-          <Typography variant="h6" mb={2}>Thông tin hồ sơ chuyên gia</Typography>
-          {selectedUser && (
-            <UpdateMakeupArtistProfileComponent currentUser={selectedUser} readOnly />
-          )}
-          {/* Nếu đơn đã bị từ chối, hiển thị lý do */}
-          {selectedUser && getRequestStatus(selectedUser.email) === "rejected" && (
-            <Box mt={2} color="#b71c1c">
-              <Chip label="Đã từ chối" color="error" size="small" />
-              {getRequestReason(selectedUser.email) && (
-                <div style={{ fontSize: 14, marginTop: 4 }}>
-                  Lý do từ chối: {getRequestReason(selectedUser.email)}
-                </div>
-              )}
-            </Box>
-          )}
-          {/* Nếu đơn đang pending thì cho phép duyệt/hủy */}
-          {selectedUser && getRequestStatus(selectedUser.email) === "pending" && (
-            <Box mt={3} display="flex" gap={2}>
-              {!showCancelReason ? (
-                <>
-                  <Button variant="contained" color="success" onClick={handleApproveConfirm}>Xác nhận duyệt</Button>
-                  <Button variant="outlined" color="error" onClick={() => setShowCancelReason(true)}>Hủy đơn</Button>
-                  <Button variant="text" onClick={() => { setShowApproveModal(false); setShowCancelReason(false); }}>Đóng</Button>
-                </>
-              ) : (
-                <Box width="100%">
-                  <TextField
-                    label="Lý do hủy đơn"
-                    value={cancelReason}
-                    onChange={e => setCancelReason(e.target.value)}
-                    fullWidth
-                    multiline
-                    minRows={2}
-                    sx={{ mb: 2 }}
-                  />
-                  <Box display="flex" gap={2}>
-                    <Button variant="contained" color="error" onClick={handleCancelRequest}>Xác nhận hủy</Button>
-                    <Button variant="text" onClick={() => setShowCancelReason(false)}>Quay lại</Button>
-                  </Box>
-                </Box>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Modal>
+                  {/* Modal duyệt đơn và xem profile */}
+                  <Modal open={showApproveModal} onClose={() => { setShowApproveModal(false); setShowCancelReason(false); }} maxWidth="md">
+                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, minWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}>
+                      <Typography variant="h6" mb={2}>Thông tin hồ sơ chuyên gia</Typography>
+                      {selectedUser && (
+                        <UpdateMakeupArtistProfileComponent currentUser={selectedUser} readOnly />
+                      )}
+                      {/* Nếu đơn đã bị từ chối, hiển thị lý do */}
+                      {selectedUser && getRequestStatus(selectedUser.email) === "rejected" && (
+                        <Box mt={2} color="#b71c1c">
+                          <Chip label="Đã từ chối" color="error" size="small" />
+                          {getRequestReason(selectedUser.email) && (
+                            <div style={{ fontSize: 14, marginTop: 4 }}>
+                              Lý do từ chối: {getRequestReason(selectedUser.email)}
+                            </div>
+                          )}
+                        </Box>
+                      )}
+                      {/* Nếu đơn đang pending thì cho phép duyệt/hủy */}
+                      {selectedUser && getRequestStatus(selectedUser.email) === "pending" && (
+                        <Box mt={3} display="flex" gap={2}>
+                          {!showCancelReason ? (
+                            <>
+                              <Button variant="contained" color="success" onClick={handleApproveConfirm}>Xác nhận duyệt</Button>
+                              <Button variant="outlined" color="error" onClick={() => setShowCancelReason(true)}>Hủy đơn</Button>
+                              <Button variant="text" onClick={() => { setShowApproveModal(false); setShowCancelReason(false); }}>Đóng</Button>
+                            </>
+                          ) : (
+                            <Box width="100%">
+                              <TextField
+                                label="Lý do hủy đơn"
+                                value={cancelReason}
+                                onChange={e => setCancelReason(e.target.value)}
+                                fullWidth
+                                multiline
+                                minRows={2}
+                                sx={{ mb: 2 }}
+                              />
+                              <Box display="flex" gap={2}>
+                                <Button variant="contained" color="error" onClick={handleCancelRequest}>Xác nhận hủy</Button>
+                                <Button variant="text" onClick={() => setShowCancelReason(false)}>Quay lại</Button>
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  </Modal>
                 </TableRow>
               ))}
             </TableBody>

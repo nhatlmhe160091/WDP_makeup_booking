@@ -2,7 +2,7 @@
 import { Toaster } from "react-hot-toast";
 import { AppProvider } from "./contexts/AppContext";
 import { Providers } from "./providers";
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>

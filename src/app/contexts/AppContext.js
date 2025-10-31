@@ -23,6 +23,7 @@ export function AppProvider({ children }) {
     // Hàm chuẩn hóa user cho mọi trường hợp
     const normalizeUser = (user1, user2) => {
       // user1: từ backend (local), user2: từ session Google
+       console.log("[AppContext] user1.role:", user1?.role, "user2.role:", user2?.role);
       return {
         _id: user1?._id || user2?.id || user2?._id || "",
         id: user1?._id || user2?.id || user2?._id || "",
@@ -51,9 +52,16 @@ export function AppProvider({ children }) {
     };
 
     if (status === "authenticated" && session?.user) {
-      // Nếu đã đăng nhập Google, đồng bộ với user local nếu có
-      setUser(prev => normalizeUser(prev, session.user));
-      setLoading(false);
+      // Nếu đã đăng nhập Google, luôn gọi backend để lấy user chuẩn nếu có token
+      const token = localStorage.getItem("token") || "";
+      if (!token) {
+        // Nếu chưa có token backend, chỉ lấy từ session Google
+        setUser(normalizeUser({}, session.user));
+        setTimeout(() => setLoading(false), 0); // Đảm bảo setUser xong mới tắt loading
+      } else {
+        // Nếu có token backend, gọi fetchData để lấy user từ backend
+        fetchData();
+      }
       return;
     }
 
@@ -67,28 +75,27 @@ export function AppProvider({ children }) {
         setUser({});
         // save current url
         localStorage.setItem("redirectUrl", window.location.pathname);
-        setLoading(false);
+        setTimeout(() => setLoading(false), 0);
       } else {
         try {
+          console.log("Fetching user data with token:", token);
           const res = await SendRequest("GET", "/api/users/me");
           if (res.payload) {
             userPayload = res.payload;
-            setLoading(false);
           } else {
             // save current url
             localStorage.setItem("redirectUrl", window.location.pathname);
-            setLoading(false);
             // remove token
             localStorage.removeItem("token");
             router.push("/dang-nhap");
           }
         } catch (error) {
           console.error("Error during fetching user data:", error);
-          setLoading(false);
         }
+        // Luôn merge xong mới tắt loading
+        setUser(normalizeUser(userPayload, session?.user));
+        setTimeout(() => setLoading(false), 0);
       }
-      // Nếu có session Google thì merge luôn
-      setUser(normalizeUser(userPayload, session?.user));
       loadingState.current = false;
     };
     if (!loadingState.current) {

@@ -19,7 +19,7 @@ export async function GET(req) {
     if (!user) {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
-
+  console.log("Fetched user:", user);
     // Trả về dữ liệu user
     return NextResponse.json({ success: true, data: user });
   } catch (error) {

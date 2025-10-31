@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
-  const [orderDetails, setOrderDetails] = useState(null);
+  // const [orderDetails, setOrderDetails] = useState(null);
 
   useEffect(() => {
     if (orderId) {

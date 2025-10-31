@@ -5,28 +5,34 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
+
 import { useApp } from "@muahub/app/contexts/AppContext";
 const SignInComponent = () => {
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { refreshUserData } = useApp();
+  const { refreshUserData, currentUser, loading: userLoading } = useApp();
 
+  // Sau khi đăng nhập thành công, chờ lấy role rồi mới chuyển hướng
   useEffect(() => {
-    if (status === "authenticated") {
-      // Người dùng đã đăng nhập, chuyển hướng dựa vào role
-      const userRole = session?.user?.role;
-      if (userRole === "admin") {
-        router.push("/admin");
-      } else if (userRole === "makeup_artist") {
-        router.push("/makeup-artists");
-      } else {
-        router.push("/");
+    if (pendingRedirect) {
+      // Ưu tiên lấy role từ currentUser, fallback sang session
+      const userRole = currentUser?.role || session?.user?.role;
+      if (userRole) {
+        setPendingRedirect(false);
+        if (userRole === "admin") {
+          router.push("/admin");
+        } else if (userRole === "makeup_artist") {
+          router.push("/makeup-artists");
+        } else {
+          router.push("/");
+        }
       }
     }
-  }, [status, session, router]);
+  }, [pendingRedirect, currentUser, session, router]);
 
   const validateForm = () => {
     let validationErrors = {};
@@ -50,25 +56,19 @@ const SignInComponent = () => {
     if (validateForm()) {
       setLoading(true);
       const res = await SendRequest("POST", "/api/users/login", formData);
-      setLoading(false);
       if (res.payload) {
         if (res.payload.active == false) {
           toast.error("Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt tài khoản.");
+          setLoading(false);
           return;
         }
         toast.success("Đăng nhập thành công");
         localStorage.setItem("token", res.payload.token);
-        // Refresh user data before navigation
         await refreshUserData();
-        if (res.payload.role === "admin") {
-          router.push("/admin");
-        } else if (res.payload.role === "makeup_artist") {
-          router.push("/makeup-artists");
-        } else {
-          router.push("/");
-        }
+        setPendingRedirect(true); // Bắt đầu chờ role
       } else {
         toast.error("Đăng nhập thất bại, vui lòng kiểm tra thông tin của bạn.");
+        setLoading(false);
       }
     }
   };
@@ -88,6 +88,8 @@ const SignInComponent = () => {
       if (result?.error) {
         toast.error("Đăng nhập bằng Google thất bại");
       } else {
+        // Xóa token local khi đăng nhập Google thành công
+        localStorage.removeItem("token");
         await refreshUserData();
         router.push("/");
       }
@@ -97,6 +99,15 @@ const SignInComponent = () => {
       setLoading(false);
     }
   };
+
+  // Hiển thị loading khi đang chờ role hoặc đang submit
+  if (loading || userLoading || pendingRedirect) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 300 }}>
+        <div className="spinner-border text-primary" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div className="container-fluid py-5">

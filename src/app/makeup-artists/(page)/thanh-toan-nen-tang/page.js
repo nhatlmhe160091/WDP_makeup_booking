@@ -96,21 +96,32 @@ const WebsitePaymentPage = () => {
   // }, [currentUser]);
 
   const fetchCurrentUser = useCallback(async () => {
+    // Nếu đã đăng nhập Google và không có token backend, lấy từ currentUser
+    const token = localStorage.getItem("token") || "";
+    if (!token) {
+      setCurrentPlan(currentUser.payment_type);
+      setCurrentPaymentAmount(currentUser.payment_amount || 0);
+      return;
+    }
     try {
       const res = await SendRequest("GET", "/api/users/me");
       if (res.payload) {
         setCurrentPlan(res.payload.payment_type);
-      
         setCurrentPaymentAmount(res.payload.payment_amount || 0);
       }
     } catch (error) {
       console.error("Error fetching current user:", error);
     }
-  }, []);
+  }, [currentUser]);
 // console.log('Current Plan:', currentPlan);
 // console.log('Current Payment Amount:', currentPaymentAmount);
   // Thêm hàm fetch lịch sử thanh toán
   const fetchPaymentHistory = useCallback(async () => {
+    const token = localStorage.getItem("token") || "";
+    if (!token) {
+      setPaymentHistory(currentUser.payment_history || []);
+      return;
+    }
     try {
       const res = await SendRequest("GET", "/api/users/me");
       if (res) {
@@ -119,7 +130,7 @@ const WebsitePaymentPage = () => {
     } catch (error) {
       console.error("Error fetching payment history:", error);
     }
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     if (Object.keys(currentUser).length === 0) return;

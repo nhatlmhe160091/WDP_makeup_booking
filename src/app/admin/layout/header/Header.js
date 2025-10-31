@@ -1,42 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button, Menu, MenuItem, Typography } from "@mui/material";
+import {
+  Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button, Menu, MenuItem, Typography
+} from "@mui/material";
 import PropTypes from "prop-types";
-import Link from "next/link";
-// components
 import Profile from "./Profile";
 import { IconBellRinging, IconMenu } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-const Header = ({ toggleMobileSidebar }) => {
-  // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
-  // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
+const Header = ({ toggleMobileSidebar }) => {
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     boxShadow: "none",
     background: theme.palette.background.paper,
     justifyContent: "center",
     backdropFilter: "blur(4px)",
-    [theme.breakpoints.up("lg")]: {
-      minHeight: "70px"
-    }
-  }));
-  const ToolbarStyled = styled(Toolbar)(({ theme }) => ({
-    width: "100%",
-    color: theme.palette.text.secondary
+    [theme.breakpoints.up("lg")]: { minHeight: "70px" },
   }));
 
-  // State cho thông báo
+  const ToolbarStyled = styled(Toolbar)(({ theme }) => ({
+    width: "100%",
+    color: theme.palette.text.secondary,
+  }));
+
   const [notifications, setNotifications] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(10); // 👈 số lượng hiển thị ban đầu
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
-        // Lấy tất cả thông báo, không lọc isRead
         const res = await fetch(`/api/notifications/admin`);
         const data = await res.json();
-        if (data.success) setNotifications(data.data);
+        if (data.success) setNotifications(data.data || []);
       } catch (err) {
         setNotifications([]);
       } finally {
@@ -46,49 +43,47 @@ const Header = ({ toggleMobileSidebar }) => {
     fetchNotifications();
   }, []);
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
+  const handleOpenMenu = (e) => setAnchorEl(e.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
 
- const router = useRouter();
-  // Hàm đánh dấu đã đọc và chuyển trang với orderId
   const handleReadAndGo = async (item) => {
     try {
-      await fetch('/api/notifications', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: item._id })
+      await fetch("/api/notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item._id }),
       });
-      setNotifications((prev) => prev.map((n) => n._id === item._id ? { ...n, isRead: true } : n));
-    } catch (e) {}
-    if (item.orderId) {
-      router.push(`/admin/danh-sach-dat-lich?orderId=${item.orderId}`);
-    } else {
-      router.push('/admin/danh-sach-dat-lich');
-    }
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === item._id ? { ...n, isRead: true } : n))
+      );
+    } catch {}
+    if (item.orderId) router.push(`/admin/danh-sach-dat-lich?orderId=${item.orderId}`);
+    else router.push("/admin/danh-sach-dat-lich");
     setAnchorEl(null);
   };
 
-  // Hàm giải phóng thông báo quá hạn
   const handleClearNotifications = async () => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa tất cả thông báo quá hạn?')) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa tất cả thông báo quá hạn?")) return;
     try {
       setLoading(true);
-      const res = await fetch('/api/notifications', { method: 'DELETE' });
+      const res = await fetch("/api/notifications", { method: "DELETE" });
       const data = await res.json();
-      if (data.success) {
-        // Sau khi xóa, reload lại danh sách
-        setNotifications((prev) => prev.filter(n => new Date(n.created_at) >= new Date()));
-        // Hoặc gọi lại fetchNotifications nếu muốn chắc chắn
-        // fetchNotifications();
-      }
-    } catch (e) {} finally {
+      if (data.success) setNotifications([]);
+    } catch {} finally {
       setLoading(false);
     }
   };
+
+  // ✅ Load thêm khi scroll tới cuối
+  const handleScroll = (e) => {
+    const bottom =
+      e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
+    if (bottom && visibleCount < notifications.length && !loading) {
+      setVisibleCount((prev) => prev + 10); // mỗi lần thêm 10
+    }
+  };
+
+  const visibleNotifications = notifications.slice(0, visibleCount);
 
   return (
     <AppBarStyled position="sticky" color="default">
@@ -97,19 +92,13 @@ const Header = ({ toggleMobileSidebar }) => {
           color="inherit"
           aria-label="menu"
           onClick={toggleMobileSidebar}
-          sx={{
-            display: {
-              lg: "none",
-              xs: "inline"
-            }
-          }}
+          sx={{ display: { lg: "none", xs: "inline" } }}
         >
           <IconMenu width="20" height="20" />
         </IconButton>
 
         <IconButton
           size="large"
-          aria-label="show notifications"
           color="inherit"
           aria-controls="msgs-menu"
           aria-haspopup="true"
@@ -119,60 +108,102 @@ const Header = ({ toggleMobileSidebar }) => {
             <IconBellRinging size="21" stroke="1.5" />
           </Badge>
         </IconButton>
+
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleCloseMenu}
           PaperProps={{
-            sx: {
-              width: 350,
-              maxHeight: 400,
-              p: 0,
-              mt: 1.5,
-            }
+            sx: { width: 350, maxHeight: 400, p: 0, mt: 1.5, overflowY: "auto" },
+            onScroll: handleScroll, // 👈 theo dõi scroll
           }}
         >
-          <Box sx={{ p: 2, borderBottom: "1px solid #eee", fontWeight: 600 }}>Thông báo mới</Box>
+          <Box sx={{ p: 2, borderBottom: "1px solid #eee", fontWeight: 600 }}>
+            Thông báo mới
+          </Box>
+
           {loading ? (
-            <MenuItem disabled><Box sx={{ p: 2 }}>Đang tải...</Box></MenuItem>
+            <MenuItem disabled>
+              <Box sx={{ p: 2 }}>Đang tải...</Box>
+            </MenuItem>
           ) : notifications.length === 0 ? (
-            <MenuItem disabled><Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box></MenuItem>
+            <MenuItem disabled>
+              <Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box>
+            </MenuItem>
           ) : (
-            notifications.map((item) => (
+            visibleNotifications.map((item) => (
               <MenuItem
                 key={item._id}
                 sx={{
-                  alignItems: 'flex-start',
-                  whiteSpace: 'normal',
-                  borderBottom: '1px solid #eee',
-                  cursor: item.isRead ? 'default' : 'pointer',
+                  alignItems: "flex-start",
+                  whiteSpace: "normal",
+                  borderBottom: "1px solid #eee",
+                  cursor: item.isRead ? "default" : "pointer",
                   opacity: item.isRead ? 0.6 : 1,
-                  backgroundColor: item.isRead ? '#f5f5f5' : 'inherit',
-                  '&:hover': { backgroundColor: item.isRead ? '#f5f5f5' : '#f0f7ff' }
+                  backgroundColor: item.isRead ? "#f5f5f5" : "inherit",
+                  "&:hover": {
+                    backgroundColor: item.isRead ? "#f5f5f5" : "#f0f7ff",
+                  },
                 }}
-               onClick={() => !item.isRead && handleReadAndGo(item)}
+                onClick={() => !item.isRead && handleReadAndGo(item)}
                 disabled={item.isRead}
               >
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box>
-                    <Typography fontWeight={item.isRead ? 400 : 500}>{item.message}</Typography>
-                    <Typography fontSize={12} color="#888">{new Date(item.created_at).toLocaleString()}</Typography>
+                    <Typography fontWeight={item.isRead ? 400 : 500}>
+                      {item.message}
+                    </Typography>
+                    <Typography fontSize={12} color="#888">
+                      {new Date(item.created_at).toLocaleString()}
+                    </Typography>
                   </Box>
                   {item.isRead && (
                     <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-                      <span style={{ color: '#4caf50', fontSize: 16 }}>✔</span>
-                      <Typography fontSize={12} color="#4caf50">Đã đọc</Typography>
+                      <span style={{ color: "#4caf50", fontSize: 16 }}>✔</span>
+                      <Typography fontSize={12} color="#4caf50">
+                        Đã đọc
+                      </Typography>
                     </Box>
                   )}
                 </Box>
               </MenuItem>
             ))
           )}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1 }}>
-            <Button size="small" color="error" onClick={handleClearNotifications}>Giải phóng thông báo</Button>
-            <Button size="small" onClick={handleCloseMenu}>Đóng</Button>
+
+          {/* Hiển thị thông báo trạng thái */}
+          {visibleCount < notifications.length && !loading && (
+            <MenuItem disabled>
+              <Box sx={{ p: 1, textAlign: "center", color: "#888" }}>
+                Kéo xuống để xem thêm...
+              </Box>
+            </MenuItem>
+          )}
+          {visibleCount >= notifications.length && notifications.length > 0 && (
+            <MenuItem disabled>
+              <Box sx={{ p: 1, textAlign: "center", color: "#888" }}>
+                Hết thông báo
+              </Box>
+            </MenuItem>
+          )}
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              p: 1,
+              borderTop: "1px solid #eee",
+            }}
+          >
+            <Button size="small" color="error" onClick={handleClearNotifications}>
+              Giải phóng
+            </Button>
+            <Button size="small" onClick={handleCloseMenu}>
+              Đóng
+            </Button>
           </Box>
         </Menu>
+
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
           <Profile />
@@ -183,7 +214,7 @@ const Header = ({ toggleMobileSidebar }) => {
 };
 
 Header.propTypes = {
-  sx: PropTypes.object
+  sx: PropTypes.object,
 };
 
 export default Header;

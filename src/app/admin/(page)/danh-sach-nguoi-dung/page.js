@@ -35,6 +35,11 @@ const UserListPage = () => {
     user: null,
     action: null
   });
+  // Filter state
+  const [filter, setFilter] = useState({
+    search: '',
+    status: 'all', // all, active, locked
+  });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -134,6 +139,31 @@ const UserListPage = () => {
     );
   };
 
+  // Filtered users
+  // Phân trang
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  // Reset page về 1 khi filter thay đổi
+  useEffect(() => { setPage(1); }, [filter]);
+
+  const filteredUsers = users.filter((user) => {
+    // Search by email, name, phone
+    const searchText = filter.search.toLowerCase();
+    const matchSearch =
+      user.email?.toLowerCase().includes(searchText) ||
+      user.name?.toLowerCase().includes(searchText) ||
+      user.phone?.toLowerCase().includes(searchText);
+    // Status filter
+    let matchStatus = true;
+    if (filter.status === 'active') matchStatus = user.status !== false;
+    if (filter.status === 'locked') matchStatus = user.status === false;
+    return matchSearch && matchStatus;
+  });
+
+  const totalRows = filteredUsers.length;
+  const totalPages = Math.ceil(totalRows / rowsPerPage) || 1;
+  const pagedUsers = filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+
   return (
     <PageContainer title="Danh sách người dùng" description="Danh sách tất cả người dùng trong hệ thống">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -142,62 +172,116 @@ const UserListPage = () => {
           Tải lại
         </Button>
       </Box>
+      {/* Filter UI */}
+      <Box display="flex" gap={2} mb={2}>
+        <input
+          type="text"
+          placeholder="Tìm kiếm email, tên, SĐT..."
+          value={filter.search}
+          onChange={e => setFilter(f => ({ ...f, search: e.target.value }))}
+          style={{ padding: 8, minWidth: 220, border: '1px solid #ccc', borderRadius: 4 }}
+        />
+        <select
+          value={filter.status}
+          onChange={e => setFilter(f => ({ ...f, status: e.target.value }))}
+          style={{ padding: 8, border: '1px solid #ccc', borderRadius: 4 }}
+        >
+          <option value="all">Tất cả trạng thái</option>
+          <option value="active">Hoạt động</option>
+          <option value="locked">Đã khóa</option>
+        </select>
+      </Box>
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Avatar</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Điện thoại</TableCell>
-                <TableCell>Tên</TableCell>
-                <TableCell>Địa chỉ</TableCell>
-                <TableCell>Ngày đăng ký</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                {/* <TableCell>Duyệt đơn</TableCell> */}
-                <TableCell>Thao tác</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user._id}>
-                  <TableCell>
-                    <img src={user.avatar || "/img/carousel.jpg"} alt={user.name} width="50" height="50" />
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.address}</TableCell>
-                  <TableCell>{convertDateTime(user.created_at)}</TableCell>
-                  <TableCell>{renderAccountStatus(user.status)}</TableCell>
-                  {/* <TableCell>
-                    {hasPendingRequest(user.email) ? (
-                      <Button variant="contained" color="success" size="small" onClick={() => handleApprove(user)}>
-                        Duyệt
-                      </Button>
-                    ) : (
-                      <span style={{ color: "#aaa" }}>-</span>
-                    )}
-                  </TableCell> */}
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      color={user.status === false ? "success" : "error"}
-                      size="small"
-                      onClick={() => handleToggleAccountStatus(user)}
-                    >
-                      {user.status === false ? "Mở khóa" : "Khóa tài khoản"}
-                    </Button>
-                  </TableCell>
+        <>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Avatar</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Điện thoại</TableCell>
+                  <TableCell>Tên</TableCell>
+                  <TableCell>Địa chỉ</TableCell>
+                  <TableCell>Ngày đăng ký</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                  {/* <TableCell>Duyệt đơn</TableCell> */}
+                  <TableCell>Thao tác</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {pagedUsers.map((user) => (
+                  <TableRow key={user._id}>
+                    <TableCell>
+                      <img src={user.avatar || "/img/carousel.jpg"} alt={user.name} width="50" height="50" />
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.address}</TableCell>
+                    <TableCell>{convertDateTime(user.created_at)}</TableCell>
+                    <TableCell>{renderAccountStatus(user.status)}</TableCell>
+                    {/* <TableCell>
+                      {hasPendingRequest(user.email) ? (
+                        <Button variant="contained" color="success" size="small" onClick={() => handleApprove(user)}>
+                          Duyệt
+                        </Button>
+                      ) : (
+                        <span style={{ color: "#aaa" }}>-</span>
+                      )}
+                    </TableCell> */}
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color={user.status === false ? "success" : "error"}
+                        size="small"
+                        onClick={() => handleToggleAccountStatus(user)}
+                      >
+                        {user.status === false ? "Mở khóa" : "Khóa tài khoản"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {/* Pagination controls */}
+          <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+            <div>
+              <span>
+                Trang {page}/{totalPages} &nbsp;|&nbsp; Tổng: {totalRows} người dùng
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label>Hiển thị</label>
+              <select value={rowsPerPage} onChange={e => setRowsPerPage(Number(e.target.value))}>
+                {[5, 10, 20, 50, 100].map(n => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+              <span>/trang</span>
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+              >
+                Trước
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={page === totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              >
+                Sau
+              </Button>
+            </div>
+          </Box>
+        </>
       )}
 
       {/* Dialog xác nhận */}
