@@ -26,7 +26,7 @@ const AdminOverview = () => {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
 
-  // Hàm gọi API để lấy dữ liệu đặt lịch makeup
+
   const fetchBookings = async (currentUser) => {
     setLoading(true);
     try {
@@ -51,6 +51,13 @@ const AdminOverview = () => {
     totalRevenue: 0,
     totalTransactions: 0
   });
+
+  const packageNameVN = {
+    monthly_3: "Gói 3 tháng",
+    monthly_6: "Gói 6 tháng",
+    yearly: "Gói 1 năm"
+  };
+
   const processData = () => {
     // Chỉ tính các gói monthly_3, monthly_6, yearly
     const validPackages = ["monthly_3", "monthly_6", "yearly"];
@@ -64,7 +71,7 @@ const AdminOverview = () => {
       );
     });
 
-    // Gom nhóm theo payment_package
+   
     const packageStats = {};
     filteredData.forEach((item) => {
       const pkg = item.payment_package;
@@ -80,7 +87,8 @@ const AdminOverview = () => {
     const countData = categories.map((pkg) => packageStats[pkg].count);
     const totalData = categories.map((pkg) => packageStats[pkg].total);
 
-    setCategories(categories);
+    // Hiển thị tên gói tiếng Việt trên trục x
+    setCategories(categories.map((pkg) => packageNameVN[pkg] || pkg));
     setSeries([
       { name: "Số lượng giao dịch", data: countData },
       { name: "Tổng tiền (VNĐ)", data: totalData }
@@ -88,7 +96,7 @@ const AdminOverview = () => {
 
     // Top các gói được đặt nhiều nhất (top 3)
     const sortedPackages = categories
-      .map((pkg) => ({ name: pkg, count: packageStats[pkg].count, total: packageStats[pkg].total }))
+      .map((pkg) => ({ name: packageNameVN[pkg] || pkg, count: packageStats[pkg].count, total: packageStats[pkg].total }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
     setTopPackages(sortedPackages);
@@ -123,12 +131,11 @@ const AdminOverview = () => {
   };
 
   useEffect(() => {
-    // dynamic import react-apexcharts with error handling
     if (!Chart) {
       import("react-apexcharts")
         .then((mod) => {
           Chart = mod.default || mod;
-          // reprocess to trigger chart render after module load
+
           if (data.length) {
             processData();
           }
@@ -143,7 +150,7 @@ const AdminOverview = () => {
 
   useEffect(() => {
     if (data.length) {
-      // Lấy danh sách năm có trong dữ liệu (dựa vào created_at)
+
       const yearSet = new Set(data.map((item) => new Date(item.created_at).getFullYear()));
       setYears(Array.from(yearSet).sort((a, b) => a - b));
       processData();
@@ -159,7 +166,8 @@ const AdminOverview = () => {
       toolbar: { show: true },
       height: 370
     },
-    colors: [primary, secondary],
+    // Đặt màu hồng đậm cho số lượng giao dịch, màu xanh cho tổng tiền
+    colors: ["#ec4899", secondary],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -224,164 +232,78 @@ const AdminOverview = () => {
         </Box>
       ) : (
         <>
-          {/* Thông tin tổng quan - UI đẹp hơn */}
+          {/* Thông tin tổng quan - UI màu hồng, bố cục đẹp */}
           <Box display="flex" gap={3} mb={3} flexWrap="wrap" justifyContent="center">
-            <Box
-              sx={{
-                minWidth: 220,
-                bgcolor: '#e3f2fd',
-                borderRadius: 3,
-                p: 2,
-                boxShadow: 2,
-                display: 'flex',
-                alignItems: 'center',
-                mb: { xs: 2, md: 0 }
-              }}
-            >
-              <span style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: '#1976d2',
-                color: '#fff',
-                marginRight: 16,
-                fontSize: 24
-              }}>👥</span>
-              <div>
-                <div style={{ fontSize: 15, color: '#1976d2', fontWeight: 500 }}>Người sử dụng dịch vụ</div>
-                <div style={{ fontWeight: 700, fontSize: 26 }}>{overview.userCount}</div>
-              </div>
+            <Box sx={{ minWidth: 200, border: '2px solid #fed9d5d7', borderRadius: 3, p: 2.5, background: '#fff0f6', textAlign: 'center', flex: 1, maxWidth: 300 }}>
+              <div style={{ fontSize: 15, color: '#000000d9', fontWeight: 600, marginBottom: 4 }}>Người sử dụng dịch vụ</div>
+              <div style={{ fontWeight: 700, fontSize: 26, color: '#000000d8' }}>{overview.userCount}</div>
             </Box>
-            <Box
-              sx={{
-                minWidth: 220,
-                bgcolor: '#fff3e0',
-                borderRadius: 3,
-                p: 2,
-                boxShadow: 2,
-                display: 'flex',
-                alignItems: 'center',
-                mb: { xs: 2, md: 0 }
-              }}
-            >
-              <span style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: '#ff9800',
-                color: '#fff',
-                marginRight: 16,
-                fontSize: 24
-              }}>📦</span>
-              <div>
-                <div style={{ fontSize: 15, color: '#ff9800', fontWeight: 500 }}>Tổng số giao dịch</div>
-                <div style={{ fontWeight: 700, fontSize: 26 }}>{overview.totalTransactions}</div>
-              </div>
+            <Box sx={{ minWidth: 200, border: '2px solid #fed9d5d7', borderRadius: 3, p: 2.5, background: '#fff0f6', textAlign: 'center', flex: 1, maxWidth: 300 }}>
+              <div style={{ fontSize: 15, color: '#000000d9', fontWeight: 600, marginBottom: 4 }}>Tổng số giao dịch</div>
+              <div style={{ fontWeight: 700, fontSize: 26, color: '#000000d8' }}>{overview.totalTransactions}</div>
             </Box>
-            <Box
-              sx={{
-                minWidth: 220,
-                bgcolor: '#e8f5e9',
-                borderRadius: 3,
-                p: 2,
-                boxShadow: 2,
-                display: 'flex',
-                alignItems: 'center',
-                mb: { xs: 2, md: 0 }
-              }}
-            >
-              <span style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: '#43a047',
-                color: '#fff',
-                marginRight: 16,
-                fontSize: 24
-              }}>💰</span>
-              <div>
-                <div style={{ fontSize: 15, color: '#43a047', fontWeight: 500 }}>Tổng tiền kiếm được</div>
-                <div style={{ fontWeight: 700, fontSize: 26 }}>{overview.totalRevenue.toLocaleString()} VNĐ</div>
-              </div>
+            <Box sx={{ minWidth: 200, border: '2px solid #fed9d5d7', borderRadius: 3, p: 2.5, background: '#fff0f6', textAlign: 'center', flex: 1, maxWidth: 300 }}>
+              <div style={{ fontSize: 15, color: '#000000d9', fontWeight: 600, marginBottom: 4 }}>Tổng tiền kiếm được</div>
+              <div style={{ fontWeight: 700, fontSize: 26, color: '#000000d8' }}>{overview.totalRevenue.toLocaleString()} VNĐ</div>
             </Box>
           </Box>
           <Chart options={optionscolumnchart} series={series} type="bar" height={370} width={"100%"} />
-          {/* Top các gói được đặt nhiều nhất - UI đẹp hơn */}
+          {/* Top các gói được đặt nhiều nhất - UI màu hồng */}
           <Box mt={4}>
-            <h4 style={{ margin: 0, marginBottom: 16, color: '#1976d2', fontWeight: 600, fontSize: 20, letterSpacing: 0.5 }}>Top gói được đặt nhiều nhất</h4>
-            <Box display="flex" gap={2} flexWrap="wrap">
+            <h4 style={{ margin: 0, marginBottom: 12, color: '#000000d9', fontWeight: 700, fontSize: 18 }}>Top gói được đặt nhiều nhất</h4>
+            <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
               {topPackages.length === 0 && (
-                <Box sx={{ bgcolor: '#f5f5f5', borderRadius: 2, p: 2, minWidth: 220, textAlign: 'center', color: '#888' }}>Không có dữ liệu</Box>
+                <Box sx={{ bgcolor: '#fce4ec', borderRadius: 2, p: 2, minWidth: 180, textAlign: 'center', color: '#888', fontSize: 15 }}>Không có dữ liệu</Box>
               )}
-              {topPackages.map((pkg, idx) => (
+              {topPackages.map((pkg) => (
                 <Box key={pkg.name} sx={{
-                  bgcolor: idx === 0 ? '#e3f2fd' : idx === 1 ? '#fff3e0' : '#e8f5e9',
+                  border: '2px solid #fed9d5d7',
                   borderRadius: 3,
                   p: 2,
-                  minWidth: 220,
-                  boxShadow: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  mb: 1
+                  minWidth: 180,
+                  background: '#fff0f6',
+                  mb: 1,
+                  textAlign: 'center',
+                  flex: 1,
+                  maxWidth: 250
                 }}>
-                  <span style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: idx === 0 ? '#1976d2' : idx === 1 ? '#ff9800' : '#43a047',
-                    color: '#fff',
-                    marginRight: 14,
-                    fontSize: 20
-                  }}>🏆</span>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 17 }}>{pkg.name}</div>
-                    <div style={{ color: '#888', fontSize: 14 }}>{pkg.count} lượt, tổng tiền <b style={{ color: '#1976d2' }}>{pkg.total.toLocaleString()} VNĐ</b></div>
-                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 16, color: '#000000d8' }}>{pkg.name}</div>
+                  <div style={{ color: '#000000d9', fontSize: 14 }}>{pkg.count} lượt, tổng tiền <b style={{ color: '#000000d9' }}>{pkg.total.toLocaleString()} VNĐ</b></div>
                 </Box>
               ))}
             </Box>
           </Box>
-          {/* Danh sách người dùng đang sử dụng các gói - UI đẹp hơn */}
+          {/* Danh sách người dùng đang sử dụng các gói - UI màu hồng */}
           <Box mt={4}>
-            <h4 style={{ margin: 0, marginBottom: 16, color: '#43a047', fontWeight: 600, fontSize: 20, letterSpacing: 0.5 }}>Người dùng đang sử dụng các gói</h4>
-            <Box display="flex" flexWrap="wrap" gap={2}>
+            <h4 style={{ margin: 0, marginBottom: 12, color: '#000000d9', fontWeight: 700, fontSize: 18 }}>Người dùng đang sử dụng các gói</h4>
+            <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
               {userPackages.length === 0 && (
-                <Box sx={{ bgcolor: '#f5f5f5', borderRadius: 2, p: 2, minWidth: 220, textAlign: 'center', color: '#888' }}>Không có dữ liệu</Box>
+                <Box sx={{ bgcolor: '#fce4ec', borderRadius: 2, p: 2, minWidth: 180, textAlign: 'center', color: '#888', fontSize: 15 }}>Không có dữ liệu</Box>
               )}
               {userPackages.map((user, idx) => (
                 <Box key={user.email + user.payment_package + idx} sx={{
-                  bgcolor: '#fff',
+                  border: '2px solid #fed9d5d7',
                   borderRadius: 3,
                   p: 2,
-                  minWidth: 260,
-                  boxShadow: 1,
+                  minWidth: 220,
+                  background: '#fff0f6',
                   display: 'flex',
                   alignItems: 'center',
                   mb: 1,
-                  border: '1px solid #e0e0e0'
+                  maxWidth: 350
                 }}>
                   {user.avatar && (
-                    <img src={user.avatar} alt={user.name} style={{ width: 36, height: 36, borderRadius: "50%", marginRight: 14, objectFit: 'cover', border: '2px solid #1976d2' }} />
+                    <img src={user.avatar} alt={user.name} style={{ width: 32, height: 32, borderRadius: "50%", marginRight: 14, objectFit: 'cover', border: '1.5px solid #fed9d5d7' }} />
                   )}
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 16 }}>{user.name}</div>
-                    <div style={{ color: '#888', fontSize: 13 }}>{user.email}</div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#000000d8' }}>{user.name}</div>
+                    <div style={{ color: '#000000d9', fontSize: 13 }}>{user.email}</div>
                     <div style={{ marginTop: 2 }}>
-                      <span style={{ color: '#1976d2', fontWeight: 500 }}>{user.payment_package}</span>
+                      <span style={{ color: '#000000d9', fontWeight: 600 }}>{
+                        packageNameVN[user.payment_package] || user.payment_package
+                      }</span>
                       {user.payment_expiry && (
-                        <span style={{ marginLeft: 8, color: '#888', fontSize: 13 }}>
+                        <span style={{ marginLeft: 8, color: '#888', fontSize: 12 }}>
                           (HSD: {new Date(user.payment_expiry).toLocaleDateString("vi-VN")})
                         </span>
                       )}

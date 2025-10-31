@@ -3,10 +3,10 @@ import {
   IconChartBar,
   IconHistory,
   IconListCheck,
-  IconCalendarEvent,
-  IconSoccerField,
-  IconPlus,
-  IconUser,
+  // IconCalendarEvent,
+  // IconSoccerField,
+  // IconPlus,
+  // IconUser,
   IconUsers,
   IconMessage,
   // thêm icon danh sách chuyên viên align-box-left-bottom
@@ -35,9 +35,9 @@ const Menuitems = [
   },
     {
     id: uniqueId(),
-    title: "Gói dịch vụ",
-    icon: IconChartBar,
-    href: "/admin/thong-ke-goi-dich-vu"
+    title: "Gói nền tảng",
+    icon: IconMoneybag,
+    href: "/admin/thong-ke-goi-nen-tang"
   },
   {
     id: uniqueId(),
