@@ -166,8 +166,7 @@ const AdminOverview = () => {
       toolbar: { show: true },
       height: 370
     },
-    // Đặt màu hồng đậm cho số lượng giao dịch, màu xanh cho tổng tiền
-    colors: ["#ec4899", secondary],
+    colors: [primary, secondary],
     plotOptions: {
       bar: {
         horizontal: false,
