@@ -20,8 +20,8 @@ export async function GET(req) {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
   console.log("Fetched user:", user);
-    // Trả về dữ liệu user
-    return NextResponse.json({ success: true, data: user });
+  // Trả về dữ liệu user kèm id
+  return NextResponse.json({ success: true, data: { ...user, id: user._id } });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
