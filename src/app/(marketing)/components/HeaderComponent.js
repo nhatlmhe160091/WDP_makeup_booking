@@ -8,7 +8,7 @@
   import { useApp } from "@muahub/app/contexts/AppContext";
   import { ROLE_MANAGER } from "@muahub/constants/System";
   import { useSession, signOut } from "next-auth/react";
-  import { Badge, IconButton, Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
+  import {Menu, MenuItem, CircularProgress, Typography, Box } from "@mui/material";
   
   const HeaderComponent = () => {
   // Favorite count from localStorage
@@ -76,29 +76,35 @@
     const router = useRouter();
 
     // Fetch notifications from API when user is logged in
-    useEffect(() => {
-      const fetchNotifications = async () => {
-        if (!isLoggedIn) return; // don't fetch for anonymous users
-        setLoadingNoti(true);
-        try {
-          const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-          const userIdParam = currentUser?._id || currentUser?.id || currentUser?.userId;
-          let url = '/api/notifications/user';
-          if (userIdParam) url += `?userId=${encodeURIComponent(userIdParam)}`;
+    // Hàm fetch thông báo
+    const fetchNotifications = async () => {
+      if (!isLoggedIn) return;
+      setLoadingNoti(true);
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const userIdParam = currentUser?._id || currentUser?.id || currentUser?.userId;
+        let url = '/api/notifications/user';
+        if (userIdParam) url += `?userId=${encodeURIComponent(userIdParam)}`;
+        const res = await fetch(url, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        const data = await res.json();
+        if (data.success) setNotifications(data.data);
+      } catch (err) {
+        setNotifications([]);
+      } finally {
+        setLoadingNoti(false);
+      }
+    };
 
-          const res = await fetch(url, {
-            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          });
-          const data = await res.json();
-          if (data.success) setNotifications(data.data);
-        } catch (err) {
-          setNotifications([]);
-        } finally {
-          setLoadingNoti(false);
-        }
-      };
+    // Polling: tự động cập nhật thông báo mỗi 30 giây, dừng khi menu đang mở
+    useEffect(() => {
       fetchNotifications();
-    }, [isLoggedIn, currentUser]);
+      const interval = setInterval(() => {
+        if (!anchorEl) fetchNotifications();
+      }, 30000); // 30 giây
+      return () => clearInterval(interval);
+    }, [isLoggedIn, currentUser, anchorEl]);
 
     // Refetch notifications when user just logged in (isLoggedIn chuyển từ false sang true)
     const prevIsLoggedIn = useRef(isLoggedIn);

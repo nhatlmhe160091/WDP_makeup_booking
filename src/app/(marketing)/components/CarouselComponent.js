@@ -31,13 +31,23 @@ const CarouselComponent = ({ pathUrl }) => {
   // Fetch banners from API
   useEffect(() => {
     if (pathUrl !== "/") return;
-    // Luôn dùng ảnh local từ public/img để đảm bảo hiển thị đúng theo yêu cầu
     setLoading(true);
-    try {
-      setBanners(getDefaultBanners());
-    } finally {
-      setLoading(false);
-    }
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch("/api/banners");
+        const json = await res.json();
+        if (json && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setBanners(json.data);
+        } else {
+          setBanners(getDefaultBanners());
+        }
+      } catch (e) {
+        setBanners(getDefaultBanners());
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBanners();
   }, [pathUrl]);
 
   const getDefaultBanners = () => [

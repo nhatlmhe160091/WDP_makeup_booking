@@ -61,7 +61,8 @@ const TimelineHistoryPage = () => {
   const handleCloseModal = () => {
     setSelectedBookings([]);
   };
-
+  console.log("services", services);
+  console.log("bookings", bookings);
   return (
     <PageContainer title="Lịch sử đặt dịch vụ" description="Danh sách các dịch vụ bạn đã đặt">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -108,7 +109,7 @@ const TimelineHistoryPage = () => {
                         <Grid container spacing={1}>
                           {field.timeDetail.map((time) => {
                             const matchingBookings = bookings.filter(
-                              (b) => b.time === time && b.field === fieldId && b.serviceId === service._id
+                              (b) => b.time === time && b.field === field.name && b.serviceId === service._id
                             );
                             return (
                               <Grid item xs={12} sm={6} md={3} key={time}>
@@ -159,16 +160,21 @@ const TimelineHistoryPage = () => {
           <Typography variant="h6" gutterBottom>
             Thông tin đặt dịch vụ
           </Typography>
-          {selectedBookings.map((booking) => (
-            <Paper key={booking._id} style={{ padding: 10, marginBottom: 10 }}>
-              <Typography>Tên: {booking.user.name}</Typography>
-              <Typography>Email: {booking.user.email}</Typography>
-              <Typography>Phone: {booking.user.phone}</Typography>
-              <Typography>Thời gian: {booking.time}</Typography>
-              <Typography>Gói dịch vụ: {booking.service.serviceName}</Typography>
-              <Typography>Loại dịch vụ makeup: {booking.service.packages[booking.field].name}</Typography>
-            </Paper>
-          ))}
+          {selectedBookings.map((booking) => {
+            const packageObj = booking.service && booking.service.packages
+              ? Object.values(booking.service.packages).find(pkg => pkg.name === booking.field)
+              : null;
+            return (
+              <Paper key={booking._id} style={{ padding: 10, marginBottom: 10 }}>
+                <Typography>Tên: {booking.user.name}</Typography>
+                <Typography>Email: {booking.user.email}</Typography>
+                <Typography>Phone: {booking.user.phone}</Typography>
+                <Typography>Thời gian: {booking.time}</Typography>
+                <Typography>Gói dịch vụ: {booking.service.serviceName}</Typography>
+                <Typography>Loại dịch vụ makeup: {packageObj ? packageObj.name : booking.field}</Typography>
+              </Paper>
+            );
+          })}
           <Button variant="contained" color="primary" onClick={handleCloseModal} style={{ marginTop: 10 }}>
             Đóng
           </Button>

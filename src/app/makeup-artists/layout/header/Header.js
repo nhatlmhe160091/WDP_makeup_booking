@@ -38,28 +38,35 @@ const Header = ({ toggleMobileSidebar }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      setLoading(true);
-      try {
-        let userId = null;
-        if (typeof window !== "undefined") {
-          userId = localStorage.getItem("userId");
-        }
-        const url = userId
-          ? `/api/notifications/owner?userId=${userId}`
-          : `/api/notifications/owner`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.success) setNotifications(data.data || []);
-      } catch (err) {
-        setNotifications([]);
-      } finally {
-        setLoading(false);
+  // Hàm fetch thông báo
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      let userId = null;
+      if (typeof window !== "undefined") {
+        userId = localStorage.getItem("userId");
       }
-    };
+      const url = userId
+        ? `/api/notifications/owner?userId=${userId}`
+        : `/api/notifications/owner`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) setNotifications(data.data || []);
+    } catch (err) {
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Polling: tự động cập nhật thông báo mỗi 30 giây, dừng khi menu đang mở
+  useEffect(() => {
     fetchNotifications();
-  }, []);
+    const interval = setInterval(() => {
+      if (!anchorEl) fetchNotifications();
+    }, 30000); // 30 giây
+    return () => clearInterval(interval);
+  }, [anchorEl]);
 
   const handleReadAndGo = async (item) => {
     try {

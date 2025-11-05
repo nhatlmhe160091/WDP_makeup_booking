@@ -12,7 +12,8 @@ import {
   // thêm icon danh sách chuyên viên align-box-left-bottom
   IconAlignBoxLeftBottom,
   IconMoneybag,
-  IconSettings
+  IconSettings,
+  IconCalendarEvent
 } from "@tabler/icons-react";
 import { uniqueId } from "lodash";
 
@@ -68,6 +69,12 @@ const Menuitems = [
     icon: IconListCheck,
     href: "/admin/lich-su-dat-lich"
   },
+  {
+      id: uniqueId(),
+      title: "Trạng thái đặt lịch",
+      icon: IconCalendarEvent,
+      href: "/admin/timeline-dich-vu"
+    },
   {
     navlabel: true,
     subheader: "Quản lý người dùng",

@@ -27,21 +27,28 @@ const Header = ({ toggleMobileSidebar }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Hàm fetch thông báo
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/notifications/admin`);
+      const data = await res.json();
+      if (data.success) setNotifications(data.data || []);
+    } catch (err) {
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Polling: tự động cập nhật thông báo mỗi 30 giây, dừng khi menu đang mở
   useEffect(() => {
-    const fetchNotifications = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/notifications/admin`);
-        const data = await res.json();
-        if (data.success) setNotifications(data.data || []);
-      } catch (err) {
-        setNotifications([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchNotifications();
-  }, []);
+    const interval = setInterval(() => {
+      if (!anchorEl) fetchNotifications();
+    }, 30000); // 30 giây
+    return () => clearInterval(interval);
+  }, [anchorEl]);
 
   const handleOpenMenu = (e) => setAnchorEl(e.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
