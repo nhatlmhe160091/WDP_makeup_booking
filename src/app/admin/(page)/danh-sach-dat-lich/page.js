@@ -72,7 +72,7 @@ const BookingHistoryPage = () => {
         status: newStatus
       });
       // console.log("Update booking status response:", res);
-        fetchData();
+      fetchData();
     } catch (error) {
       console.error("Error updating booking status:", error);
     }
@@ -200,7 +200,18 @@ const BookingHistoryPage = () => {
       );
     }
   };
-
+  if (orderId && filteredBookings.length === 0) {
+    return (
+      <PageContainer title="Danh sách đặt dịch vụ makeup" description="Danh sách các dịch vụ makeup bạn đã đặt">
+        <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+          <Typography color="info.main" variant="h6">Đã được xử lý</Typography>
+           <Button variant="contained" color="secondary" onClick={() => router.push('/makeup-artists/danh-sach-dat-lich')} sx={{ ml: 2 }}>
+                    Quay lại
+                  </Button>
+        </Box>
+      </PageContainer>
+    );
+  }
   return (
     <PageContainer title="Danh sách đặt dịch vụ makeup" description="Danh sách các dịch vụ makeup bạn đã đặt">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>

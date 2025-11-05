@@ -11,6 +11,27 @@ const MakeupServiceNoiBatComponent = () => {
   const [packages, setPackages] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [bookingCounts, setBookingCounts] = useState({});
+
+  // Fetch booking counts for each package
+  const fetchBookingCounts = async () => {
+    try {
+      const response = await SendRequest("GET", "/api/orders");
+      if (response.payload) {
+        const counts = {};
+        response.payload.forEach((order) => {
+          // order.serviceId can be string or object, normalize to string
+          const serviceId = typeof order.serviceId === 'object' && order.serviceId._id ? order.serviceId._id : order.serviceId;
+          if (serviceId) {
+            counts[serviceId] = (counts[serviceId] || 0) + 1;
+          }
+        });
+        setBookingCounts(counts);
+      }
+    } catch (error) {
+      console.error("Error fetching booking counts:", error);
+    }
+  };
 
   // Fetch featured packages data from API
   useEffect(() => {
@@ -21,7 +42,6 @@ const MakeupServiceNoiBatComponent = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("Featured services data:", data);
         if (data.data) {
           setPackages(data.data);
         }
@@ -31,8 +51,8 @@ const MakeupServiceNoiBatComponent = () => {
         setIsLoading(false);
       }
     };
-    
     fetchFeaturedPackages();
+    fetchBookingCounts();
   }, []);
 
   // Tự động chuyển trang
@@ -100,6 +120,7 @@ const MakeupServiceNoiBatComponent = () => {
                 field={field}
                 showDistance={false}
                 showBookingCount={true}
+                bookingCount={bookingCounts[field._id] || 0}
               />
             ))
           ) : (
