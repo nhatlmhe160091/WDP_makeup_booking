@@ -22,6 +22,8 @@ export function AppProvider({ children }) {
   useEffect(() => {
     // Hàm chuẩn hóa user cho mọi trường hợp
     const normalizeUser = (user1, user2) => {
+      // user1: từ backend (local), user2: từ session Google
+       console.log("[AppContext] user1.role:", user1?.role, "user2.role:", user2?.role);
       return {
         _id: user1?._id || user2?.id || user2?._id || "",
         id: user1?._id || user2?.id || user2?._id || "",
@@ -40,6 +42,7 @@ export function AppProvider({ children }) {
         withdrawn: user1?.withdrawn || 0,
         created_at: user1?.created_at || user2?.created_at || "",
         updated_at: user1?.updated_at || user2?.updated_at || "",
+        // Bổ sung các trường cần thiết
         cccd: user1?.cccd || "",
         totalPrice: user1?.totalPrice || 0,
         payment_amount: user1?.payment_amount || 0,
@@ -48,26 +51,15 @@ export function AppProvider({ children }) {
       };
     };
 
-    // Ưu tiên lấy user từ localStorage nếu đã có, giảm delay khi chuyển trang
-    const localUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
-    if (localUser) {
-      try {
-        const parsedUser = JSON.parse(localUser);
-        if (parsedUser && parsedUser._id) {
-          setUser(parsedUser);
-          setTimeout(() => setLoading(false), 0);
-          return;
-        }
-      } catch {}
-    }
-
-    // Nếu đã đăng nhập Google, luôn gọi backend để lấy user chuẩn nếu có token
     if (status === "authenticated" && session?.user) {
+      // Nếu đã đăng nhập Google, luôn gọi backend để lấy user chuẩn nếu có token
       const token = localStorage.getItem("token") || "";
       if (!token) {
+        // Nếu chưa có token backend, chỉ lấy từ session Google
         setUser(normalizeUser({}, session.user));
-        setTimeout(() => setLoading(false), 0);
+        setTimeout(() => setLoading(false), 0); // Đảm bảo setUser xong mới tắt loading
       } else {
+        // Nếu có token backend, gọi fetchData để lấy user từ backend
         fetchData();
       }
       return;
@@ -81,23 +73,26 @@ export function AppProvider({ children }) {
 
       if (!token) {
         setUser({});
+        // save current url
         localStorage.setItem("redirectUrl", window.location.pathname);
         setTimeout(() => setLoading(false), 0);
       } else {
         try {
+          console.log("Fetching user data with token:", token);
           const res = await SendRequest("GET", "/api/users/me");
           if (res.payload) {
             userPayload = res.payload;
-            // Lưu user vào localStorage để lấy nhanh khi chuyển trang
-            localStorage.setItem("user", JSON.stringify(userPayload));
           } else {
+            // save current url
             localStorage.setItem("redirectUrl", window.location.pathname);
+            // remove token
             localStorage.removeItem("token");
             router.push("/dang-nhap");
           }
         } catch (error) {
           console.error("Error during fetching user data:", error);
         }
+        // Luôn merge xong mới tắt loading
         setUser(normalizeUser(userPayload, session?.user));
         setTimeout(() => setLoading(false), 0);
       }
