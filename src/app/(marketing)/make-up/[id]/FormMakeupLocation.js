@@ -3,7 +3,23 @@ import React, { useState } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
+// Icon cho studio
+const studioIcon = new L.Icon({
+  iconUrl: '/logo.png', 
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
+// Icon cho vị trí của bạn
+const userIcon = new L.Icon({
+  iconUrl: '/avatar.png',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
 function getDistanceKm(lat1, lng1, lat2, lng2) {
   function toRad(x) { return x * Math.PI / 180; }
   const R = 6371; // bán kính Trái Đất (km)
@@ -85,11 +101,11 @@ const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longi
         </div>
       )}
 
-  <Modal show={showMapModal} onHide={() => setShowMapModal(false)} centered>
+      <Modal show={showMapModal} onHide={() => setShowMapModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Chọn vị trí trên bản đồ</Modal.Title>
         </Modal.Header>
-  <Modal.Body>
+        <Modal.Body>
           <div className="mb-3">
             <Button variant="info" onClick={() => {
               if (navigator.geolocation) {
@@ -111,11 +127,11 @@ const FormMakeupLocation = ({ makeupLocation, setMakeupLocation, latitude, longi
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <Marker position={[latitude, longitude]}>
+              <Marker position={[latitude, longitude]} icon={studioIcon}>
                 <Popup>Studio</Popup>
               </Marker>
               {userLat && userLng && (
-                <Marker position={[userLat, userLng]}>
+                <Marker position={[userLat, userLng]} icon={userIcon}>
                   <Popup>Vị trí của bạn</Popup>
                 </Marker>
               )}
