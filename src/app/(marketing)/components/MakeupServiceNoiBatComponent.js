@@ -5,7 +5,7 @@ import BoxFieldComponent from "../components/BoxFieldComponent";
 import SendRequest from "@muahub/utils/SendRequest";
 
 const ITEMS_PER_PAGE = 6;
-const AUTO_ROTATE_INTERVAL = 5000; // 5 giây
+const AUTO_ROTATE_INTERVAL = 25000; // 25 giây
 
 const MakeupServiceNoiBatComponent = () => {
   const [packages, setPackages] = useState([]);

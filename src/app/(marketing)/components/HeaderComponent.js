@@ -37,17 +37,17 @@
     const isLocalUserValid = currentUser && (currentUser.id || currentUser._id || currentUser.email);
     const isLoggedIn = !!(session?.user || isLocalUserValid);
     // Debug log
-    console.log("HeaderComponent - isLoggedIn:", isLoggedIn, "session:", session, "currentUser:", currentUser);
-    // Log user session info when logged in (Google hoặc thường)
-    useEffect(() => {
-      if (isLoggedIn) {
-        if (session?.user) {
-          console.log('[Header] User session (Google/next-auth):', session.user);
-        } else if (currentUser && Object.keys(currentUser).length > 0) {
-          console.log('[Header] User session (local):', currentUser);
-        }
-      }
-    }, [isLoggedIn, session, currentUser]);
+    // console.log("HeaderComponent - isLoggedIn:", isLoggedIn, "session:", session, "currentUser:", currentUser);
+    // // Log user session info when logged in (Google hoặc thường)
+    // useEffect(() => {
+    //   if (isLoggedIn) {
+    //     if (session?.user) {
+    //       console.log('[Header] User session (Google/next-auth):', session.user);
+    //     } else if (currentUser && Object.keys(currentUser).length > 0) {
+    //       console.log('[Header] User session (local):', currentUser);
+    //     }
+    //   }
+    // }, [isLoggedIn, session, currentUser]);
     const [allMakeups, setAllMakeups] = useState([]);
     const [searchValue, setSearchValue] = useState("");
     const [showResults, setShowResults] = useState(false);
@@ -104,7 +104,7 @@
         if (!anchorEl) fetchNotifications();
       }, 30000); // 30 giây
       return () => clearInterval(interval);
-    }, [isLoggedIn, currentUser, anchorEl]);
+    }, [isLoggedIn, anchorEl, currentUser?._id]);
 
     // Refetch notifications when user just logged in (isLoggedIn chuyển từ false sang true)
     const prevIsLoggedIn = useRef(isLoggedIn);

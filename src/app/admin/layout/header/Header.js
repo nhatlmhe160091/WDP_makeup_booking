@@ -22,7 +22,7 @@ const Header = ({ toggleMobileSidebar }) => {
   }));
 
   const [notifications, setNotifications] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(10); // 👈 số lượng hiển thị ban đầu
+  const [visibleCount, setVisibleCount] = useState(10); // Số lượng thông báo hiển thị
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -81,13 +81,9 @@ const Header = ({ toggleMobileSidebar }) => {
     }
   };
 
-  // ✅ Load thêm khi scroll tới cuối
-  const handleScroll = (e) => {
-    const bottom =
-      e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 50;
-    if (bottom && visibleCount < notifications.length && !loading) {
-      setVisibleCount((prev) => prev + 10); // mỗi lần thêm 10
-    }
+  // Hiển thị thêm 10 thông báo khi bấm nút
+  const handleShowMore = () => {
+    setVisibleCount((prev) => Math.min(prev + 10, notifications.length));
   };
 
   const visibleNotifications = notifications.slice(0, visibleCount);
@@ -111,7 +107,7 @@ const Header = ({ toggleMobileSidebar }) => {
           aria-haspopup="true"
           onClick={handleOpenMenu}
         >
-          <Badge badgeContent={notifications.length} color="primary">
+          <Badge badgeContent={notifications.filter((n) => !n.isRead).length} color="primary">
             <IconBellRinging size="21" stroke="1.5" />
           </Badge>
         </IconButton>
@@ -121,76 +117,69 @@ const Header = ({ toggleMobileSidebar }) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseMenu}
           PaperProps={{
-            sx: { width: 350, maxHeight: 400, p: 0, mt: 1.5, overflowY: "auto" },
-            onScroll: handleScroll, // 👈 theo dõi scroll
+            sx: { width: 350, maxHeight: 450, p: 0, mt: 1.5, overflowY: "auto" },
           }}
         >
           <Box sx={{ p: 2, borderBottom: "1px solid #eee", fontWeight: 600 }}>
             Thông báo mới
           </Box>
 
+
           {loading ? (
             <MenuItem disabled>
               <Box sx={{ p: 2 }}>Đang tải...</Box>
             </MenuItem>
-          ) : notifications.length === 0 ? (
+          ) : visibleNotifications.length === 0 ? (
             <MenuItem disabled>
               <Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box>
             </MenuItem>
           ) : (
-            visibleNotifications.map((item) => (
-              <MenuItem
-                key={item._id}
-                sx={{
-                  alignItems: "flex-start",
-                  whiteSpace: "normal",
-                  borderBottom: "1px solid #eee",
-                  cursor: item.isRead ? "default" : "pointer",
-                  opacity: item.isRead ? 0.6 : 1,
-                  backgroundColor: item.isRead ? "#f5f5f5" : "inherit",
-                  "&:hover": {
-                    backgroundColor: item.isRead ? "#f5f5f5" : "#f0f7ff",
-                  },
-                }}
-                onClick={() => !item.isRead && handleReadAndGo(item)}
-                disabled={item.isRead}
-              >
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Box>
-                    <Typography fontWeight={item.isRead ? 400 : 500}>
-                      {item.message}
-                    </Typography>
-                    <Typography fontSize={12} color="#888">
-                      {new Date(item.created_at).toLocaleString()}
-                    </Typography>
-                  </Box>
-                  {item.isRead && (
-                    <Box display="flex" alignItems="center" gap={0.5} ml={1}>
-                      <span style={{ color: "#4caf50", fontSize: 16 }}>✔</span>
-                      <Typography fontSize={12} color="#4caf50">
-                        Đã đọc
+            <>
+              {visibleNotifications.map((item) => (
+                <MenuItem
+                  key={item._id}
+                  sx={{
+                    alignItems: "flex-start",
+                    whiteSpace: "normal",
+                    borderBottom: "1px solid #eee",
+                    cursor: item.isRead ? "default" : "pointer",
+                    opacity: item.isRead ? 0.6 : 1,
+                    backgroundColor: item.isRead ? "#f5f5f5" : "inherit",
+                    "&:hover": {
+                      backgroundColor: item.isRead ? "#f5f5f5" : "#f0f7ff",
+                    },
+                  }}
+                  onClick={() => !item.isRead && handleReadAndGo(item)}
+                  disabled={item.isRead}
+                >
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Box>
+                      <Typography fontWeight={item.isRead ? 400 : 500}>
+                        {item.message}
+                      </Typography>
+                      <Typography fontSize={12} color="#888">
+                        {new Date(item.created_at).toLocaleString()}
                       </Typography>
                     </Box>
-                  )}
+                    {item.isRead && (
+                      <Box display="flex" alignItems="center" gap={0.5} ml={1}>
+                        <span style={{ color: "#4caf50", fontSize: 16 }}>✔</span>
+                        <Typography fontSize={12} color="#4caf50">
+                          Đã đọc
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </MenuItem>
+              ))}
+              {visibleCount < notifications.length && (
+                <Box sx={{ textAlign: "center", p: 1 }}>
+                  <Button size="small" onClick={handleShowMore}>
+                    Xem thêm
+                  </Button>
                 </Box>
-              </MenuItem>
-            ))
-          )}
-
-          {/* Hiển thị thông báo trạng thái */}
-          {visibleCount < notifications.length && !loading && (
-            <MenuItem disabled>
-              <Box sx={{ p: 1, textAlign: "center", color: "#888" }}>
-                Kéo xuống để xem thêm...
-              </Box>
-            </MenuItem>
-          )}
-          {visibleCount >= notifications.length && notifications.length > 0 && (
-            <MenuItem disabled>
-              <Box sx={{ p: 1, textAlign: "center", color: "#888" }}>
-                Hết thông báo
-              </Box>
-            </MenuItem>
+              )}
+            </>
           )}
 
           <Box

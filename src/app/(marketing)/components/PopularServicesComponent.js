@@ -1,15 +1,16 @@
+
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ArtistComponent from "./ArtistComponent";
+
+const ARTISTS_PER_PAGE = 3;
+const AUTO_ROTATE_INTERVAL = 10000; // 10 seconds
 
 const PopularServicesComponent = () => {
   const [packages, setPackages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const carouselRef = useRef(null);
-  const ARTISTS_PER_SLIDE = 3;
-  const AUTO_SCROLL_INTERVAL = 5000; // 5 seconds
 
   useEffect(() => {
     const fetchFeaturedPackages = async () => {
@@ -20,7 +21,6 @@ const PopularServicesComponent = () => {
         }
         const data = await response.json();
         console.log("API response for featured artists:", data);
-
         if (data?.featuredArtists) {
           setPackages(data.featuredArtists);
         } else {
@@ -33,30 +33,23 @@ const PopularServicesComponent = () => {
         setLoading(false);
       }
     };
-
     fetchFeaturedPackages();
   }, []);
 
-  // Set up auto-scrolling
+  // Auto-rotate page
   useEffect(() => {
-    if (packages.length > ARTISTS_PER_SLIDE) {
-      const interval = setInterval(() => {
-        setActiveSlide((prev) => {
-          const nextSlide = prev + 1;
-          const maxSlides = Math.ceil(packages.length / ARTISTS_PER_SLIDE);
-          return nextSlide >= maxSlides ? 0 : nextSlide;
-        });
-      }, AUTO_SCROLL_INTERVAL);
-
-      return () => clearInterval(interval);
-    }
+    if (packages.length <= ARTISTS_PER_PAGE) return;
+    const maxPages = Math.ceil(packages.length / ARTISTS_PER_PAGE);
+    const timer = setInterval(() => {
+      setCurrentPage((prevPage) => (prevPage + 1) % maxPages);
+    }, AUTO_ROTATE_INTERVAL);
+    return () => clearInterval(timer);
   }, [packages.length]);
-  const renderArtistSlides = () => {
-    const slides = [];
-    for (let i = 0; i < packages.length; i += ARTISTS_PER_SLIDE) {
-      slides.push(packages.slice(i, i + ARTISTS_PER_SLIDE));
-    }
-    return slides;
+
+  const totalPages = Math.ceil(packages.length / ARTISTS_PER_PAGE);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
@@ -67,86 +60,54 @@ const PopularServicesComponent = () => {
           <h1 className="display-5">Các make up artist được ưa chuộng</h1>
         </div>
 
-        {loading ? (
-          <div className="text-center">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Đang tải...</span>
+        {/* Navigation buttons */}
+        {!loading && totalPages > 1 && (
+          <div className="text-center mb-4">
+            <div className="btn-group">
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  className={`btn btn-sm rounded-circle mx-1 ${currentPage === index ? 'btn-primary' : 'btn-outline-primary'}`}
+                  style={{ width: '10px', height: '10px', padding: '0' }}
+                  onClick={() => handlePageChange(index)}
+                >
+                  <span className="visually-hidden">Trang {index + 1}</span>
+                </button>
+              ))}
             </div>
-          </div>
-        ) : error ? (
-          <div className="text-center text-danger">
-            {error}
-          </div>
-        ) : packages.length === 0 ? (
-          <div className="text-center">Không có nghệ sĩ nổi bật</div>
-        ) : (
-          <div className="position-relative">
-            {/* Main Carousel */}
-            <div className="carousel-container overflow-hidden" ref={carouselRef}>
-              <div 
-                className="carousel-inner d-flex transition-transform"
-                style={{
-                  transform: `translateX(-${activeSlide * 100}%)`,
-                  transition: 'transform 0.5s ease-in-out'
-                }}
-              >
-                {renderArtistSlides().map((slideArtists, index) => (
-                  <div 
-                    key={index} 
-                    className="carousel-slide w-100 flex-shrink-0"
-                  >
-                    <div className="row g-3">
-                      {slideArtists.map((artist) => (
-                        <ArtistComponent key={artist._id} artist={artist} />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Navigation Dots */}
-            {packages.length > ARTISTS_PER_SLIDE && (
-              <div className="carousel-indicators position-relative mt-4">
-                {renderArtistSlides().map((_, index) => (
-                  <button
-                    key={index}
-                    className={`btn btn-sm rounded-circle mx-1 ${
-                      activeSlide === index ? 'btn-primary' : 'btn-outline-primary'
-                    }`}
-                    style={{ width: '10px', height: '10px', padding: '0' }}
-                    onClick={() => setActiveSlide(index)}
-                  >
-                    <span className="visually-hidden">Slide {index + 1}</span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         )}
-      </div>
 
-      <style jsx>{`
-        .carousel-container {
-          position: relative;
-          width: 100%;
-        }
-        .carousel-inner {
-          display: flex;
-          transition: transform 0.5s ease-in-out;
-        }
-        .carousel-slide {
-          flex: 0 0 100%;
-        }
-        .carousel-indicators {
-          display: flex;
-          justify-content: center;
-          padding: 1rem 0;
-        }
-        .transition-transform {
-          transition: transform 0.5s ease-in-out;
-        }
-      `}</style>
+        {/* Artists List */}
+        <div className="row g-3">
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: ARTISTS_PER_PAGE }).map((_, index) => (
+              <div key={index} className="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay={`0.${index + 1}s`}>
+                <div className="bg-light rounded p-4" style={{ minHeight: "300px" }}>
+                  <div className="placeholder-glow">
+                    <div className="placeholder col-12 mb-3" style={{ height: "200px" }}></div>
+                    <div className="placeholder col-8 mb-2"></div>
+                    <div className="placeholder col-4"></div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : error ? (
+            <div className="col-12 text-center text-danger">
+              {error}
+            </div>
+          ) : packages && packages.length > 0 ? (
+            packages.slice(currentPage * ARTISTS_PER_PAGE, (currentPage + 1) * ARTISTS_PER_PAGE).map((artist) => (
+              <ArtistComponent key={artist._id} artist={artist} />
+            ))
+          ) : (
+            <div className="col-12 text-center">
+              <p>Không có nghệ sĩ nổi bật</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -96,8 +96,13 @@ const Header = ({ toggleMobileSidebar }) => {
     setAnchorEl(null);
   };
 
-  // Giới hạn hiển thị 10 thông báo
-  const displayedNotifications = notifications.slice(0, 10);
+  // Hiển thị thêm 10 thông báo khi bấm nút
+  const [visibleCount, setVisibleCount] = useState(10);
+  const displayedNotifications = notifications.slice(0, visibleCount);
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => Math.min(prev + 10, notifications.length));
+  };
 
   return (
     <AppBarStyled position="sticky" color="default">
@@ -153,6 +158,7 @@ const Header = ({ toggleMobileSidebar }) => {
             Thông báo mới
           </Box>
 
+
           {loading ? (
             <MenuItem disabled>
               <Box sx={{ p: 2 }}>Đang tải...</Box>
@@ -162,48 +168,42 @@ const Header = ({ toggleMobileSidebar }) => {
               <Box sx={{ p: 2, color: "#888" }}>Không có thông báo</Box>
             </MenuItem>
           ) : (
-            displayedNotifications.map((item) => (
-              <MenuItem
-                key={item._id}
-                sx={{
-                  alignItems: "flex-start",
-                  whiteSpace: "normal",
-                  borderBottom: "1px solid #eee",
-                  cursor: item.isRead ? "default" : "pointer",
-                  opacity: item.isRead ? 0.6 : 1,
-                  backgroundColor: item.isRead ? "#f5f5f5" : "inherit",
-                  "&:hover": {
-                    backgroundColor: item.isRead ? "#f5f5f5" : "#f0f7ff",
-                  },
-                }}
-                onClick={() => !item.isRead && handleReadAndGo(item)}
-                disabled={item.isRead}
-              >
-                <Box display="flex" flexDirection="column">
-                  <Typography fontWeight={item.isRead ? 400 : 500}>
-                    {item.message}
-                  </Typography>
-                  <Typography fontSize={12} color="#888">
-                    {new Date(item.created_at).toLocaleString()}
-                  </Typography>
+            <>
+              {displayedNotifications.map((item) => (
+                <MenuItem
+                  key={item._id}
+                  sx={{
+                    alignItems: "flex-start",
+                    whiteSpace: "normal",
+                    borderBottom: "1px solid #eee",
+                    cursor: item.isRead ? "default" : "pointer",
+                    opacity: item.isRead ? 0.6 : 1,
+                    backgroundColor: item.isRead ? "#f5f5f5" : "inherit",
+                    "&:hover": {
+                      backgroundColor: item.isRead ? "#f5f5f5" : "#f0f7ff",
+                    },
+                  }}
+                  onClick={() => !item.isRead && handleReadAndGo(item)}
+                  disabled={item.isRead}
+                >
+                  <Box display="flex" flexDirection="column">
+                    <Typography fontWeight={item.isRead ? 400 : 500}>
+                      {item.message}
+                    </Typography>
+                    <Typography fontSize={12} color="#888">
+                      {new Date(item.created_at).toLocaleString()}
+                    </Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+              {visibleCount < notifications.length && (
+                <Box sx={{ textAlign: "center", p: 1 }}>
+                  <Button size="small" onClick={handleShowMore}>
+                    Xem thêm
+                  </Button>
                 </Box>
-              </MenuItem>
-            ))
-          )}
-
-          {/* Nếu có nhiều hơn 10 thông báo */}
-          {notifications.length > 10 && (
-            <Box sx={{ textAlign: "center", p: 1 }}>
-              <Button
-                size="small"
-                onClick={() => {
-                  handleCloseMenu();
-                  router.push("/makeup-artists/danh-sach-dat-lich");
-                }}
-              >
-                Xem tất cả
-              </Button>
-            </Box>
+              )}
+            </>
           )}
 
           <Box sx={{ textAlign: "right", p: 1 }}>
