@@ -90,8 +90,8 @@ const AdminOverview = () => {
     // Hiển thị tên gói tiếng Việt trên trục x
     setCategories(categories.map((pkg) => packageNameVN[pkg] || pkg));
     setSeries([
-      { name: "Số lượng giao dịch", data: countData },
-      { name: "Tổng tiền (VNĐ)", data: totalData }
+      { name: "Số lượng giao dịch", data: countData, type: "column" },
+      { name: "Tổng tiền (VNĐ)", data: totalData, type: "column", yAxisIndex: 1 }
     ]);
 
     // Top các gói được đặt nhiều nhất (top 3)
@@ -166,7 +166,7 @@ const AdminOverview = () => {
       toolbar: { show: true },
       height: 370
     },
-    colors: [primary, secondary],
+    colors: ["#ffb3c6", "#7ed6fc"],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -190,9 +190,19 @@ const AdminOverview = () => {
       borderColor: "rgba(0,0,0,0.1)",
       strokeDashArray: 3
     },
-    yaxis: {
-      tickAmount: 4
-    },
+    yaxis: [
+      {
+        title: { text: "Số lượng giao dịch" },
+        labels: { style: { colors: "#ffb3c6" } },
+        min: 0
+      },
+      {
+        opposite: true,
+        title: { text: "Tổng tiền (VNĐ)" },
+        labels: { style: { colors: "#7ed6fc" } },
+        min: 0
+      }
+    ],
     xaxis: {
       categories: categories,
       axisBorder: { show: false }
