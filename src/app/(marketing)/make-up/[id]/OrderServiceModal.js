@@ -15,13 +15,14 @@ const OrderServiceModal = ({ open, onClose, serviceData, currentUser }) => {
   const [selectedField, setSelectedField] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [orderDone, setOrderDone] = useState(false);
-  const [latitude, setLatitude] = useState(16.0544);
-  const [longitude, setLongitude] = useState(108.2022);
+  const [latitude, setLatitude] = useState(serviceData?.latitude || 16.0544);
+  const [longitude, setLongitude] = useState(serviceData?.longitude || 108.2022);
 
   const [qrCode, setQrCode] = useState("");
   const [payosQr, setPayosQr] = useState("");
   const [payosInfo, setPayosInfo] = useState(null); // lưu toàn bộ object trả về từ PayOS
-  const [paymentMethod, setPaymentMethod] = useState("vietqr"); // 'vietqr' | 'payos'
+  // Mặc định chọn PayOS
+  const [paymentMethod, setPaymentMethod] = useState("payos"); // 'vietqr' | 'payos'
   const [dataOrder, setDataOrder] = useState([]);
 
   const [selectedFieldSlot, setSelectedFieldSlot] = useState([]); // {time: "7:00-8:00", fieldIndex: 2}
@@ -548,6 +549,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             <Form.Group className="mb-3">
               <Form.Label>Chọn phương thức thanh toán</Form.Label>
               <div className="d-flex gap-2">
+                {/*
                 <Button
                   variant={paymentMethod === "vietqr" ? "primary" : "outline-primary"}
                   onClick={() => setPaymentMethod("vietqr")}
@@ -555,6 +557,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
                 >
                   Chuyển khoản ngân hàng (VietQR)
                 </Button>
+                */}
                 <Button
                   variant={paymentMethod === "payos" ? "primary" : "outline-primary"}
                   onClick={() => setPaymentMethod("payos")}
@@ -601,40 +604,41 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             <Form.Group className="mb-3">
               <Form.Label>Chọn dịch vụ</Form.Label>
               <div className="d-flex flex-wrap gap-2">
-                {Object.keys(serviceData.packages).map((field, index) => {
-                  if (!serviceData.packages[field].isAvailable) return null;
-                  return (
-                    <Button
-                      key={index}
-                      variant={selectedField === field ? "primary" : "outline-primary"}
-                      size="sm"
-                      onClick={() => setSelectedField(field)}
-                      className="mb-2 d-flex flex-column align-items-center px-3 py-2"
-                      style={{ minWidth: "120px", height: "auto", color: selectedField === field ? "#fff" : "#adafb3" }}
-                    >
-                      <div
-                        style={{
-                          fontSize: "0.9rem",
-                          fontWeight: "bold",
-                          lineHeight: "1.2",
-                          color: selectedField === field ? "#fff" : "#adafb3"
-                        }}
+                {serviceData?.packages &&
+                  Object.keys(serviceData.packages).map((field, index) => {
+                    if (!serviceData.packages[field].isAvailable) return null;
+                    return (
+                      <Button
+                        key={index}
+                        variant={selectedField === field ? "primary" : "outline-primary"}
+                        size="sm"
+                        onClick={() => setSelectedField(field)}
+                        className="mb-2 d-flex flex-column align-items-center px-3 py-2"
+                        style={{ minWidth: "120px", height: "auto", color: selectedField === field ? "#fff" : "#adafb3" }}
                       >
-                        {serviceData.packages[field].name}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "0.8rem",
-                          lineHeight: "1",
-                          marginTop: "4px",
-                          color: selectedField === field ? "#fff" : "#414142"
-                        }}
-                      >
-                        {formatCurrency(serviceData.packages[field].price)} VND
-                      </div>
-                    </Button>
-                  );
-                })}
+                        <div
+                          style={{
+                            fontSize: "0.9rem",
+                            fontWeight: "bold",
+                            lineHeight: "1.2",
+                            color: selectedField === field ? "#fff" : "#adafb3"
+                          }}
+                        >
+                          {serviceData.packages[field].name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.8rem",
+                            lineHeight: "1",
+                            marginTop: "4px",
+                            color: selectedField === field ? "#fff" : "#414142"
+                          }}
+                        >
+                          {formatCurrency(serviceData.packages[field].price)} VND
+                        </div>
+                      </Button>
+                    );
+                  })}
               </div>
             </Form.Group>
 

@@ -7,7 +7,7 @@ import L from 'leaflet';
 
 // Icon cho studio
 const studioIcon = new L.Icon({
-  iconUrl: '/logo.png', 
+  iconUrl: '/avatar.png',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],
@@ -15,7 +15,7 @@ const studioIcon = new L.Icon({
 
 // Icon cho vị trí của bạn
 const userIcon = new L.Icon({
-  iconUrl: '/avatar.png',
+  iconUrl: '/logo.png',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40],

@@ -2,7 +2,7 @@ import { validateToken } from "@muahub/lib/auth";
 import clientPromise from "@muahub/lib/mongodb";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/route";
 // API GET để lấy danh sách users
 export async function GET(req) {
   try {

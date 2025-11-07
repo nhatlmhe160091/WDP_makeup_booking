@@ -403,29 +403,30 @@ const MakeupServiceDetail = () => {
                   Bảng giá dịch vụ
                 </h5>
                 <div className="row g-3">
-                  {Object.values(serviceData?.packages)
-                    .filter((f) => f.isAvailable)
-                    .map((service, index) => (
-                      <div key={index} className="col-md-6">
-                        <div className="p-3 border rounded bg-light">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                              <h6 className="mb-1">{service.name}</h6>
-                              <small className="text-muted">Thời gian: {service.timeMatch} phút</small>
-                            </div>
-                            <div className="text-end">
-                              <h5 className="mb-0 text-primary">{formatCurrency(service.price)}</h5>
-                              {service.count > 1 && (
-                                <small className="text-success">
-                                  <i className="fas fa-users me-1"></i>
-                                  Phục vụ {service.count} khách/lần
-                                </small>
-                              )}
+                  {serviceData?.packages &&
+                    Object.values(serviceData.packages)
+                      .filter((f) => f.isAvailable)
+                      .map((service, index) => (
+                        <div key={index} className="col-md-6">
+                          <div className="p-3 border rounded bg-light">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div>
+                                <h6 className="mb-1">{service.name}</h6>
+                                <small className="text-muted">Thời gian: {service.timeMatch} phút</small>
+                              </div>
+                              <div className="text-end">
+                                <h5 className="mb-0 text-primary">{formatCurrency(service.price)}</h5>
+                                {service.count > 1 && (
+                                  <small className="text-success">
+                                    <i className="fas fa-users me-1"></i>
+                                    Phục vụ {service.count} khách/lần
+                                  </small>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                 </div>
               </div>
 

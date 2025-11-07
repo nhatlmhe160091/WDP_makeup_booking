@@ -213,10 +213,10 @@ const EditServiceModal = ({ open, onClose, onSuccess, serviceData={} }) => {
         return;
       }
 
-      // Kiểm tra giá & số lượng hợp lệ
+      // Kiểm tra giá hợp lệ
       for (const [key, value] of Object.entries(packages)) {
-        if (value.isAvailable && (value.price <= 0 || value.count <= 0)) {
-          toast.error("Giá và số lượng dịch vụ makeup phải lớn hơn 0");
+        if (value.isAvailable && value.price <= 0) {
+          toast.error("Giá dịch vụ makeup phải lớn hơn 0");
           return;
         }
       }
