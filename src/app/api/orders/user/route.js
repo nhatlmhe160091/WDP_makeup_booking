@@ -2,7 +2,8 @@ import clientPromise from "@muahub/lib/mongodb";
 import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
 import { validateToken } from "@muahub/lib/auth";
-
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
 const DB_NAME = "services";
 const STADIUM_COLLECTION_NAME = "service";
 const COLLECTION_NAME = "orders";
@@ -87,8 +88,18 @@ export async function POST(req) {
     const dbUser = client.db("accounts");
     const accountsCollection = dbUser.collection("users");
 
-    const objectId = await validateToken(req);
-
+    let  objectId = await validateToken(req);
+    if (!objectId) {
+      // Lấy từ session nếu chưa có
+      const session = await getServerSession(authOptions);
+      if (session?.user?.id) {
+        objectId = getObjectId(session.user.id);
+      }
+    }
+    if (!objectId) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+    
     let { serviceId, ownerId, field, time, date, deposit, fieldSlot } = await req.json();
 
     deposit = parseInt(deposit);

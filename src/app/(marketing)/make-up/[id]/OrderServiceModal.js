@@ -285,7 +285,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
       }
 
       // 3. Tạo payload cho các đơn hàng
-        selectedFieldSlot.forEach((slot) => {
+      selectedFieldSlot.forEach((slot) => {
         const payload = {
           serviceId: serviceData._id,
           ownerId: serviceData.ownerId,
@@ -305,6 +305,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             studioLat: serviceLocation.studioLat,
             studioLng: serviceLocation.studioLng
           },
+          userId: currentUser?.id || currentUser?._id
         };
         orderCost += payload.deposit * 0.3;
         payloadArr.push(payload);
