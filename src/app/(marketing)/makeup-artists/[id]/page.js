@@ -15,10 +15,10 @@ export default function MakeupArtistPage() {
     const fetchArtist = async () => {
       try {
         const res = await SendRequest("get", `/api/makeup-artists/${params.id}`);
-        console.log("res", res);
+        // console.log("res", res);
         if (res.payload) {
           setArtist(res.payload);
-          console.log("artist", res.payload);
+          // console.log("artist", res.payload);
         } else {
           setError("Could not find makeup artist");
         }

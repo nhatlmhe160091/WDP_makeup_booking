@@ -56,7 +56,9 @@ export function AppProvider({ children }) {
       const token = localStorage.getItem("token") || "";
       if (!token) {
         // Nếu chưa có token backend, chỉ lấy từ session Google
-        setUser(normalizeUser({}, session.user));
+        const normalized = normalizeUser({}, session.user);
+        console.log("[AppContext] Normalized user (session only):", normalized);
+        setUser(normalized);
         setTimeout(() => setLoading(false), 0); // Đảm bảo setUser xong mới tắt loading
       } else {
         // Nếu có token backend, gọi fetchData để lấy user từ backend
@@ -93,7 +95,9 @@ export function AppProvider({ children }) {
           console.error("Error during fetching user data:", error);
         }
         // Luôn merge xong mới tắt loading
-        setUser(normalizeUser(userPayload, session?.user));
+        const normalized = normalizeUser(userPayload, session?.user);
+        console.log("[AppContext] Normalized user (backend + session):", normalized);
+        setUser(normalized);
         setTimeout(() => setLoading(false), 0);
       }
       loadingState.current = false;

@@ -55,20 +55,41 @@ export const authOptions = {
       return true;
     },
     async session({ session, token }) {
-      // Lấy toàn bộ thông tin user từ database vào session.user
+      // Lấy toàn bộ thông tin user từ database vào session.user, đồng bộ format với backend
       if (session.user) {
         const client = await clientPromise;
         const db = client.db("accounts");
         const accountsCollection = db.collection("users");
         const dbUser = await accountsCollection.findOne({ email: session.user.email });
         if (dbUser) {
-          // Merge toàn bộ thông tin user từ DB vào session.user
+          // Chuyển _id sang string
+          const id = dbUser._id?.toString() || dbUser.id || "";
           session.user = {
-            ...session.user,
-            ...dbUser,
-            id: dbUser._id?.toString() || dbUser.id,
-            _id: dbUser._id?.toString() || dbUser.id,
+            _id: id,
+            id: id,
+            email: dbUser.email || session.user.email || "",
+            name: dbUser.name || session.user.name || "",
             avatar: dbUser.avatar || session.user.image || "",
+            role: dbUser.role || "user",
+            active: dbUser.active ?? true,
+            phone: dbUser.phone || "",
+            address: dbUser.address || "",
+            bank_info: dbUser.bank_info || "",
+            bank_info_number: dbUser.bank_info_number || "",
+            bio: dbUser.bio || "",
+            payment_package: dbUser.payment_package || null,
+            payment_type: dbUser.payment_type || null,
+            withdrawn: dbUser.withdrawn || 0,
+            created_at: dbUser.created_at || "",
+            updated_at: dbUser.updated_at || "",
+            cccd: dbUser.cccd || "",
+            totalPrice: dbUser.totalPrice || 0,
+            payment_amount: dbUser.payment_amount || 0,
+            payment_expiry: dbUser.payment_expiry || "",
+            payment_history: dbUser.payment_history || [],
+            // Các trường Google
+            googleId: dbUser.googleId || "",
+            image: dbUser.avatar || session.user.image || "",
           };
         }
       }

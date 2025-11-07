@@ -61,8 +61,8 @@ const TimelineHistoryPage = () => {
   const handleCloseModal = () => {
     setSelectedBookings([]);
   };
-  console.log("services", services);
-  console.log("bookings", bookings);
+  // console.log("services", services);
+  // console.log("bookings", bookings);
   return (
     <PageContainer title="Lịch sử đặt dịch vụ" description="Danh sách các dịch vụ bạn đã đặt">
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>

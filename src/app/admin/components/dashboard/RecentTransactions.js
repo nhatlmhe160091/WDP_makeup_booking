@@ -45,7 +45,8 @@ const RecentNotifies = () => {
     if (Object.keys(currentUser).length === 0) return;
     fetchTodayBookings(currentUser);
   }, [currentUser]);
-
+// console.log("RecentNotifies Render: currentUser=", currentUser, "data=", data, "loading=", loading);
+// console.log("bookings data:", data);
   return (
     <DashboardCard title="Lịch makeup hôm nay">
       {loading ? (
@@ -88,11 +89,11 @@ const RecentNotifies = () => {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent>
-                  <Typography fontWeight="600">{booking.service.serviceName}</Typography>
+                  <Typography fontWeight="600">{booking?.service?.serviceName}</Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {booking.service.location}
+                    {booking?.service?.location}
                   </Typography>
-                  <Typography variant="body2">Người đặt: {booking.user.name}</Typography>
+                  <Typography variant="body2">Người đặt: {booking?.user?.name}</Typography>
                 </TimelineContent>
               </TimelineItem>
             ))}
