@@ -82,15 +82,18 @@ const BoxFieldComponent = ({ field, showDistance = false, distance, showBookingC
     );
   };
 
-  // Tính rating mặc định dựa trên kinh nghiệm
+  // Tính rating mặc định dựa trên kinh nghiệm, chỉ khi có bookingCount
   const getDisplayRating = () => {
     if (field.rating) return field.rating;
-    // Tính rating dựa trên kinh nghiệm
-    const years = field.experienceYears || 0;
-    if (years >= 10) return "5.0";
-    if (years >= 5) return "4.8";
-    if (years >= 2) return "4.5";
-    return "4.2";
+    if (typeof bookingCount === 'number' && bookingCount > 0) {
+      const years = field.experienceYears || 0;
+      if (years >= 10) return "5.0";
+      if (years >= 5) return "4.8";
+      if (years >= 2) return "4.5";
+      return "4.2";
+    }
+    // Không có bookingCount thì không hiển thị rate
+    return null;
   };
 
   return (

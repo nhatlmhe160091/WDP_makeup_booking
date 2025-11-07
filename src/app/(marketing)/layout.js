@@ -51,7 +51,7 @@ const UserAppLayout = ({ children }) => {
   return (
     <>
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:wght@400;500;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&display=swap"
         rel="stylesheet"
       />
 
@@ -68,7 +68,17 @@ const UserAppLayout = ({ children }) => {
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossOrigin="anonymous"
       />
-
+      {/* Botpress webchat inject - load sau khi trang tương tác */}
+      <Script
+        src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"
+        strategy="afterInteractive"
+      />
+      {/* Script botpress content (defer) - đặt sau inject.js */}
+      <Script
+        src="https://files.bpcontent.cloud/2025/11/07/06/20251107065809-TY9VOLUP.js"
+        strategy="afterInteractive"
+        defer
+      />
       <link href="/lib/css/style.css" rel="stylesheet" />
       <HeaderComponent />
       {children}

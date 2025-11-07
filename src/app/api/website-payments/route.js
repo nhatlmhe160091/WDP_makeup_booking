@@ -35,7 +35,15 @@ export async function GET(req) {
           }
         },
         { $unwind: "$owner" },
-        { $sort: { created_at: -1 } }
+        { $sort: { created_at: -1 } },
+        // Loại bỏ trùng lặp theo ownerId + payment_package, chỉ lấy bản mới nhất
+        {
+          $group: {
+            _id: { ownerId: "$ownerId", payment_package: "$payment_package" },
+            doc: { $first: "$$ROOT" }
+          }
+        },
+        { $replaceRoot: { newRoot: "$doc" } }
       ])
       .toArray();
 

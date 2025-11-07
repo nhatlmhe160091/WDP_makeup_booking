@@ -41,11 +41,25 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
     );
   }
 
+  // Thêm mục Quản lý Blog nếu user có payment_type phù hợp
+  const shouldShowBlog =
+    currentUser?.payment_type === "monthly_6" || currentUser?.payment_type === "yearly";
+
+  // Tạo danh sách menu mới nếu cần
+  let menuToRender = [...Menuitems];
+  if (shouldShowBlog) {
+    menuToRender.push(
+      { navlabel: true, subheader: "Quản lý Blog" }
+      // Có thể thêm các mục con ở đây nếu cần
+    );
+    // Ví dụ thêm mục blog quản lý:
+    // menuToRender.push({ id: 'blog', title: 'Blog', icon: ..., href: '/makeup-artists/blog' });
+  }
+
   return (
     <Box sx={{ px: 3 }}>
       <List sx={{ pt: 0 }} className="sidebarNav" component="div">
-        {Menuitems.map((item) => {
-          // {/********SubHeader**********/}
+        {menuToRender.map((item) => {
           if (item.onlyUser && currentUser?.role === ROLE_MANAGER.ADMIN) {
             return null;
           }
@@ -54,9 +68,6 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
           }
           if (item.subheader) {
             return <NavGroup item={item} key={item.subheader} />;
-
-            // {/********If Sub Menu**********/}
-            /* eslint no-else-return: "off" */
           } else {
             return <NavItem item={item} key={item.id} pathDirect={pathDirect} onClick={toggleMobileSidebar} />;
           }

@@ -114,7 +114,7 @@ const MakeupServiceModal = () => {
   const filteredPackages = packages.filter((field) => {
     const matchesArea = areaFilter ? field.location.includes(areaFilter) : true;
     if (sizeFilter === "") return matchesArea;
-    const matchesType = field.packages[sizeFilter].isAvailable;
+    const matchesType = field.packages && field.packages[sizeFilter] && field.packages[sizeFilter].isAvailable;
     return matchesArea && matchesType;
   });
 
