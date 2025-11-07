@@ -24,7 +24,7 @@ const defaultProfile = {
 };
 
 const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRequest }) => {
-  // Validate các trường bắt buộc ngân hàng
+  // Validate các trường bắt buộc ngân hàng và các trường social/portfolio/certificates
   const validateBankInfo = () => {
     const errors = {};
     if (!profile.bankInfo.bankName) errors.bankName = "Ngân hàng là bắt buộc.";
@@ -33,7 +33,38 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
     return errors;
   };
 
+  const validateOtherFields = () => {
+    const errors = {};
+    // Social links: nếu có nhập thì phải đúng định dạng URL
+    if (profile.socialLinks.facebook && !/^https?:\/\//.test(profile.socialLinks.facebook)) {
+      errors.facebook = "Facebook phải là một đường dẫn hợp lệ (bắt đầu bằng http:// hoặc https://)";
+    }
+    if (profile.socialLinks.instagram && !/^https?:\/\//.test(profile.socialLinks.instagram)) {
+      errors.instagram = "Instagram phải là một đường dẫn hợp lệ (bắt đầu bằng http:// hoặc https://)";
+    }
+    // Portfolio: mỗi item phải có image và desc
+    profile.portfolio.forEach((item, idx) => {
+      if (!item.image) {
+        errors[`portfolio_image_${idx}`] = "URL ảnh là bắt buộc.";
+      }
+      if (!item.desc) {
+        errors[`portfolio_desc_${idx}`] = "Mô tả là bắt buộc.";
+      }
+    });
+    // Certificates: mỗi item phải có name và image
+    profile.certificates.forEach((item, idx) => {
+      if (!item.name) {
+        errors[`certificate_name_${idx}`] = "Tên chứng chỉ là bắt buộc.";
+      }
+      if (!item.image) {
+        errors[`certificate_image_${idx}`] = "URL ảnh/PDF là bắt buộc.";
+      }
+    });
+    return errors;
+  };
+
   const [bankErrors, setBankErrors] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
   const [profile, setProfile] = useState({
     ...defaultProfile,
     name: currentUser?.name || "",
@@ -96,9 +127,15 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
   const handleSubmit = async (e) => {
     e.preventDefault();
     const bankErrs = validateBankInfo();
+    const otherErrs = validateOtherFields();
     setBankErrors(bankErrs);
+    setFieldErrors(otherErrs);
     if (Object.keys(bankErrs).length > 0) {
       toast.error("Vui lòng điền đầy đủ thông tin ngân hàng.");
+      return;
+    }
+    if (Object.keys(otherErrs).length > 0) {
+      toast.error("Vui lòng kiểm tra các trường thông tin bổ sung.");
       return;
     }
     setLoading(true);
@@ -313,10 +350,12 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         <div className="col-md-6 mb-2">
           <label>Facebook</label>
           <input className="form-control" name="facebook" value={profile.socialLinks.facebook} onChange={e => handleNestedChange(e, 'socialLinks')} />
+          {fieldErrors.facebook && <div className="text-danger small">{fieldErrors.facebook}</div>}
         </div>
         <div className="col-md-6 mb-2">
           <label>Instagram</label>
           <input className="form-control" name="instagram" value={profile.socialLinks.instagram} onChange={e => handleNestedChange(e, 'socialLinks')} />
+          {fieldErrors.instagram && <div className="text-danger small">{fieldErrors.instagram}</div>}
         </div>
       </div>
       <hr />
@@ -325,9 +364,11 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         <div className="row mb-2" key={idx}>
           <div className="col-md-5">
             <input className="form-control" placeholder="URL ảnh" value={item.image} onChange={e => handlePortfolioChange(idx, 'image', e.target.value)} />
+            {fieldErrors[`portfolio_image_${idx}`] && <div className="text-danger small">{fieldErrors[`portfolio_image_${idx}`]}</div>}
           </div>
           <div className="col-md-5">
             <input className="form-control" placeholder="Mô tả" value={item.desc} onChange={e => handlePortfolioChange(idx, 'desc', e.target.value)} />
+            {fieldErrors[`portfolio_desc_${idx}`] && <div className="text-danger small">{fieldErrors[`portfolio_desc_${idx}`]}</div>}
           </div>
           <div className="col-md-2 d-flex align-items-center">
             <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemovePortfolio(idx)}>Xóa</button>
@@ -341,9 +382,11 @@ const CreateMakeupArtistProfileComponent = ({ currentUser, onSubmit, isUpgradeRe
         <div className="row mb-2" key={idx}>
           <div className="col-md-6">
             <input className="form-control" placeholder="Tên chứng chỉ" value={item.name} onChange={e => handleCertificateChange(idx, 'name', e.target.value)} />
+            {fieldErrors[`certificate_name_${idx}`] && <div className="text-danger small">{fieldErrors[`certificate_name_${idx}`]}</div>}
           </div>
           <div className="col-md-4">
             <input className="form-control" placeholder="URL ảnh/PDF" value={item.image} onChange={e => handleCertificateChange(idx, 'image', e.target.value)} />
+            {fieldErrors[`certificate_image_${idx}`] && <div className="text-danger small">{fieldErrors[`certificate_image_${idx}`]}</div>}
           </div>
           <div className="col-md-2 d-flex align-items-center">
             <button type="button" className="btn btn-danger btn-sm" onClick={() => handleRemoveCertificate(idx)}>Xóa</button>
