@@ -16,13 +16,13 @@ const MakeupArtistProfile = ({ artist }) => {
       </div>
     );
   }
-  if (!artist.profileComplete) {
-    return (
-      <div className="container py-5">
-        <div className="alert alert-info">Hồ sơ đang được cập nhật.</div>
-      </div>
-    );
-  }
+  // if (!artist.profileComplete) {
+  //   return (
+  //     <div className="container py-5">
+  //       <div className="alert alert-info">Hồ sơ đang được cập nhật.</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="container py-5">

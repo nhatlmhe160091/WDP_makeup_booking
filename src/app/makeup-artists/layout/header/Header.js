@@ -16,7 +16,7 @@ import PropTypes from "prop-types";
 import { useRouter } from "next/navigation";
 import Profile from "./Profile";
 import { IconBellRinging, IconMenu } from "@tabler/icons-react";
-
+import { useApp } from "../../../contexts/AppContext";
 const Header = ({ toggleMobileSidebar }) => {
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     boxShadow: "none",
@@ -42,10 +42,8 @@ const Header = ({ toggleMobileSidebar }) => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      let userId = null;
-      if (typeof window !== "undefined") {
-        userId = localStorage.getItem("userId");
-      }
+         const { currentUser } = useApp();
+      const userId = currentUser?._id || currentUser?.id;
       const url = userId
         ? `/api/notifications/owner?userId=${userId}`
         : `/api/notifications/owner`;
