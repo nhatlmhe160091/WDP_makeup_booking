@@ -267,6 +267,7 @@ const HistoryBookingComponent = ({ currentUser, highlightOrderId }) => {
             )}
             {bookings.map((booking) => {
               const { isAlreadyRated, canCancel, canRate, isToday, remainingTimeToCancel } = checkTime(booking);
+              const isCancelled = booking.status === "cancelled";
               const isHighlighted = highlightOrderId && booking._id === highlightOrderId;
               return (
                 <tr key={booking._id} style={isHighlighted ? { backgroundColor: '#ffe082', fontWeight: 'bold' } : {}}>
@@ -284,7 +285,7 @@ const HistoryBookingComponent = ({ currentUser, highlightOrderId }) => {
                       booking.status === "confirmed" ? "green" :
                         booking.status === "deposit_confirmed" ? "#ff9800" :
                           booking.status === "pending" ? "#1976d2" :
-                            booking.status === "cancel" ? "#b71c1c" :
+                            booking.status === "cancel" || booking.status === "cancelled" ? "#b71c1c" :
                               booking.status === "completed" ? "#388e3c" :
                                 booking.status === "failed" ? "#d32f2f" :
                                   "#888"
@@ -292,10 +293,10 @@ const HistoryBookingComponent = ({ currentUser, highlightOrderId }) => {
                     {booking.status === "confirmed" && "Đã xác nhận hoàn tất"}
                     {booking.status === "deposit_confirmed" && "Đã xác nhận cọc"}
                     {booking.status === "pending" && "Chờ xác nhận cọc"}
-                    {booking.status === "cancel" && "Đã hủy"}
+                    {(booking.status === "cancel" || booking.status === "cancelled") && "Đã hủy"}
                     {booking.status === "completed" && "Hoàn thành"}
                     {booking.status === "failed" && "Thất bại"}
-                    {!["confirmed", "deposit_confirmed", "pending", "cancel", "completed", "failed"].includes(booking.status) && booking.status}
+                    {!["confirmed", "deposit_confirmed", "pending", "cancel", "cancelled", "completed", "failed"].includes(booking.status) && booking.status}
                   </td>
                   <td className="text-center">
                     <button
@@ -309,7 +310,7 @@ const HistoryBookingComponent = ({ currentUser, highlightOrderId }) => {
                       {isAlreadyRated && <span className="ms-1">✓</span>}
                     </button>
 
-                    {!isToday && canCancel && remainingTimeToCancel > 0 && (
+                    {!isCancelled && !isToday && canCancel && remainingTimeToCancel > 0 && (
                       <div className="d-inline-block">
                         <button
                           className="btn btn-sm btn-danger ms-2"

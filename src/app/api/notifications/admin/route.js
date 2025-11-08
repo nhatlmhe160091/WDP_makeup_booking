@@ -17,8 +17,12 @@ export async function GET(req) {
     const userId = searchParams.get("userId");
     const isRead = searchParams.get("isRead");
 
-  const query = { type: "admin" };
-  if (userId) query.userId = getObjectId(userId);
+  let query = { type: "admin" };
+  if (userId) {
+    query.userId = getObjectId(userId);
+  } else {
+    query.userId = null;
+  }
   if (isRead !== null && isRead !== undefined) query.isRead = isRead === "true";
 
     const notifications = await notificationsCollection
