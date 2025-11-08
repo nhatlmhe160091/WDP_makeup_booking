@@ -129,7 +129,7 @@ export async function PUT(req) {
     } = await req.json();
 
     const ObjectId = getObjectId(id);
-    const userId = await validateToken(req);
+    // const userId = await validateToken(req);
 
     const service = await servicesCollection.findOne({ _id: ObjectId });
     if (!service) {

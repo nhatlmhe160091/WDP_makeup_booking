@@ -3,7 +3,7 @@ import getObjectId from "@muahub/lib/getObjectId";
 import { NextResponse } from "next/server";
 import { validateToken } from "@muahub/lib/auth";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/route";
 const DB_NAME = "services";
 const STADIUM_COLLECTION_NAME = "service";
 const COLLECTION_NAME = "orders";
