@@ -64,7 +64,7 @@ const Header = ({ toggleMobileSidebar }) => {
       if (!anchorEl) fetchNotifications();
     }, 30000); // 30 giây
     return () => clearInterval(interval);
-  }, [anchorEl]);
+  }, [anchorEl, currentUser]);
 
   const handleReadAndGo = async (item) => {
     try {
