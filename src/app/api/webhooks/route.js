@@ -53,7 +53,6 @@ export async function GET() {
   }
 }
 
-// API POST
 export async function POST(req) {
   try {
     const client = await clientPromise;
@@ -63,22 +62,9 @@ export async function POST(req) {
 
     let data = await req.json();
 
-    // Kiểm tra trùng banking
-    const existedBanking = await bankingsCollection.findOne({
-      content: data.content,
-      transferAmount: data.transferAmount
-    });
-    let resultBanking;
-    if (existedBanking) {
-      resultBanking = existedBanking;
-    } else {
-      const dataOrder = await bankingsCollection.insertOne(data);
-      resultBanking = { ...data, _id: dataOrder.insertedId };
-    }
+    const dataOrder = await bankingsCollection.insertOne(data);
 
-    // Thực hiện các action còn lại ở đây nếu cần
-
-    return NextResponse.json({ success: true, message: "Nhận qr thành công", data: resultBanking });
+    return NextResponse.json({ success: true, message: "Nhận qr thành công", data: dataOrder });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
