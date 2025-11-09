@@ -42,11 +42,8 @@ const Header = ({ toggleMobileSidebar }) => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const userId = currentUser?._id || currentUser?.id;
-      console.log("Fetching notifications for userId:", userId);
-      const url = userId
-        ? `/api/notifications/owner?userId=${userId}`
-        : `/api/notifications/owner`;
+      // Lấy thẳng bằng currentUser
+      const url = `/api/notifications/owner?userId=${currentUser?._id || currentUser?.id}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.success) setNotifications(data.data || []);
@@ -101,7 +98,7 @@ const Header = ({ toggleMobileSidebar }) => {
   const handleShowMore = () => {
     setVisibleCount((prev) => Math.min(prev + 10, notifications.length));
   };
- console.log("notifications", notifications);
+//  console.log("notifications", notifications);
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
