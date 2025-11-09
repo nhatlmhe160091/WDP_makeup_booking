@@ -325,8 +325,10 @@ console.log('serviceData in OrderServiceModal:', currentUser);
       }
 
       // 5. Chờ xác nhận thanh toán và tạo đơn hàng
+      let orderCreated = false;
       setTimeout(() => {
         const intervalId = setInterval(async () => {
+          if (orderCreated) return;
           const resPayment = await SendRequest("get", `/api/webhooks`);
           let paymentDone = false;
 
@@ -342,6 +344,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
 
           if (!paymentDone) return;
 
+          orderCreated = true;
           try {
             // Tạo tất cả orders
             for (const payload of payloadArr) {
@@ -354,7 +357,6 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             setErrorMessage('Có lỗi xảy ra khi tạo đơn hàng. Vui lòng liên hệ hỗ trợ.');
             await cleanupLocks();
           }
-          
           clearInterval(intervalId);
         }, 5000);
       }, 5000);
@@ -775,7 +777,7 @@ console.log('serviceData in OrderServiceModal:', currentUser);
             )} */}
         {orderDone ? (
           <>
-            <Link href="/trang-ca-nhan">
+            <Link href={dataOrder && dataOrder[0]?._id ? `/trang-ca-nhan?orderId=${dataOrder[0]._id}` : "/trang-ca-nhan"}>
               <Button variant="primary">Xem lịch sử đặt lịch</Button>
             </Link>
             <Button variant="secondary" onClick={handleClose}>

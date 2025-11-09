@@ -27,11 +27,6 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
     !currentUser?.payment_type &&
     pathname === "/makeup-artists/thanh-toan-nen-tang"
   ) {
-     console.log("[SidebarItems] Blocked: currentUser=", currentUser, "pathname=", pathname, "ROLE_MANAGER=", ROLE_MANAGER, "condition:", {
-          isMua: currentUser.role === ROLE_MANAGER.MUA,
-          noPayment: !currentUser.payment_type,
-          isPaymentPage: pathname === "/admin/thanh-toan-nen-tang"
-        });
     return (
       <Box sx={{ px: 3 }}>
         <div style={{ padding: "16px", textAlign: "center", color: "#888" }}>
@@ -41,29 +36,26 @@ const SidebarItems = ({ toggleMobileSidebar }) => {
     );
   }
 
-  // Thêm mục Quản lý Blog nếu user có payment_type phù hợp
-  const shouldShowBlog =
-    currentUser?.payment_type === "monthly_6" || currentUser?.payment_type === "yearly";
-
-  // Tạo danh sách menu mới nếu cần
-  let menuToRender = [...Menuitems];
-  if (shouldShowBlog) {
-    menuToRender.push(
-      { navlabel: true, subheader: "Quản lý Blog" }
-      // Có thể thêm các mục con ở đây nếu cần
-    );
-    // Ví dụ thêm mục blog quản lý:
-    // menuToRender.push({ id: 'blog', title: 'Blog', icon: ..., href: '/makeup-artists/blog' });
-  }
-
   return (
     <Box sx={{ px: 3 }}>
       <List sx={{ pt: 0 }} className="sidebarNav" component="div">
-        {menuToRender.map((item) => {
+        {Menuitems.map((item) => {
+          // Ẩn mục onlyUser cho admin
           if (item.onlyUser && currentUser?.role === ROLE_MANAGER.ADMIN) {
             return null;
           }
+          // Ẩn mục onlyAdmin cho MUA
           if (item.onlyAdmin && currentUser?.role === ROLE_MANAGER.MUA) {
+            return null;
+          }
+          // Hiển thị mục onlyMua nếu payment_type hợp lệ
+          if (
+            item.onlyMua &&
+            !(
+              currentUser?.payment_type === "monthly_6" ||
+              currentUser?.payment_type === "yearly"
+            )
+          ) {
             return null;
           }
           if (item.subheader) {

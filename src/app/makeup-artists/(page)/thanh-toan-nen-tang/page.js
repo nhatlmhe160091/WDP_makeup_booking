@@ -404,7 +404,9 @@ const WebsitePaymentPage = () => {
           const maxPolling = 40; // tối đa 40 lần (60s)
           const orderCode = paymentMethod === "payos" ? currentOrderCode : null;
           const uuid = currentPaymentUUID;
+          let paymentConfirmed = false;
           const intervalId = setInterval(async () => {
+            if (paymentConfirmed) return;
             pollingCount++;
             const resPayment = await SendRequest("get", `/api/webhooks`);
             let paymentDone = false;
@@ -416,12 +418,6 @@ const WebsitePaymentPage = () => {
                   }
                 } else if (paymentMethod === "payos") {
                   if (item.data) {
-                    // Log để so sánh orderCode
-                    // console.log('[PAYOS] So sánh:', {
-                    //   itemOrderCode: item.data.orderCode,
-                    //   pollingOrderCode: orderCode,
-                    //   equal: String(item.data.orderCode) === String(orderCode)
-                    // });
                     if (String(item.data.orderCode) === String(orderCode)) {
                       console.log('[PAYOS] Payment confirmed for orderCode:', orderCode);
                       paymentDone = true;
@@ -431,6 +427,7 @@ const WebsitePaymentPage = () => {
               });
             }
             if (paymentDone) {
+              paymentConfirmed = true;
               clearInterval(intervalId);
               handleConfirmPayment(selectedPaymentType);
             } else if (pollingCount >= maxPolling) {

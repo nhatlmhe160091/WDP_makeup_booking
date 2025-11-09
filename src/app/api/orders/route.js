@@ -140,33 +140,46 @@ export async function POST(req) {
 
     const isToday = bookingDate.getTime() === today.getTime();
 
-    let newOrder = {
-      userId: objectId,
+
+    // Kiểm tra trùng đơn hàng
+    const existedOrder = await ordersCollection.findOne({
       serviceId: getObjectId(serviceId),
-      ownerId: getObjectId(ownerId),
-      field,
-      time,
-      deposit,
-      remaining: total - deposit,
-      status: isToday ? "deposit_confirmed" : "pending", // Tự động xác nhận cọc nếu đặt trong ngày
-      fieldSlot,
       date,
-      serviceLocationType: serviceLocationType || null,
-      serviceLocation: {
-        extraFee: parsedExtraFee,
-        distanceKm: parsedDistanceKm,
-        customerLat,
-        customerLng,
-        studioLat,
-        studioLng
-      },
-      created_at: new Date(),
-      updated_at: new Date()
-    };
+      time,
+      fieldSlot,
+      userId: objectId
+    });
 
-    const dataOrder = await ordersCollection.insertOne(newOrder);
-
-    newOrder = { ...newOrder, _id: dataOrder.insertedId };
+    let newOrder;
+    if (existedOrder) {
+      newOrder = existedOrder;
+    } else {
+      newOrder = {
+        userId: objectId,
+        serviceId: getObjectId(serviceId),
+        ownerId: getObjectId(ownerId),
+        field,
+        time,
+        deposit,
+        remaining: total - deposit,
+        status: isToday ? "deposit_confirmed" : "pending", // Tự động xác nhận cọc nếu đặt trong ngày
+        fieldSlot,
+        date,
+        serviceLocationType: serviceLocationType || null,
+        serviceLocation: {
+          extraFee: parsedExtraFee,
+          distanceKm: parsedDistanceKm,
+          customerLat,
+          customerLng,
+          studioLat,
+          studioLng
+        },
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+      const dataOrder = await ordersCollection.insertOne(newOrder);
+      newOrder = { ...newOrder, _id: dataOrder.insertedId };
+    }
 
     // Notification logic
     const notificationsCollection = db.collection("notifications");

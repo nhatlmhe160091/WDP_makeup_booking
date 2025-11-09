@@ -128,20 +128,16 @@ const Menuitems = [
   },
   {
     navlabel: true,
-    subheader: "Quản lý Blog"
+    subheader: "Quản lý Blog",
+    onlyMua: true
   },
   {
     id: uniqueId(),
     title: "Danh sách bài viết",
     icon: IconListCheck,
-    href: "/makeup-artists/danh-sach-blog"
+    href: "/makeup-artists/danh-sach-blog",
+    onlyMua: true
   },
-  // {
-  //   id: uniqueId(),
-  //   title: "Thêm bài viết",
-  //   icon: IconPlus,
-  //   href: "/makeup-artists/them-blog"
-  // }
 ];
 
 export default Menuitems;

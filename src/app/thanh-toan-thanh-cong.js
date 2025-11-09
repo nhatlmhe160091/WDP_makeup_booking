@@ -31,7 +31,7 @@ export default function PaymentSuccess() {
         )}
 
         <div className="mt-4">
-          <Link href="/trang-ca-nhan" className="btn btn-primary me-3">
+          <Link href={orderId ? `/trang-ca-nhan?orderId=${orderId}` : "/trang-ca-nhan"} className="btn btn-primary me-3">
             Xem lịch sử đặt lịch
           </Link>
           <Link href="/" className="btn btn-outline-primary">
