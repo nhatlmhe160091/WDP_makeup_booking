@@ -1,4 +1,4 @@
-import { validateToken } from "@muahub/lib/auth";
+// import { validateToken } from "@muahub/lib/auth";
 import clientPromise from "@muahub/lib/mongodb";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
@@ -62,12 +62,32 @@ export async function POST(req) {
 
     const { ownerId, payment_package, amount, status } = await req.json();
 
+    // Lấy thời gian tạo
+    const now = new Date();
+    // Làm tròn về ngày và giờ
+    const roundedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+    // Kiểm tra trùng ownerId, payment_package, amount, status, created_at (ngày và giờ)
+    const existed = await paymentsCollection.findOne({
+      ownerId: new ObjectId(ownerId),
+      payment_package,
+      amount,
+      status: "CONFIRM",
+      created_at: roundedDate
+    });
+    if (existed) {
+      return NextResponse.json({
+        success: true,
+        message: "Payment already exists, returning existing paymentId",
+        paymentId: existed._id
+      });
+    }
+
     const newPayment = {
       ownerId: new ObjectId(ownerId),
       payment_package,
       amount,
       status: status || "PENDING",
-      created_at: new Date()
+      created_at: roundedDate
     };
 
     const result = await paymentsCollection.insertOne(newPayment);
