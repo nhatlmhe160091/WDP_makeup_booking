@@ -37,13 +37,13 @@ const Header = ({ toggleMobileSidebar }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+ const { currentUser } = useApp();
   // Hàm fetch thông báo
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-         const { currentUser } = useApp();
       const userId = currentUser?._id || currentUser?.id;
+      console.log("Fetching notifications for userId:", userId);
       const url = userId
         ? `/api/notifications/owner?userId=${userId}`
         : `/api/notifications/owner`;
@@ -101,7 +101,7 @@ const Header = ({ toggleMobileSidebar }) => {
   const handleShowMore = () => {
     setVisibleCount((prev) => Math.min(prev + 10, notifications.length));
   };
-
+ console.log("notifications", notifications);
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
