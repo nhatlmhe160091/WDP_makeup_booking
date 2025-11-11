@@ -160,7 +160,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
   <html>
     <head>
       <meta charset="UTF-8" />
-      <title>Nâng cấp tài khoản thành chuyên viên - ${EMAIL_NAME}</title>
+      <title>Nâng cấp tài khoản thành Chuyên Viên - ${EMAIL_NAME}</title>
       <style>
         body {
           font-family: Arial, sans-serif;
@@ -183,16 +183,16 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
           text-align: center;
         }
         .highlight-box {
-          background-color: #f8f4ff;
+          background-color: #fce4ec;
           padding: 15px;
           border-radius: 5px;
-          border-left: 4px solid #6e45e2;
+          border-left: 4px solid #e91e63;
           margin: 20px 0;
         }
         .button {
           display: inline-block;
           padding: 12px 24px;
-          background-color: #6e45e2;
+          background-color: #e91e63;
           color: white !important;
           text-decoration: none;
           border-radius: 4px;
@@ -205,7 +205,7 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
       <div class="container">
         <h2>Xin chúc mừng ${name}!</h2>
         
-        <p>Tài khoản của bạn tại <strong>${EMAIL_NAME}</strong> đã được nâng cấp thành công lên <strong>chuyên viên</strong>.</p>
+        <p>Tài khoản của bạn tại <strong>${EMAIL_NAME}</strong> đã được nâng cấp thành công lên <strong>Chuyên Viên</strong>.</p>
         
         <div class="highlight-box">
           <p><strong>Thông tin tài khoản:</strong></p>
@@ -214,18 +214,20 @@ export const htmlUpdateAccount = ({ name, email, phone, address }) => {
             <li><strong>Email:</strong> ${email}</li>
             <li><strong>Số điện thoại:</strong> ${phone}</li>
             <li><strong>Địa chỉ:</strong> ${address}</li>
-            <li><strong>Vai trò:</strong> chuyên viên</li>
+            <li><strong>Vai trò:</strong> Chuyên Viên</li>
           </ul>
         </div>
 
         <p>Giờ đây bạn có thể:</p>
         <ul>
-          <li>Tạo và quản lý các sân bóng của mình</li>
-          <li>Tiếp nhận đặt sân từ khách hàng</li>
+          <li>Tạo và quản lý hồ sơ chuyên viên của mình</li>
+          <li>Đăng tải các dịch vụ makeup và bảng giá</li>
+          <li>Tiếp nhận đặt lịch từ khách hàng</li>
+          <li>Quản lý lịch làm việc và portfolio</li>
           <li>Theo dõi doanh thu và lịch sử hoạt động</li>
         </ul>
 
-        <p>Chúng tôi rất vui mừng được hợp tác cùng bạn trong hành trình kinh doanh sân bóng đá. Nếu có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi.</p>
+        <p>Chúng tôi rất vui mừng được hợp tác cùng bạn trong hành trình phát triển nghề chuyên viên. Nếu có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi.</p>
 
         <a href="${MAIN_URL_APP}/makeup-artists" class="button">Truy cập trang quản lý</a>
 
