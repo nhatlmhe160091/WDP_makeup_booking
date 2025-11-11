@@ -40,19 +40,31 @@ const MUAsOverview = () => {
   // Lọc và xử lý dữ liệu cho biểu đồ theo giờ trong ngày
   const processData = () => {
     if (!data.length) return;
-    // Lọc theo ngày được chọn
+    
+    // Lọc theo ngày được chọn và chỉ tính các booking đã confirmed
     const filtered = data.filter((item) => {
       const d = new Date(item.date);
-      // So sánh yyyy-mm-dd
-      return d.toISOString().slice(0, 10) === selectedDate;
+      // So sánh yyyy-mm-dd và chỉ tính confirmed bookings
+      return d.toISOString().slice(0, 10) === selectedDate && 
+             (item.status === 'confirmed' || item.status === 'deposit_confirmed');
     });
+    
     // Gom nhóm theo giờ (0-23)
     const revenueByHour = Array(24).fill(0);
+    
     filtered.forEach((item) => {
-      const d = new Date(item.date);
-      const hour = d.getHours();
-      revenueByHour[hour] += item.deposit;
+      // Lấy giờ từ trường time (ví dụ: "8:30 - 10:00")
+      if (item.time) {
+        const timeStr = item.time.split(' - ')[0]; // Lấy giờ bắt đầu
+        const [hourStr] = timeStr.split(':');
+        const hour = parseInt(hourStr, 10);
+        
+        if (hour >= 0 && hour <= 23) {
+          revenueByHour[hour] += item.deposit;
+        }
+      }
     });
+    
     setCategories(Array.from({ length: 24 }, (_, i) => `${i}:00`));
     setSeries([{ name: "Đặt cọc", data: revenueByHour }]);
   };

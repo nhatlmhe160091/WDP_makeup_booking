@@ -13,11 +13,22 @@ const nextConfig = {
     ignoreDuringBuilds: true, //Cho phép build dù có warning
   },
    images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      }
+    ],
+    // Fallback cho các domain cụ thể nếu cần
     domains: [
       'media6.ppl-media.com',
-       'res.cloudinary.com',
-    'imgur.com',
-      // add more domains here if needed
+      'res.cloudinary.com',
+      'imgur.com',
+      'i.pinimg.com',
     ],
   },
 };

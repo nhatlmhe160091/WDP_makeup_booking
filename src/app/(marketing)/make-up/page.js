@@ -17,6 +17,6 @@ export const metadata = {
   }
 };
 
-export default function SanBongPage() {
+export default function DichVuPage() {
   return <MakeupServiceModal />;
 }

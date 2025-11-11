@@ -98,6 +98,13 @@ const CarouselComponent = ({ pathUrl }) => {
         name: "Danh sách dịch vụ",
         path: "/dich-vu"
       };
+    } 
+    else if (pathUrl.includes("/blog/")) {
+      NameService = "Chi Tiết Blog";
+      parentPath = {
+        name: "Bài viết",
+        path: "/blog"
+      };
     }
     return (
       <div className="container-fluid bg-breadcrumb" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/img/carousel3.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>

@@ -79,7 +79,7 @@ const MakeupServiceModal = () => {
 
   useEffect(() => {
     const fetchPackages = async () => {
-      const response = await SendRequest("GET", "/api/services");
+      const response = await SendRequest("GET", "/api/services?active=true");
       if (response.payload) {
         setPackages(response.payload);
       }

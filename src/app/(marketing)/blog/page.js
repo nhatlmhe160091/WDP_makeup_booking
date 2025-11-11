@@ -15,7 +15,7 @@ const Blog = () => {
   // Filter states
   const [ownerId, setOwnerId] = useState("");
   const [muaList, setMuaList] = useState([]);
-  const [status, setStatus] = useState("published");
+  const status = "published"; // Cố định status là published
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
@@ -68,7 +68,6 @@ const Blog = () => {
 
   // Filter handlers
   const handleOwnerIdChange = (e) => setOwnerId(e.target.value);
-  const handleStatusChange = (e) => setStatus(e.target.value);
   const handleCategoryChange = (e) => setCategory(e.target.value);
   const handleLimitChange = (e) => setLimit(Number(e.target.value));
   const handlePageChange = (newPage) => setPage(newPage);
@@ -81,7 +80,7 @@ const Blog = () => {
       <div className="container py-5">
         {/* Filters Section */}
         <div className="row mb-3 align-items-center">
-          <div className="col-md-3 mb-2">
+          <div className="col-md-4 mb-2">
             <select className="form-select border-pink" value={ownerId} onChange={handleOwnerIdChange}>
               <option value="">Tất cả MUA</option>
               {muaList.map((mua) => (
@@ -91,14 +90,7 @@ const Blog = () => {
               ))}
             </select>
           </div>
-          <div className="col-md-3 mb-2">
-            <select className="form-select border-pink" value={status} onChange={handleStatusChange}>
-              <option value="">Tất cả trạng thái</option>
-              <option value="published">Đã xuất bản</option>
-              <option value="draft">Bản nháp</option>
-            </select>
-          </div>
-          <div className="col-md-3 mb-2">
+          <div className="col-md-4 mb-2">
             <select className="form-select border-pink" value={category} onChange={handleCategoryChange}>
               <option value="">Tất cả danh mục</option>
               <option value="Makeup cơ bản">Makeup cơ bản</option>
@@ -109,7 +101,7 @@ const Blog = () => {
               <option value="Mẹo làm đẹp">Mẹo làm đẹp</option>
             </select>
           </div>
-          <div className="col-md-3 mb-2">
+          <div className="col-md-4 mb-2">
             <select className="form-select border-pink" value={limit} onChange={handleLimitChange}>
               {[6, 12, 24, 48].map((num) => (
                 <option key={num} value={num}>{num} blog/trang</option>
@@ -127,7 +119,7 @@ const Blog = () => {
           {blogs.map((blog) => (
             <Grid item xs={12} md={4} lg={3} key={blog._id}>
               <BlankCard sx={{ position: "relative", height: "100%" }}>
-                <Box component={Link} href={`/blog/${blog.slug || blog._id}`} sx={{ display: "block" }}>
+                <Box component={Link} href={`/blog/${blog._id || blog.slug}`} sx={{ display: "block" }}>
                   {blog.coverImage ? (
                     <Box sx={{ width: "100%", height: 200, position: "relative" }}>
                       <Image
@@ -148,7 +140,7 @@ const Blog = () => {
                 </Box>
                 <CardContent sx={{ p: 2 }}>
                   <Stack spacing={1}>
-                    <Typography variant="h6" component={Link} href={`/blog/${blog.slug || blog._id}`} sx={{ textDecoration: "none", color: "inherit" }}>
+                    <Typography variant="h6" component={Link} href={`/blog/${blog._id || blog.slug}`} sx={{ textDecoration: "none", color: "inherit" }}>
                       {blog.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" noWrap>
