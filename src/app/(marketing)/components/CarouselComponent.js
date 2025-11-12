@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { useState, useEffect } from "react";
+import Head from "next/head";
 // import SendRequest from "@muahub/utils/SendRequest";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -21,52 +22,63 @@ const LinkName = [
   { name: "Quên mật khẩu", path: "/quen-mat-khau" },
   { name: "Đặt lại mật khẩu", path: "/dat-lai-mat-khau" },
   { name: "Bài viết", path: "/blog" },
-  { name: "Yêu thích", path: "/yeu-thich" }
+  { name: "Yêu thích", path: "/yeu-thích" }
+];
+
+// Move function outside component để tránh tạo lại mỗi render
+const getDefaultBanners = () => [
+  {
+    _id: 'default-1',
+    imageUrl: "/img/carousel.jpg",
+    title: "Trang Điểm Nhanh – Tỏa Sáng Ngay",
+    description: "Đặt lịch makeup trực tuyến dễ dàng. Chuyên gia đến đúng giờ, phong cách theo ý bạn!"
+  },
+  {
+    _id: 'default-2',
+    imageUrl: "/img/carousel1.jpg",
+    title: "Đặt Lịch Makeup Tiện Lợi",
+    description: "Chọn chuyên viên, thời gian và phong cách chỉ trong vài bước. Trải nghiệm dịch vụ chuyên nghiệp."
+  },
+  {
+    _id: 'default-3',
+    imageUrl: "/img/carousel2.jpg",
+    title: "Chuyên Gia Makeup Tận Tâm",
+    description: "Đa dạng phong cách: dự tiệc, cô dâu, cá nhân… Bạn chọn – chúng tôi thực hiện."
+  }
 ];
 
 const CarouselComponent = ({ pathUrl }) => {
-  const [banners, setBanners] = useState([]);
+  const [banners, setBanners] = useState(() => {
+    // Khởi tạo với default banners ngay lập tức để tránh loading state
+    return pathUrl === "/" ? getDefaultBanners() : [];
+  });
   const [loading, setLoading] = useState(false);
 
   // Fetch banners from API
   useEffect(() => {
     if (pathUrl !== "/") return;
-    setLoading(true);
+    
     const fetchBanners = async () => {
       try {
-        const res = await fetch("/api/banners");
+        const res = await fetch("/api/banners", {
+          // Thêm cache control để tăng tốc
+          cache: 'force-cache',
+          next: { revalidate: 300 } // Cache 5 phút
+        });
         const json = await res.json();
         if (json && json.success && Array.isArray(json.data) && json.data.length > 0) {
           setBanners(json.data);
-        } else {
-          setBanners(getDefaultBanners());
         }
+        // Không cần else vì đã có default banners
       } catch (e) {
-        setBanners(getDefaultBanners());
-      } finally {
-        setLoading(false);
+        console.warn('Failed to fetch banners, using default:', e);
+        // Vẫn giữ default banners
       }
     };
+    
+    // Fetch async mà không block UI
     fetchBanners();
   }, [pathUrl]);
-
-  const getDefaultBanners = () => [
-    {
-      imageUrl: "/img/carousel.jpg",
-      title: "Trang Điểm Nhanh – Tỏa Sáng Ngay",
-      description: "Đặt lịch makeup trực tuyến dễ dàng. Chuyên gia đến đúng giờ, phong cách theo ý bạn!"
-    },
-    {
-      imageUrl: "/img/carousel1.jpg",
-      title: "Đặt Lịch Makeup Tiện Lợi",
-      description: "Chọn chuyên viên, thời gian và phong cách chỉ trong vài bước. Trải nghiệm dịch vụ chuyên nghiệp."
-    },
-    {
-      imageUrl: "/img/carousel2.jpg",
-      title: "Chuyên Gia Makeup Tận Tâm",
-      description: "Đa dạng phong cách: dự tiệc, cô dâu, cá nhân… Bạn chọn – chúng tôi thực hiện."
-    }
-  ];
 
   if (pathUrl !== "/") {
     if (pathUrl.startsWith("/makeup-artists/")) {
@@ -126,20 +138,22 @@ const CarouselComponent = ({ pathUrl }) => {
     );
   }
 
-  if (loading) {
-    return (
-      <div
-        className="container-fluid"
-        style={{ height: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  // Bỏ loading state vì đã có default banners
 
   return (
+    <>
+      {/* Preload banner đầu tiên */}
+      {banners.length > 0 && (
+        <Head>
+          <link
+            rel="preload"
+            as="image"
+            href={banners[0].imageUrl}
+            fetchPriority="high"
+          />
+        </Head>
+      )}
+      
     <Swiper
       modules={[Navigation, Pagination, Autoplay]}
       spaceBetween={50}
@@ -155,16 +169,29 @@ const CarouselComponent = ({ pathUrl }) => {
     >
       {banners.map((banner, index) => (
         <SwiperSlide key={banner._id || index}>
-          <img
-            src={banner.imageUrl}
-            className="img-fluid w-100"
-            alt={banner.title || "Banner"}
-            style={{ height: "500px", objectFit: "cover" }}
-            loading={index === 0 ? "eager" : "lazy"}
-            decoding="async"
-            sizes="100vw"
-            fetchPriority={index === 0 ? "high" : "low"}
-          />
+          <div style={{ position: 'relative', height: "500px", backgroundColor: '#f8f9fa' }}>
+            <img
+              src={banner.imageUrl}
+              className="img-fluid w-100"
+              alt={banner.title || "Banner"}
+              style={{ 
+                height: "500px", 
+                objectFit: "cover",
+                transition: 'opacity 0.3s ease'
+              }}
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
+              sizes="100vw"
+              fetchPriority={index === 0 ? "high" : "low"}
+              onLoad={(e) => {
+                e.target.style.opacity = '1';
+              }}
+              onError={(e) => {
+                // Fallback image nếu không load được
+                e.target.src = '/img/carousel.jpg';
+              }}
+            />
+          </div>
           <div className="carousel-caption">
             <div className="container-fluid d-flex justify-content-start align-items-center h-100 ps-4 ps-md-5" style={{ height: '100%' }}>
               <div className="col-xl-7 col-lg-8 col-md-10 col-12">
@@ -199,6 +226,7 @@ const CarouselComponent = ({ pathUrl }) => {
         }
       `}</style>
     </Swiper>
+    </>
   );
 };
 
