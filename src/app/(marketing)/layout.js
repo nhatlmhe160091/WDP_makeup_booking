@@ -68,16 +68,18 @@ const UserAppLayout = ({ children }) => {
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossOrigin="anonymous"
       />
-      {/* Botpress webchat inject - load sau khi trang tương tác */}
+      {/* Botpress webchat inject */}
       <Script
         src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
+        onError={(e) => console.error('Botpress inject failed:', e)}
       />
-      {/* Script botpress content (defer) - đặt sau inject.js */}
+      {/* Botpress config - load sau inject */}
       <Script
         src="https://files.bpcontent.cloud/2025/11/07/06/20251107065809-TY9VOLUP.js"
         strategy="afterInteractive"
-        defer
+        onError={(e) => console.error('Botpress config failed:', e)}
+        onLoad={() => console.log('Botpress loaded successfully')}
       />
       <link href="/lib/css/style.css" rel="stylesheet" />
       <HeaderComponent />
