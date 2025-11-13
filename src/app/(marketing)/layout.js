@@ -50,6 +50,45 @@ const UserAppLayout = ({ children }) => {
 
   return (
     <>
+      {/* CSS cho Botpress webchat - đảm bảo luôn hiển thị trên cùng */}
+      <style jsx global>{`
+        #bp-web-widget,
+        #bp-web-widget-container,
+        [id^="bp-"],
+        [class*="bp-"],
+        .bpWidget,
+        .bpWebchat {
+          z-index: 999999 !important;
+        }
+
+        #bp-web-widget-container {
+          position: fixed !important;
+          z-index: 999999 !important;
+        }
+
+        .bpWidget button,
+        #bp-web-widget button {
+          z-index: 999999 !important;
+          position: fixed !important;
+        }
+
+        .bpWidget iframe,
+        #bp-web-widget iframe {
+          z-index: 999999 !important;
+        }
+
+        .bpWidget,
+        #bp-web-widget {
+          z-index: 999999 !important;
+          position: fixed !important;
+        }
+
+        body #bp-web-widget,
+        body .bpWidget {
+          z-index: 999999 !important;
+        }
+      `}</style>
+
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&display=swap"
         rel="stylesheet"
@@ -68,18 +107,18 @@ const UserAppLayout = ({ children }) => {
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossOrigin="anonymous"
       />
-      {/* Botpress webchat inject */}
+      {/* Botpress webchat - chỉ cho marketing pages */}
       <Script
         src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"
-        strategy="beforeInteractive"
+        strategy="lazyOnload"
         onError={(e) => console.error('Botpress inject failed:', e)}
       />
       {/* Botpress config - load sau inject */}
       <Script
         src="https://files.bpcontent.cloud/2025/11/07/06/20251107065809-TY9VOLUP.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         onError={(e) => console.error('Botpress config failed:', e)}
-        onLoad={() => console.log('Botpress loaded successfully')}
+        onLoad={() => console.log('Botpress loaded successfully for marketing')}
       />
       <link href="/lib/css/style.css" rel="stylesheet" />
       <HeaderComponent />

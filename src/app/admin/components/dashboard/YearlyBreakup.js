@@ -26,19 +26,24 @@ const ProductTotal = () => {
   const primarylight = "#ecf2ff";
   const successlight = theme.palette.success.light;
 
-  // Hàm lấy dữ liệu từ API
-
   // Xử lý dữ liệu sản phẩm cho biểu đồ
   const processProductData = (currentUser) => {
-    const totalPrice = currentUser.totalPrice;
-    const totalWithdrawn = currentUser.withdrawn;
+    // GIẢI THÍCH CÁC TRƯỜNG:
+    // - totalPrice: Tổng tiền CỌC admin đã nhận từ khách hàng (deposit)
+    // - withdrawn: Tổng tiền admin đã RÚT RA khỏi hệ thống
+    // - remaining: Tổng tiền khách hàng CÒN NỢ chưa thanh toán (không liên quan đến admin rút tiền)
+    
+    // Số tiền admin CÓ THỂ SỬ DỤNG = totalPrice - withdrawn
+    const totalPrice = currentUser.totalPrice || 0;
+    const totalWithdrawn = currentUser.withdrawn || 0;
+    const availableToWithdraw = totalPrice - totalWithdrawn; // Tiền admin có thể rút
 
-    setTotal(totalPrice);
-    setAvailable(totalPrice - totalWithdrawn);
-    setUsed(totalWithdrawn);
+    setTotal(totalPrice); // Tổng tiền cọc đã nhận
+    setAvailable(availableToWithdraw); // Còn lại có thể rút
+    setUsed(totalWithdrawn); // Đã rút ra
 
-    // Cập nhật dữ liệu cho biểu đồ
-    setSeries([totalPrice - totalWithdrawn, totalWithdrawn, 0]);
+    // Cập nhật dữ liệu cho biểu đồ: [Còn lại có thể rút, Đã rút, padding]
+    setSeries([availableToWithdraw, totalWithdrawn, 0]);
   };
 
   useEffect(() => {

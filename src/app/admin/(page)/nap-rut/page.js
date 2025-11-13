@@ -125,18 +125,69 @@ const HistoryBankComponent = () => {
   };
 
   const handlePay = async () => {
-    handleExportCSV();
-    for (const id of selectedIds) {
-      await SendRequest("PUT", "/api/refund", {
-        id,
-        status: "completed"
-      });
-    }
-    toast.success("Yêu cầu rút tiền đã được gửi.");
-    setSelectedIds([]);
-    fetchRefunds();
+    try {
+      handleExportCSV();
 
-    setConfirmDialog(false);
+      // Tính tổng số tiền thực tế admin phải chuyển (sau chiết khấu)
+      let totalRealAmount = 0;
+      const refundsToProcess = refunds.filter((r) => selectedIds.includes(r._id));
+
+      // Cập nhật trạng thái từng yêu cầu rút tiền
+      for (const refund of refundsToProcess) {
+        const realAmount = refund.discount 
+          ? refund.totalAmount - refund.totalAmount * (refund.discount / 100) 
+          : refund.totalAmount;
+        
+        totalRealAmount += realAmount;
+
+        await SendRequest("PUT", "/api/refund", {
+          id: refund._id,
+          status: "completed"
+        });
+      }
+
+      // CẬP NHẬT: Admin cũng cần cập nhật withdrawn khi chuyển tiền cho MUA
+      const adminWithdrawn = (currentUser.withdrawn || 0) + totalRealAmount;
+      await SendRequest("PUT", "/api/users", {
+        id: currentUser.id,
+        withdrawn: adminWithdrawn
+      });
+
+      // CẬP NHẬT: Lưu lịch sử admin rút tiền (chuyển cho MUA)
+      await SendRequest("POST", "/api/withdrawn", {
+        ownerId: currentUser.id,
+        bank_info: currentUser.bank_info || "",
+        bank_info_number: currentUser.bank_info_number || "",
+        amount: totalRealAmount
+      });
+      
+      // Đánh dấu lịch sử rút tiền của admin là đã hoàn thành ngay
+      // (vì admin đã chuyển tiền cho MUA rồi)
+      const adminWithdrawHistory = await SendRequest("GET", "/api/withdrawn", {
+        ownerId: currentUser.id
+      });
+      if (adminWithdrawHistory.success && adminWithdrawHistory.data.length > 0) {
+        const latestWithdraw = adminWithdrawHistory.data[0]; // Lấy record mới nhất
+        await SendRequest("PUT", "/api/withdrawn", {
+          id: latestWithdraw._id,
+          status: "CONFIRM" // Đánh dấu là đã xác nhận
+        });
+      }
+
+      // Cập nhật context
+      updateUser({
+        ...currentUser,
+        withdrawn: adminWithdrawn
+      });
+
+      toast.success(`Đã chuyển ${formatCurrency(totalRealAmount)} cho ${selectedIds.length} người`);
+      setSelectedIds([]);
+      fetchRefunds();
+      setConfirmDialog(false);
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Có lỗi xảy ra khi xử lý thanh toán");
+    }
   };
 
   const handleExportCSV = () => {
