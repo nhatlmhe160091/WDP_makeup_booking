@@ -132,7 +132,7 @@ const HistoryBankComponent = () => {
       let totalRealAmount = 0;
       const refundsToProcess = refunds.filter((r) => selectedIds.includes(r._id));
 
-      // Cập nhật trạng thái từng yêu cầu rút tiền
+      // Cập nhật trạng thái từng yêu cầu rút tiền thành "completed"
       for (const refund of refundsToProcess) {
         const realAmount = refund.discount 
           ? refund.totalAmount - refund.totalAmount * (refund.discount / 100) 
@@ -140,45 +140,27 @@ const HistoryBankComponent = () => {
         
         totalRealAmount += realAmount;
 
+        // Cập nhật status = "completed" và thêm transactionDate
         await SendRequest("PUT", "/api/refund", {
           id: refund._id,
-          status: "completed"
+          status: "completed",
+          transactionDate: new Date()
         });
       }
 
-      // CẬP NHẬT: Admin cũng cần cập nhật withdrawn khi chuyển tiền cho MUA
-      const adminWithdrawn = (currentUser.withdrawn || 0) + totalRealAmount;
-      await SendRequest("PUT", "/api/users", {
-        id: currentUser.id,
-        withdrawn: adminWithdrawn
-      });
-
-      // CẬP NHẬT: Lưu lịch sử admin rút tiền (chuyển cho MUA)
-      await SendRequest("POST", "/api/withdrawn", {
-        ownerId: currentUser.id,
-        bank_info: currentUser.bank_info || "",
-        bank_info_number: currentUser.bank_info_number || "",
-        amount: totalRealAmount
-      });
+      // Gọi API đồng bộ lại dữ liệu tài chính của admin từ database
+      // API này sẽ tự động tính lại withdrawn từ tất cả refunds có status = "completed"
+      const syncResponse = await SendRequest("PATCH", "/api/users/admin");
       
-      // Đánh dấu lịch sử rút tiền của admin là đã hoàn thành ngay
-      // (vì admin đã chuyển tiền cho MUA rồi)
-      const adminWithdrawHistory = await SendRequest("GET", "/api/withdrawn", {
-        ownerId: currentUser.id
-      });
-      if (adminWithdrawHistory.success && adminWithdrawHistory.data.length > 0) {
-        const latestWithdraw = adminWithdrawHistory.data[0]; // Lấy record mới nhất
-        await SendRequest("PUT", "/api/withdrawn", {
-          id: latestWithdraw._id,
-          status: "CONFIRM" // Đánh dấu là đã xác nhận
+      if (syncResponse.success) {
+        // Cập nhật context với dữ liệu mới
+        updateUser({
+          ...currentUser,
+          totalPrice: syncResponse.totalPrice,
+          withdrawn: syncResponse.withdrawn,
+          remaining: syncResponse.remaining
         });
       }
-
-      // Cập nhật context
-      updateUser({
-        ...currentUser,
-        withdrawn: adminWithdrawn
-      });
 
       toast.success(`Đã chuyển ${formatCurrency(totalRealAmount)} cho ${selectedIds.length} người`);
       setSelectedIds([]);
