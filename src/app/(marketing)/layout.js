@@ -50,45 +50,6 @@ const UserAppLayout = ({ children }) => {
 
   return (
     <>
-      {/* CSS cho Botpress webchat - đảm bảo luôn hiển thị trên cùng */}
-      <style jsx global>{`
-        #bp-web-widget,
-        #bp-web-widget-container,
-        [id^="bp-"],
-        [class*="bp-"],
-        .bpWidget,
-        .bpWebchat {
-          z-index: 999999 !important;
-        }
-
-        #bp-web-widget-container {
-          position: fixed !important;
-          z-index: 999999 !important;
-        }
-
-        .bpWidget button,
-        #bp-web-widget button {
-          z-index: 999999 !important;
-          position: fixed !important;
-        }
-
-        .bpWidget iframe,
-        #bp-web-widget iframe {
-          z-index: 999999 !important;
-        }
-
-        .bpWidget,
-        #bp-web-widget {
-          z-index: 999999 !important;
-          position: fixed !important;
-        }
-
-        body #bp-web-widget,
-        body .bpWidget {
-          z-index: 999999 !important;
-        }
-      `}</style>
-
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&display=swap"
         rel="stylesheet"
