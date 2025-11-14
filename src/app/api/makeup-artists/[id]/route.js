@@ -79,8 +79,8 @@ export async function GET(request, { params }) {
     // console.log("artist.email", artist.email);
 
     const artistData = {
-      ...artist,
       ...profile,
+      ...artist,
       reviews,
       portfolio,
       certificates,
