@@ -1,6 +1,6 @@
 export const WEB_NAME = "MuaHub";
 
-export const MAIN_URL_APP = "http://localhost:3000";
+export const MAIN_URL_APP = process.env.NEXT_PUBLIC_MAIN_URL_APP;
 
 export const VIDEO_LINK = "https://www.youtube.com/watch?v=6aeqqcG5ACw";
 
