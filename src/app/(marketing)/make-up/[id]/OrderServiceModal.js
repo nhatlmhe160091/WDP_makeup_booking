@@ -90,10 +90,11 @@ console.log('serviceData in OrderServiceModal:', currentUser);
 
       // Gọi hàm onClose từ parent component
       onClose();
+      window.location.reload();
     } catch (error) {
       console.error('Error closing modal:', error);
-      // Vẫn đóng modal ngay cả khi có lỗi giải phóng lock
       onClose();
+      window.location.reload();
     }
   };
 
